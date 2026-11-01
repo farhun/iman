@@ -35,6 +35,18 @@ object PrayerNotificationPublisher {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val selectedSound = when {
+            type == PrayerAlarmType.PRE_PRAYER -> settings.prePrayerNotificationSound
+            else -> when (prayerName) {
+                "Fajr" -> settings.fajrPrayerNotificationSound
+                "Dhuhr" -> settings.dhuhrPrayerNotificationSound
+                "Asr" -> settings.asrPrayerNotificationSound
+                "Maghrib" -> settings.maghribPrayerNotificationSound
+                "Isha" -> settings.ishaPrayerNotificationSound
+                else -> null
+            }
+        }
+
         val content = PrayerNotificationCopy.build(
             context = context,
             settings = settings,
@@ -46,10 +58,11 @@ object PrayerNotificationPublisher {
 
         val builder = NotificationCompat.Builder(
             context,
-            PrayerNotificationScheduler.channelIdForStyle(
-                style = alertStyle,
-                customSoundUriString = settings.prayerNotificationCustomSoundUri
-            )
+            selectedSound?.let(PrayerNotificationScheduler::channelIdForSound)
+                ?: PrayerNotificationScheduler.channelIdForStyle(
+                    style = alertStyle,
+                    customSoundUriString = settings.prayerNotificationCustomSoundUri
+                )
         )
             .setSmallIcon(R.drawable.ic_notification_glyph)
             .setColor(ContextCompat.getColor(context, R.color.splash_background))
@@ -59,7 +72,7 @@ object PrayerNotificationPublisher {
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setPriority(
-                if (alertStyle == "SILENT") {
+                if (selectedSound == "SILENT" || (selectedSound == null && alertStyle == "SILENT")) {
                     NotificationCompat.PRIORITY_LOW
                 } else {
                     NotificationCompat.PRIORITY_HIGH
@@ -68,7 +81,15 @@ object PrayerNotificationPublisher {
             .setAutoCancel(true)
             .setContentIntent(contentIntent)
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O && selectedSound != null) {
+            if (selectedSound == "SILENT") {
+                builder.setSilent(true)
+            } else {
+                PrayerNotificationScheduler.soundUriForSelection(context, selectedSound)?.let(builder::setSound)
+                builder.setDefaults(NotificationCompat.DEFAULT_LIGHTS)
+                builder.setVibrate(longArrayOf(0L, 180L, 120L, 180L))
+            }
+        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             when (alertStyle) {
                 "CUSTOM_SOUND", "SYSTEM_SOUND" -> {
                     builder.setSound(
@@ -85,7 +106,7 @@ object PrayerNotificationPublisher {
                 }
                 "SILENT" -> builder.setSilent(true)
             }
-        } else if (alertStyle == "SILENT") {
+        } else if (selectedSound == "SILENT" || (selectedSound == null && alertStyle == "SILENT")) {
             builder.setSilent(true)
         }
 

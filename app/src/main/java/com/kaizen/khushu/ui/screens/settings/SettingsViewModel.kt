@@ -447,6 +447,14 @@ class SettingsViewModel(
         viewModelScope.launch { repository.updatePrePrayerMinutes(prayerName, minutes.coerceIn(1, 60)) }
     }
 
+    fun setPrayerNotificationSound(prayerName: String, sound: String) {
+        viewModelScope.launch { repository.updatePrayerNotificationSound(prayerName, sound) }
+    }
+
+    fun setPrePrayerNotificationSound(sound: String) {
+        viewModelScope.launch { repository.updatePrePrayerNotificationSound(sound) }
+    }
+
     fun setPrayerNotificationAlertStyle(style: String) {
         viewModelScope.launch { repository.updatePrayerNotificationAlertStyle(style) }
     }

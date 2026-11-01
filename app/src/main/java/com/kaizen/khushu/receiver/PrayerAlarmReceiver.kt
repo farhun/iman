@@ -29,6 +29,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             try {
                 val settings = SettingsRepository(context.applicationContext).settingsFlow.first()
+                PrayerNotificationScheduler(context).syncNotifications(settings)
                 PrayerNotificationScheduler.createNotificationChannels(
                     context,
                     settings.prayerNotificationCustomSoundUri
@@ -49,7 +50,6 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                         triggerAtMillis = triggerAtMillis
                     )
                 )
-                PrayerNotificationScheduler(context).syncNotifications()
             } finally {
                 pendingResult.finish()
             }

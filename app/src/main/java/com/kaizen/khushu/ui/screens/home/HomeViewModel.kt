@@ -12,6 +12,7 @@ import com.kaizen.khushu.data.repository.extraPrayerTimingShortLabel
 import com.kaizen.khushu.data.repository.PrayerTimeRepository
 import com.kaizen.khushu.data.repository.SettingsRepository
 import com.kaizen.khushu.logic.PrayerManager
+import com.kaizen.khushu.notifications.PrayerNotificationScheduler
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
 import com.kaizen.khushu.widget.PrayerWidgetProvider
 import kotlinx.coroutines.CancellationException
@@ -46,7 +47,7 @@ class HomeViewModel(
 
     private val _previewTimeMillis = MutableStateFlow<Long?>(null)
     private val _isRefreshing = MutableStateFlow(false)
-    private val timeFormatter = SimpleDateFormat("h:mm a", Locale.getDefault())
+    private val timeFormatter = SimpleDateFormat("HH:mm", Locale.getDefault())
 
     private var refreshStartedAtMillis = 0L
 
@@ -304,6 +305,7 @@ class HomeViewModel(
                     // Continue with the last saved coordinates if GPS lookup fails.
                 }
                 settingsRepository.updateLocationAndPrayerRefresh(System.currentTimeMillis(), location)
+                PrayerNotificationScheduler(appContext).syncNotifications()
             } finally {
                 try {
                     PrayerWidgetProvider.forceWidgetRefresh(appContext)

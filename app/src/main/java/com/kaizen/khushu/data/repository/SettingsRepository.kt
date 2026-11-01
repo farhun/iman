@@ -28,8 +28,11 @@ object WidgetVisibilityItems {
 }
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+private val PRAYER_SOUND_OPTIONS = setOf("DEFAULT", "ADHAN", "TAKBIR", "SILENT")
 
 class SettingsRepository(private val context: Context) {
+    internal val applicationContext: Context
+        get() = context.applicationContext
 
     private object PreferencesKeys {
         val HAPTICS_ENABLED = booleanPreferencesKey("haptics_enabled")
@@ -122,6 +125,12 @@ class SettingsRepository(private val context: Context) {
         val PRE_PRAYER_MINUTES_MAGHRIB = intPreferencesKey("pre_prayer_minutes_maghrib")
         val PRE_PRAYER_MINUTES_ISHA = intPreferencesKey("pre_prayer_minutes_isha")
         val PRAYER_NOTIFICATION_ALERT_STYLE = stringPreferencesKey("prayer_notification_alert_style")
+        val PRAYER_SOUND_FAJR = stringPreferencesKey("prayer_sound_fajr")
+        val PRAYER_SOUND_DHUHR = stringPreferencesKey("prayer_sound_dhuhr")
+        val PRAYER_SOUND_ASR = stringPreferencesKey("prayer_sound_asr")
+        val PRAYER_SOUND_MAGHRIB = stringPreferencesKey("prayer_sound_maghrib")
+        val PRAYER_SOUND_ISHA = stringPreferencesKey("prayer_sound_isha")
+        val PRE_PRAYER_SOUND = stringPreferencesKey("pre_prayer_sound")
         val PRAYER_NOTIFICATION_CUSTOM_SOUND_URI = stringPreferencesKey("prayer_notification_custom_sound_uri")
         val LAST_DELIVERED_PRAYER_NOTIFICATION_EVENT_ID =
             stringPreferencesKey("last_delivered_prayer_notification_event_id")
@@ -255,6 +264,12 @@ class SettingsRepository(private val context: Context) {
                 ishaPrePrayerMinutes = preferences[PreferencesKeys.PRE_PRAYER_MINUTES_ISHA] ?: 10,
                 prayerNotificationAlertStyle = preferences[PreferencesKeys.PRAYER_NOTIFICATION_ALERT_STYLE]
                     ?: "SYSTEM_SOUND",
+                fajrPrayerNotificationSound = preferences[PreferencesKeys.PRAYER_SOUND_FAJR] ?: "DEFAULT",
+                dhuhrPrayerNotificationSound = preferences[PreferencesKeys.PRAYER_SOUND_DHUHR] ?: "DEFAULT",
+                asrPrayerNotificationSound = preferences[PreferencesKeys.PRAYER_SOUND_ASR] ?: "DEFAULT",
+                maghribPrayerNotificationSound = preferences[PreferencesKeys.PRAYER_SOUND_MAGHRIB] ?: "DEFAULT",
+                ishaPrayerNotificationSound = preferences[PreferencesKeys.PRAYER_SOUND_ISHA] ?: "DEFAULT",
+                prePrayerNotificationSound = preferences[PreferencesKeys.PRE_PRAYER_SOUND] ?: "DEFAULT",
                 prayerNotificationCustomSoundUri = preferences[PreferencesKeys.PRAYER_NOTIFICATION_CUSTOM_SOUND_URI].orEmpty(),
                 lastDeliveredPrayerNotificationEventId = preferences[PreferencesKeys.LAST_DELIVERED_PRAYER_NOTIFICATION_EVENT_ID].orEmpty(),
                 selectedExtraPrayerTimings = preferences[PreferencesKeys.SELECTED_EXTRA_PRAYER_TIMINGS] ?: emptySet(),
@@ -406,6 +421,24 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun updatePrayerNotificationCustomSoundUri(uri: String) {
         context.dataStore.edit { it[PreferencesKeys.PRAYER_NOTIFICATION_CUSTOM_SOUND_URI] = uri }
+    }
+
+    suspend fun updatePrayerNotificationSound(prayerName: String, sound: String) {
+        val key = when (prayerName) {
+            "Fajr" -> PreferencesKeys.PRAYER_SOUND_FAJR
+            "Dhuhr" -> PreferencesKeys.PRAYER_SOUND_DHUHR
+            "Asr" -> PreferencesKeys.PRAYER_SOUND_ASR
+            "Maghrib" -> PreferencesKeys.PRAYER_SOUND_MAGHRIB
+            "Isha" -> PreferencesKeys.PRAYER_SOUND_ISHA
+            else -> return
+        }
+        val selectedSound = sound.takeIf { it in PRAYER_SOUND_OPTIONS } ?: "DEFAULT"
+        context.dataStore.edit { it[key] = selectedSound }
+    }
+
+    suspend fun updatePrePrayerNotificationSound(sound: String) {
+        val selectedSound = sound.takeIf { it in PRAYER_SOUND_OPTIONS } ?: "DEFAULT"
+        context.dataStore.edit { it[PreferencesKeys.PRE_PRAYER_SOUND] = selectedSound }
     }
 
     suspend fun updateLastDeliveredPrayerNotificationEventId(eventId: String) {
@@ -742,6 +775,12 @@ data class UserSettings(
     val maghribPrePrayerMinutes: Int = 10,
     val ishaPrePrayerMinutes: Int = 10,
     val prayerNotificationAlertStyle: String = "SYSTEM_SOUND",
+    val fajrPrayerNotificationSound: String = "DEFAULT",
+    val dhuhrPrayerNotificationSound: String = "DEFAULT",
+    val asrPrayerNotificationSound: String = "DEFAULT",
+    val maghribPrayerNotificationSound: String = "DEFAULT",
+    val ishaPrayerNotificationSound: String = "DEFAULT",
+    val prePrayerNotificationSound: String = "DEFAULT",
     val prayerNotificationCustomSoundUri: String = "",
     val lastDeliveredPrayerNotificationEventId: String = "",
     val selectedExtraPrayerTimings: Set<String> = emptySet(),

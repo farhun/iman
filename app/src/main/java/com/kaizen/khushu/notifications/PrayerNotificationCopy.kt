@@ -168,7 +168,7 @@ object PrayerNotificationCopy {
     }
 
     private fun formatTime(triggerAtMillis: Long): String {
-        return SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date(triggerAtMillis))
+        return SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(triggerAtMillis))
     }
 
     @Suppress("DEPRECATION")

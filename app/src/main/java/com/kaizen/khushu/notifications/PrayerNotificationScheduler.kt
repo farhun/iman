@@ -11,11 +11,17 @@ import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
+import android.provider.Settings
+import android.util.Log
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import com.kaizen.khushu.MainActivity
 import com.kaizen.khushu.data.repository.PrayerTimeRepository
 import com.kaizen.khushu.data.repository.SettingsRepository
 import com.kaizen.khushu.data.repository.UserSettings
 import com.kaizen.khushu.data.repository.EXTRA_PRAYER_TIMINGS
 import com.kaizen.khushu.receiver.PrayerAlarmReceiver
+import com.kaizen.khushu.receiver.PrayerRescheduleReceiver
 import kotlinx.coroutines.flow.first
 import java.util.Calendar
 import java.util.Date
@@ -47,6 +53,12 @@ data class PrayerNotificationScheduleConfig(
     val asrPrePrayerMinutes: Int,
     val maghribPrePrayerMinutes: Int,
     val ishaPrePrayerMinutes: Int,
+    val fajrPrayerNotificationSound: String,
+    val dhuhrPrayerNotificationSound: String,
+    val asrPrayerNotificationSound: String,
+    val maghribPrayerNotificationSound: String,
+    val ishaPrayerNotificationSound: String,
+    val prePrayerNotificationSound: String,
     val prayerNotificationAlertStyle: String,
     val extraPrayerNotifications: Set<String>,
 )
@@ -79,6 +91,12 @@ fun UserSettings.toPrayerNotificationScheduleConfig(): PrayerNotificationSchedul
         asrPrePrayerMinutes = asrPrePrayerMinutes,
         maghribPrePrayerMinutes = maghribPrePrayerMinutes,
         ishaPrePrayerMinutes = ishaPrePrayerMinutes,
+        fajrPrayerNotificationSound = fajrPrayerNotificationSound,
+        dhuhrPrayerNotificationSound = dhuhrPrayerNotificationSound,
+        asrPrayerNotificationSound = asrPrayerNotificationSound,
+        maghribPrayerNotificationSound = maghribPrayerNotificationSound,
+        ishaPrayerNotificationSound = ishaPrayerNotificationSound,
+        prePrayerNotificationSound = prePrayerNotificationSound,
         prayerNotificationAlertStyle = prayerNotificationAlertStyle,
         extraPrayerNotifications = extraPrayerNotifications,
     )
@@ -96,6 +114,7 @@ class PrayerNotificationScheduler(
         val currentSettings = settings ?: settingsRepository.settingsFlow.first()
         createNotificationChannels(appContext, currentSettings.prayerNotificationCustomSoundUri)
         cancelAllScheduledNotifications()
+        scheduleMidnightReschedule()
         if (!hasAnyNotificationEnabled(currentSettings)) return
 
         val now = System.currentTimeMillis()
@@ -106,7 +125,7 @@ class PrayerNotificationScheduler(
 
         for (anchor in datesToSchedule) {
             val targetDate = anchor.resolve()
-            val prayerTimes = prayerTimeRepository.getEffectivePrayerDateTimes(
+            val prayerTimes = prayerTimeRepository.getPrayerDateTimesForScheduling(
                 date = targetDate,
                 settings = currentSettings
             )
@@ -160,7 +179,7 @@ class PrayerNotificationScheduler(
         val currentSettings = settings ?: settingsRepository.settingsFlow.first()
         if (!hasAnyNotificationEnabled(currentSettings)) return
 
-        val prayerTimes = prayerTimeRepository.getEffectivePrayerDateTimes(
+        val prayerTimes = prayerTimeRepository.getPrayerDateTimesForScheduling(
             date = Date(nowMillis),
             settings = currentSettings
         )
@@ -233,7 +252,7 @@ class PrayerNotificationScheduler(
                         type = type,
                         prePrayerMinutes = 0,
                         triggerAtMillis = 0L,
-                        flags = PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+                        flags = PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                     )
                     if (pendingIntent != null) {
                         alarmManager.cancel(pendingIntent)
@@ -244,12 +263,49 @@ class PrayerNotificationScheduler(
         }
     }
 
+    private fun scheduleMidnightReschedule() {
+        val midnight = Calendar.getInstance().apply {
+            add(Calendar.DAY_OF_YEAR, 1)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+        val intent = Intent(appContext, PrayerRescheduleReceiver::class.java).apply {
+            action = ACTION_RESCHEDULE_AT_MIDNIGHT
+            data = Uri.parse("khushu://prayer-reminders/midnight")
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            appContext,
+            MIDNIGHT_RESCHEDULE_REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()) -> {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, midnight, pendingIntent)
+            }
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, midnight, pendingIntent)
+            }
+            else -> alarmManager.setExact(AlarmManager.RTC_WAKEUP, midnight, pendingIntent)
+        }
+        Log.d(TAG, "Scheduled midnight reschedule at ${Date(midnight)} ($midnight)")
+    }
+
     private fun schedulePrayerAlarm(
         prayerName: String,
         triggerAtMillis: Long,
         type: PrayerAlarmType,
         prePrayerMinutes: Int,
     ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+            showExactAlarmPermissionPrompt()
+            return
+        }
+
         val requestDay = dayStamp(triggerAtMillis)
         val pendingIntent = buildAlarmPendingIntent(
             prayerName = prayerName,
@@ -260,18 +316,68 @@ class PrayerNotificationScheduler(
             flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         ) ?: return
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setAndAllowWhileIdle(
+        if (type == PrayerAlarmType.PRAYER) {
+            val showIntent = Intent(appContext, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                data = Uri.parse("khushu://prayer-alarm/$requestDay/$prayerName")
+            }
+            val showPendingIntent = PendingIntent.getActivity(
+                appContext,
+                requestCode(prayerName, requestDay, type) xor Int.MIN_VALUE,
+                showIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            alarmManager.setAlarmClock(
+                AlarmManager.AlarmClockInfo(triggerAtMillis, showPendingIntent),
+                pendingIntent
+            )
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
                 triggerAtMillis,
                 pendingIntent
             )
         } else {
-            alarmManager.setExact(
-                AlarmManager.RTC_WAKEUP,
-                triggerAtMillis,
-                pendingIntent
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+        }
+        Log.d(TAG, "Scheduled ${type.name} reminder for $prayerName at ${Date(triggerAtMillis)} ($triggerAtMillis)")
+    }
+
+    private fun showExactAlarmPermissionPrompt() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
+        val manager = appContext.getSystemService(NotificationManager::class.java)
+        if (manager.getNotificationChannel(EXACT_ALARM_PERMISSION_CHANNEL) == null) {
+            manager.createNotificationChannel(
+                NotificationChannel(
+                    EXACT_ALARM_PERMISSION_CHANNEL,
+                    "Reminder setup",
+                    NotificationManager.IMPORTANCE_HIGH
+                ).apply { lockscreenVisibility = Notification.VISIBILITY_PUBLIC }
             )
+        }
+        val settingsIntent = Intent(
+            Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+            Uri.parse("package:${appContext.packageName}")
+        ).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
+        val settingsPendingIntent = PendingIntent.getActivity(
+            appContext,
+            EXACT_ALARM_PERMISSION_NOTIFICATION_ID,
+            settingsIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val notification = NotificationCompat.Builder(appContext, EXACT_ALARM_PERMISSION_CHANNEL)
+            .setSmallIcon(com.kaizen.khushu.R.drawable.ic_notification_glyph)
+            .setContentTitle("Enable exact alarms")
+            .setContentText("Allow exact alarms to receive prayer reminders on time.")
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setContentIntent(settingsPendingIntent)
+            .addAction(0, "Open Settings", settingsPendingIntent)
+            .build()
+        runCatching {
+            NotificationManagerCompat.from(appContext)
+                .notify(EXACT_ALARM_PERMISSION_NOTIFICATION_ID, notification)
         }
     }
 
@@ -348,7 +454,14 @@ class PrayerNotificationScheduler(
     }
 
     private fun requestCode(prayerName: String, requestDay: String, type: PrayerAlarmType): Int {
-        return "$prayerName|$requestDay|${type.name}".hashCode()
+        val day = requestDay.toInt()
+        val year = day / 10_000
+        val month = day / 100 % 100
+        val monthDay = day % 100
+        val prayerIndex = (listOf("Fajr", "Dhuhr", "Asr", "Maghrib", "Isha") + EXTRA_PRAYER_TIMINGS.map { it.id })
+            .indexOf(prayerName)
+            .let { if (it >= 0) it else 15 }
+        return (((year * 13 + month) * 32 + monthDay) * 32) + prayerIndex * 2 + type.ordinal
     }
 
     private suspend fun deliverIfNeeded(
@@ -412,7 +525,16 @@ class PrayerNotificationScheduler(
         const val CHANNEL_SYSTEM_SOUND = "prayer_reminders_system_sound_v2"
         const val CHANNEL_CUSTOM_SOUND_PREFIX = "prayer_reminders_custom_sound_v3_"
         const val CHANNEL_VIBRATION = "prayer_reminders_vibration_v2"
-        const val CHANNEL_SILENT = "prayer_reminders_silent_v2"
+        const val CHANNEL_SILENT = "prayer_reminders_silent_v3"
+        const val CHANNEL_PRAYER_DEFAULT = "prayer_default"
+        const val CHANNEL_PRAYER_ADHAN = "prayer_adhan"
+        const val CHANNEL_PRAYER_TAKBIR = "prayer_takbir"
+        const val CHANNEL_PRAYER_SILENT = "prayer_silent"
+        private const val EXACT_ALARM_PERMISSION_CHANNEL = "exact_alarm_permission_v1"
+        private const val MIDNIGHT_RESCHEDULE_REQUEST_CODE = 0x4D49444E
+        private const val ACTION_RESCHEDULE_AT_MIDNIGHT = "com.kaizen.khushu.action.RESCHEDULE_AT_MIDNIGHT"
+        private const val EXACT_ALARM_PERMISSION_NOTIFICATION_ID = 27104
+        private const val TAG = "PrayerAlarmScheduler"
 
         fun createNotificationChannels(
             context: Context,
@@ -430,6 +552,42 @@ class PrayerNotificationScheduler(
                 ?.let(Uri::parse)
                 ?: defaultCustomSoundUri()
             val channels = listOf(
+                NotificationChannel(
+                    CHANNEL_PRAYER_DEFAULT,
+                    "Prayer Sound: Default",
+                    NotificationManager.IMPORTANCE_HIGH
+                ).apply {
+                    setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), audioAttributes)
+                    enableVibration(true)
+                    lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                },
+                NotificationChannel(
+                    CHANNEL_PRAYER_ADHAN,
+                    "Prayer Sound: Adhan",
+                    NotificationManager.IMPORTANCE_HIGH
+                ).apply {
+                    setSound(soundUriForSelection(context, "ADHAN"), audioAttributes)
+                    enableVibration(true)
+                    lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                },
+                NotificationChannel(
+                    CHANNEL_PRAYER_TAKBIR,
+                    "Prayer Sound: Takbir",
+                    NotificationManager.IMPORTANCE_HIGH
+                ).apply {
+                    setSound(soundUriForSelection(context, "TAKBIR"), audioAttributes)
+                    enableVibration(true)
+                    lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                },
+                NotificationChannel(
+                    CHANNEL_PRAYER_SILENT,
+                    "Prayer Sound: Silent",
+                    NotificationManager.IMPORTANCE_HIGH
+                ).apply {
+                    setSound(null, null)
+                    enableVibration(false)
+                    lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                },
                 NotificationChannel(
                     CHANNEL_SYSTEM_SOUND,
                     "Prayer Reminders",
@@ -464,7 +622,7 @@ class PrayerNotificationScheduler(
                 NotificationChannel(
                     CHANNEL_SILENT,
                     "Prayer Reminders Silent",
-                    NotificationManager.IMPORTANCE_LOW
+                    NotificationManager.IMPORTANCE_HIGH
                 ).apply {
                     description = "Prayer reminders with no sound or vibration"
                     setSound(null, null)
@@ -476,6 +634,20 @@ class PrayerNotificationScheduler(
             channels.forEach { channel ->
                 notificationManager.createNotificationChannel(channel)
             }
+        }
+
+        fun channelIdForSound(sound: String): String = when (sound) {
+            "ADHAN" -> CHANNEL_PRAYER_ADHAN
+            "TAKBIR" -> CHANNEL_PRAYER_TAKBIR
+            "SILENT" -> CHANNEL_PRAYER_SILENT
+            else -> CHANNEL_PRAYER_DEFAULT
+        }
+
+        fun soundUriForSelection(context: Context, sound: String): Uri? = when (sound) {
+            "ADHAN" -> Uri.parse("android.resource://${context.packageName}/${com.kaizen.khushu.R.raw.adhan}")
+            "TAKBIR" -> Uri.parse("android.resource://${context.packageName}/${com.kaizen.khushu.R.raw.takbir}")
+            "SILENT" -> null
+            else -> RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         }
 
         fun channelIdForStyle(

@@ -102,6 +102,7 @@ import kotlin.math.min
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.compose.ui.graphics.drawscope.rotate
 
 private fun findNextPrayer(prayers: List<PrayerInfo>, now: Long): PrayerInfo? {
     if (prayers.isEmpty()) return null
@@ -129,7 +130,7 @@ private fun qiblaBearingDegrees(latitude: Double, longitude: Double): Double {
     val kaabaLatRad = Math.toRadians(KAABA_LATITUDE)
     val kaabaLngRad = Math.toRadians(KAABA_LONGITUDE)
     val deltaLng = kaabaLngRad - lngRad
-    val y = sin(deltaLng)
+    val y = sin(deltaLng) * cos(kaabaLatRad)
     val x = cos(latRad) * sin(kaabaLatRad) - sin(latRad) * cos(kaabaLatRad) * cos(deltaLng)
     return (Math.toDegrees(atan2(y, x)) + 360.0) % 360.0
 }
@@ -141,38 +142,114 @@ private fun compassPointLabel(bearing: Double): String {
     return points[index]
 }
 
+private data class CompassState(val heading: Float?, val accuracy: Int)
 @Composable
-private fun rememberDeviceHeading(): Float? {
+private fun rememberDeviceHeading(latitude: Float, longitude: Float): CompassState {
     val context = LocalContext.current
     val sensorManager = remember {
         context.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
     }
     val headingState = remember { mutableStateOf<Float?>(null) }
+    val accuracyState = remember { mutableStateOf(SensorManager.SENSOR_STATUS_ACCURACY_HIGH) }
+    val declination = remember(latitude, longitude) {
+        android.hardware.GeomagneticField(
+            latitude, longitude, 0f, System.currentTimeMillis()
+        ).declination
+    }
 
-    DisposableEffect(sensorManager) {
+    DisposableEffect(sensorManager, declination) {
         val manager = sensorManager
         val rotationSensor = manager?.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
+            ?: manager?.getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR)
+        val magnetSensor = manager?.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
         if (manager == null || rotationSensor == null) {
             onDispose { }
         } else {
             val rotationMatrix = FloatArray(9)
-            val orientation = FloatArray(3)
+            var sinAvg = 0.0
+            var cosAvg = 0.0
+            var initialized = false
+            var lastShown = Float.NaN
+            val alpha = 0.12
+
             val listener = object : SensorEventListener {
                 override fun onSensorChanged(event: SensorEvent) {
                     SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
-                    SensorManager.getOrientation(rotationMatrix, orientation)
-                    val azimuthDeg = Math.toDegrees(orientation[0].toDouble()).toFloat()
-                    headingState.value = (azimuthDeg + 360f) % 360f
+                    val r = rotationMatrix
+
+                    // 1.0 = flat (use top edge), 0.0 = upright (use back of phone)
+                    val up = Math.abs(r[8].toDouble())
+                    val wTop = ((up - 0.5) / 0.35).coerceIn(0.0, 1.0)
+
+                    // Horizontal (east, north) parts of the top edge and the back
+                    val topE = r[1].toDouble()
+                    val topN = r[4].toDouble()
+                    val backE = -r[2].toDouble()
+                    val backN = -r[5].toDouble()
+                    val topLen = Math.hypot(topE, topN)
+                    val backLen = Math.hypot(backE, backN)
+
+                    var vE = 0.0
+                    var vN = 0.0
+                    if (topLen > 0.2 && wTop > 0.0) {
+                        vE += wTop * topE / topLen
+                        vN += wTop * topN / topLen
+                    }
+                    if (backLen > 0.2 && wTop < 1.0) {
+                        vE += (1.0 - wTop) * backE / backLen
+                        vN += (1.0 - wTop) * backN / backLen
+                    }
+
+                    // Direction is ambiguous here: keep the last heading instead of jumping
+                    if (Math.hypot(vE, vN) < 0.3) return
+
+                    val magneticDeg = Math.toDegrees(atan2(vE, vN))
+                    val trueDeg = (magneticDeg + declination + 720.0) % 360.0
+
+                    val rad = Math.toRadians(trueDeg)
+                    if (!initialized) {
+                        sinAvg = sin(rad)
+                        cosAvg = cos(rad)
+                        initialized = true
+                    } else {
+                        sinAvg = sinAvg * (1 - alpha) + sin(rad) * alpha
+                        cosAvg = cosAvg * (1 - alpha) + cos(rad) * alpha
+                    }
+                    val smoothed =
+                        ((Math.toDegrees(atan2(sinAvg, cosAvg)) + 360.0) % 360.0).toFloat()
+
+                    val diff = if (lastShown.isNaN()) 360f
+                    else Math.abs(((smoothed - lastShown + 540f) % 360f) - 180f)
+                    if (diff >= 1f) {
+                        lastShown = smoothed
+                        headingState.value = smoothed
+                    }
                 }
 
                 override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
             }
-            manager.registerListener(listener, rotationSensor, SensorManager.SENSOR_DELAY_UI)
-            onDispose { manager.unregisterListener(listener) }
+
+            val accuracyListener = object : SensorEventListener {
+                override fun onSensorChanged(event: SensorEvent) = Unit
+                override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+                    accuracyState.value = accuracy
+                }
+            }
+
+            manager.registerListener(listener, rotationSensor, SensorManager.SENSOR_DELAY_GAME)
+            if (magnetSensor != null) {
+                manager.registerListener(
+                    accuracyListener, magnetSensor, SensorManager.SENSOR_DELAY_UI
+                )
+            }
+            onDispose {
+                manager.unregisterListener(listener)
+                manager.unregisterListener(accuracyListener)
+            }
         }
     }
 
-    return headingState.value
+    return CompassState(headingState.value, accuracyState.value)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -184,7 +261,10 @@ private fun QiblaCompassDialog(
     longitude: Float,
     onDismiss: () -> Unit,
 ) {
-    val heading = rememberDeviceHeading()
+    val compass = rememberDeviceHeading(latitude, longitude)
+    val heading = compass.heading
+    val needsCalibration =
+        heading != null && compass.accuracy <= SensorManager.SENSOR_STATUS_ACCURACY_LOW
     val relativeBearing = heading?.let { ((bearingDegrees - it + 360.0) % 360.0).toFloat() }
     val ringColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f)
     val northTickColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f)
@@ -221,48 +301,58 @@ private fun QiblaCompassDialog(
                             radius = radius,
                             style = androidx.compose.ui.graphics.drawscope.Stroke(width = stroke)
                         )
-                        drawLine(
-                            color = northTickColor,
-                            start = center.copy(y = center.y - radius),
-                            end = center.copy(y = center.y - radius + 22.dp.toPx()),
-                            strokeWidth = 3.dp.toPx(),
-                            cap = StrokeCap.Round
-                        )
-                        drawLine(
-                            color = needleColor,
-                            start = center,
-                            end = androidx.compose.ui.geometry.Offset(
-                                x = center.x + sin(
-                                    Math.toRadians(
-                                        (relativeBearing ?: 0f).toDouble()
-                                    )
-                                ).toFloat() * radius * 0.78f,
-                                y = center.y - cos(
-                                    Math.toRadians(
-                                        (relativeBearing ?: 0f).toDouble()
-                                    )
-                                ).toFloat() * radius * 0.78f
-                            ),
-                            strokeWidth = 6.dp.toPx(),
-                            cap = StrokeCap.Round
-                        )
+                        rotate(degrees = -(heading ?: 0f), pivot = center) {
+                            drawLine(
+                                color = northTickColor,
+                                start = center.copy(y = center.y - radius),
+                                end = center.copy(y = center.y - radius + 22.dp.toPx()),
+                                strokeWidth = 3.dp.toPx(),
+                                cap = StrokeCap.Round
+                            )
+                        }
+                        if (relativeBearing != null) {
+                            drawLine(
+                                color = needleColor,
+                                start = center,
+                                end = androidx.compose.ui.geometry.Offset(
+                                    x = center.x + sin(
+                                        Math.toRadians(
+                                            (relativeBearing ?: 0f).toDouble()
+                                        )
+                                    ).toFloat() * radius * 0.78f,
+                                    y = center.y - cos(
+                                        Math.toRadians(
+                                            (relativeBearing ?: 0f).toDouble()
+                                        )
+                                    ).toFloat() * radius * 0.78f
+                                ),
+                                strokeWidth = 6.dp.toPx(),
+                                cap = StrokeCap.Round
+                            )
+                        }
                         drawCircle(
                             color = needleColor,
                             radius = 7.dp.toPx(),
                             center = center
                         )
                     }
-                    Text(
-                        text = "N",
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            fontFamily = BeVietnamPro,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
+                    Box(
                         modifier = Modifier
-                            .align(Alignment.TopCenter)
-                            .padding(top = 18.dp)
-                    )
+                            .size(220.dp)
+                            .graphicsLayer { rotationZ = -(heading ?: 0f) }
+                    ) {
+                        Text(
+                            text = "N",
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                fontFamily = BeVietnamPro,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .padding(top = 18.dp)
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.height(14.dp))
                 Text(
@@ -279,6 +369,15 @@ private fun QiblaCompassDialog(
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(top = 6.dp)
                 )
+                if (needsCalibration) {
+                    Text(
+                        text = "Compass needs calibration. Move your phone in a figure-8 motion.",
+                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = BeVietnamPro),
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 6.dp)
+                    )
+                }
                 Text(
                     text = "Coordinates: ${"%.4f".format(Locale.US, latitude)}, ${"%.4f".format(Locale.US, longitude)}",
                     style = MaterialTheme.typography.bodySmall.copy(fontFamily = BeVietnamPro),

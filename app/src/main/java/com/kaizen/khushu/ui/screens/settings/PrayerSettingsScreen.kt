@@ -102,6 +102,13 @@ private val alertStyleLabels = mapOf(
     "SILENT" to "Silent"
 )
 
+private val prayerSoundLabels = mapOf(
+    "DEFAULT" to "Default",
+    "ADHAN" to "Adhan",
+    "TAKBIR" to "Takbir",
+    "SILENT" to "Silent"
+)
+
 
 private fun prayerSettingLabel(value: String, labels: Map<String, String>): String {
     return labels[value] ?: value
@@ -119,6 +126,7 @@ private data class PrayerNotificationPreference(
     val prayerEnabled: Boolean,
     val prePrayerEnabled: Boolean,
     val prePrayerMinutes: Int,
+    val prayerSound: String,
 )
 
 private data class ExtraTimingPreference(
@@ -139,7 +147,7 @@ fun PrayerSettingsScreen(
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val notificationsAllowed = NotificationManagerCompat.from(context).areNotificationsEnabled()
     val lastRefreshed = if (settings.lastPrayerRefreshEpochMs > 0L) {
-        SimpleDateFormat("d MMM, h:mm a", Locale.getDefault()).format(Date(settings.lastPrayerRefreshEpochMs))
+        SimpleDateFormat("d MMM, HH:mm", Locale.getDefault()).format(Date(settings.lastPrayerRefreshEpochMs))
     } else {
         "Not refreshed yet"
     }
@@ -180,37 +188,43 @@ fun PrayerSettingsScreen(
     val madhabs = listOf("SHAFI", "HANAFI")
     val sources = listOf("LOCAL", "API")
     val alertStyleOptions = listOf("CUSTOM_SOUND", "SYSTEM_SOUND", "VIBRATION", "SILENT")
+    val prayerSoundOptions = listOf("DEFAULT", "ADHAN", "TAKBIR", "SILENT")
 
     val prayerNotificationPreferences = listOf(
         PrayerNotificationPreference(
             "Fajr",
             settings.fajrPrayerNotificationEnabled,
             settings.fajrPrePrayerNotificationEnabled,
-            settings.fajrPrePrayerMinutes
+            settings.fajrPrePrayerMinutes,
+            settings.fajrPrayerNotificationSound
         ),
         PrayerNotificationPreference(
             "Dhuhr",
             settings.dhuhrPrayerNotificationEnabled,
             settings.dhuhrPrePrayerNotificationEnabled,
-            settings.dhuhrPrePrayerMinutes
+            settings.dhuhrPrePrayerMinutes,
+            settings.dhuhrPrayerNotificationSound
         ),
         PrayerNotificationPreference(
             "Asr",
             settings.asrPrayerNotificationEnabled,
             settings.asrPrePrayerNotificationEnabled,
-            settings.asrPrePrayerMinutes
+            settings.asrPrePrayerMinutes,
+            settings.asrPrayerNotificationSound
         ),
         PrayerNotificationPreference(
             "Maghrib",
             settings.maghribPrayerNotificationEnabled,
             settings.maghribPrePrayerNotificationEnabled,
-            settings.maghribPrePrayerMinutes
+            settings.maghribPrePrayerMinutes,
+            settings.maghribPrayerNotificationSound
         ),
         PrayerNotificationPreference(
             "Isha",
             settings.ishaPrayerNotificationEnabled,
             settings.ishaPrePrayerNotificationEnabled,
-            settings.ishaPrePrayerMinutes
+            settings.ishaPrePrayerMinutes,
+            settings.ishaPrayerNotificationSound
         )
     )
     val extraTimingPreferences = EXTRA_PRAYER_TIMINGS.map {
@@ -383,8 +397,8 @@ fun PrayerSettingsScreen(
 
                 Box(modifier = Modifier.padding(horizontal = 20.dp)) {
                     SettingsDropdown(
-                        title = "Alert style",
-                        subtitle = "Choose how prayer reminders sound or behave.",
+                        title = "Extra timing alert style",
+                        subtitle = "Choose how extra timing notifications sound or behave.",
                         options = alertStyleOptions,
                         selectedOption = settings.prayerNotificationAlertStyle,
                         optionLabel = { alertStyleLabels[it] ?: it },
@@ -441,6 +455,17 @@ fun PrayerSettingsScreen(
                     }
                 }
 
+                Box(modifier = Modifier.padding(horizontal = 20.dp)) {
+                    SettingsDropdown(
+                        title = "Pre-prayer reminder sound",
+                        subtitle = "Shared by all pre-prayer reminders.",
+                        options = prayerSoundOptions,
+                        selectedOption = settings.prePrayerNotificationSound,
+                        optionLabel = { prayerSoundLabels[it] ?: it },
+                        onOptionSelected = viewModel::setPrePrayerNotificationSound
+                    )
+                }
+
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     prayerNotificationPreferences.forEach { preference ->
                         PrayerReminderCard(
@@ -459,6 +484,9 @@ fun PrayerSettingsScreen(
                             },
                             onPrePrayerMinutesChange = { minutes ->
                                 viewModel.setPrePrayerMinutes(preference.prayerName, minutes)
+                            },
+                            onPrayerSoundChange = { sound ->
+                                viewModel.setPrayerNotificationSound(preference.prayerName, sound)
                             }
                         )
                     }
@@ -712,6 +740,7 @@ private fun PrayerReminderCard(
     onPrayerToggle: (Boolean) -> Unit,
     onPrePrayerToggle: (Boolean) -> Unit,
     onPrePrayerMinutesChange: (Int) -> Unit,
+    onPrayerSoundChange: (String) -> Unit,
 ) {
     val summary = buildString {
         append(if (preference.prayerEnabled) "Prayer on" else "Prayer off")
@@ -742,6 +771,14 @@ private fun PrayerReminderCard(
             subtitle = "Alert when ${preference.prayerName} starts.",
             checked = preference.prayerEnabled,
             onCheckedChange = onPrayerToggle
+        )
+        SettingsDropdown(
+            title = "Prayer reminder sound",
+            subtitle = "Sound used for the ${preference.prayerName} reminder.",
+            options = listOf("DEFAULT", "ADHAN", "TAKBIR", "SILENT"),
+            selectedOption = preference.prayerSound,
+            optionLabel = { prayerSoundLabels[it] ?: it },
+            onOptionSelected = onPrayerSoundChange
         )
         SettingsToggleItem(
             title = "Pre-prayer notification",

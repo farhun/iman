@@ -7,9 +7,15 @@ import com.batoulapps.adhan2.CalculationParameters
 import com.batoulapps.adhan2.Coordinates
 import com.batoulapps.adhan2.Madhab
 import com.batoulapps.adhan2.PrayerTimes
+import android.content.Context
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import com.batoulapps.adhan2.SunnahTimes
 import com.batoulapps.adhan2.data.DateComponents
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
@@ -20,6 +26,8 @@ import java.net.URLEncoder
 import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.TimeUnit
+
+private val Context.prayerTimesDataStore by preferencesDataStore(name = "prayer_times")
 
 fun Instant.toDate(): Date = Date(this.toEpochMilliseconds())
 
@@ -34,6 +42,7 @@ class PrayerTimeRepository(
 ) {
     private val client = OkHttpClient()
     private val json = Json { ignoreUnknownKeys = true }
+    private val context = settingsRepository.applicationContext
 
     fun usesApiSource(settings: UserSettings): Boolean {
         return settings.prayerSourceType == "API" ||
@@ -73,7 +82,7 @@ class PrayerTimeRepository(
         val coordinates = Coordinates(lat, lng)
         val calendar = Calendar.getInstance().apply { time = date }
         val dateComponents = DateComponents(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH))
-        
+
         val parameters = getCalculationParameters(methodStr).copy(
             madhab = if (madhabStr == "HANAFI") Madhab.HANAFI else Madhab.SHAFI
         )
@@ -135,14 +144,59 @@ class PrayerTimeRepository(
         val maghrib = if (isApiSource) parseApiTime("Maghrib", localPrayerTimes.maghrib.toDate()) else localPrayerTimes.maghrib.toDate()
         val isha = if (isApiSource) parseApiTime("Isha", localPrayerTimes.isha.toDate()) else localPrayerTimes.isha.toDate()
 
-        return mapOf(
+        val prayerTimes = mapOf(
             "Fajr" to applyOffset(fajr, settings.fajrOffsetMinutes),
             "Dhuhr" to applyOffset(dhuhr, settings.dhuhrOffsetMinutes),
             "Asr" to applyOffset(asr, settings.asrOffsetMinutes),
             "Maghrib" to applyOffset(maghrib, settings.maghribOffsetMinutes),
             "Isha" to applyOffset(isha, settings.ishaOffsetMinutes)
         )
+        savePrayerDateTimes(date, settings, prayerTimes)
+        return prayerTimes
     }
+
+    suspend fun getPrayerDateTimesForScheduling(date: Date, settings: UserSettings): Map<String, Date> {
+        getSavedPrayerDateTimes(date, settings)?.let { return it }
+        getEffectivePrayerDateTimes(date, settings)
+        return getSavedPrayerDateTimes(date, settings).orEmpty()
+    }
+
+    private suspend fun getSavedPrayerDateTimes(date: Date, settings: UserSettings): Map<String, Date>? {
+        val dateKey = dateKey(date)
+        val preferences = context.prayerTimesDataStore.data.first()
+        if (preferences[stringPreferencesKey("date_$dateKey")] != dateKey ||
+            preferences[stringPreferencesKey("settings_$dateKey")] != prayerSettingsSignature(settings)
+        ) return null
+
+        val times = listOf("Fajr", "Dhuhr", "Asr", "Maghrib", "Isha").mapNotNull { name ->
+            val millis = preferences[longPreferencesKey("${name.lowercase()}_$dateKey")] ?: return@mapNotNull null
+            name to Date(millis)
+        }.toMap()
+        return times.takeIf { it.size == 5 }
+    }
+
+    private suspend fun savePrayerDateTimes(date: Date, settings: UserSettings, times: Map<String, Date>) {
+        val dateKey = dateKey(date)
+        context.prayerTimesDataStore.edit { preferences ->
+            preferences[stringPreferencesKey("date_$dateKey")] = dateKey
+            preferences[stringPreferencesKey("settings_$dateKey")] = prayerSettingsSignature(settings)
+            times.forEach { (name, time) ->
+                preferences[longPreferencesKey("${name.lowercase()}_$dateKey")] = time.time
+            }
+        }
+    }
+
+    private fun dateKey(date: Date): String = java.text.SimpleDateFormat("yyyyMMdd", java.util.Locale.ROOT).format(date)
+
+    private fun prayerSettingsSignature(settings: UserSettings): String = listOf(
+        settings.locationLat, settings.locationLng, settings.useGpsLocation,
+        settings.prayerCalculationMethod, settings.prayerMadhab, settings.prayerSourceType,
+        settings.fajrOffsetMinutes, settings.dhuhrOffsetMinutes, settings.asrOffsetMinutes,
+        settings.maghribOffsetMinutes, settings.ishaOffsetMinutes,
+        settings.fajrPrePrayerMinutes, settings.dhuhrPrePrayerMinutes, settings.asrPrePrayerMinutes,
+        settings.maghribPrePrayerMinutes, settings.ishaPrePrayerMinutes,
+        Calendar.getInstance().timeZone.id
+    ).joinToString("|")
 
     suspend fun getExtraPrayerDateTimes(
         date: Date,

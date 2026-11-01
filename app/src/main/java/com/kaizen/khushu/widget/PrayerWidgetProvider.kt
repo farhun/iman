@@ -155,7 +155,7 @@ class PrayerWidgetProvider : AppWidgetProvider() {
                 } else {
                     emptyMap()
                 }
-                val timeFormatter = SimpleDateFormat("h:mm a", Locale.getDefault())
+                val timeFormatter = SimpleDateFormat("HH:mm", Locale.getDefault())
                 prayerItems.forEach { item ->
                     views.setTextViewText(item.labelId, item.name)
                     views.setTextViewText(item.timeId, effectiveTimes[item.name]?.let(timeFormatter::format) ?: "--:--")
