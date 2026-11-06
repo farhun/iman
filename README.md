@@ -1,146 +1,103 @@
-<p align="center">
-  <img src="docs/images/khushu-logo-teal-final.svg" width="100" alt="Khushu Logo">
-</p>
+# Khushu
 
-<div align="center">
-  <p style="font-size: 24px; font-weight: bold;">• Khushu •</p>
-  <strong>A calm space for your deen.</strong>
-</div>
+Khushu is an Android app for prayer times, Quran reading, and Tasbih. This is a customized fork focused on a simpler, more reliable daily-prayer experience.
 
-<br>
-<p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License"></a>
-  <img src="https://img.shields.io/badge/100%25-Free_%26_Private-success.svg" alt="100% Free & Private">
-  <img src="https://img.shields.io/badge/No_Ads-Forever-red.svg" alt="No Ads">
-  <img src="https://img.shields.io/github/v/tag/farhun/khushu?label=Version&color=3DDC84&sort=semver" alt="Release Version">
-  <!-- <img src="https://img.shields.io/github/downloads/farhun/khushu/latest/total?label=Downloads&color=3DDC84" alt="Downloads"> -->
-</p>
+- **Repository:** https://github.com/farhun/khushu
+- **App ID:** `io.github.farhun.khushu` (code namespace remains `com.kaizen.khushu`)
+- **Version:** 0.1
 
-<p align="center"><i>Available on</i></p>
-<p align="center">
-  <a href="https://github.com/farhun/khushu/releases/latest"><img src="https://raw.githubusercontent.com/Kunzisoft/Github-badge/main/get-it-on-github.svg" height="104" align="middle"></a>&nbsp;&nbsp;
-  <a href="https://f-droid.org/packages/com.kaizen.khushu/"><img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" height="104" align="middle"></a>&nbsp;&nbsp;
-  <a href="https://android.izzysoft.de/repo/apk/com.kaizen.khushu"><img src="https://gitlab.com/izzyondroid/repo/-/raw/master/assets/IzzyOnDroid.png" height="104" align="middle"></a>&nbsp;&nbsp;
-  <a href="http://apps.obtainium.imranr.dev/redirect.html?r=obtainium://add/https://github.com/farhun/khushu"><img src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" height="70" align="middle"></a>
-</p>
-<p align="center"><i>Not on Play Store yet (empty pockets</i> 😁)</p>
+> Based on the original Khushu app by *[add original author / repo link here]*. *[Add license here.]*
 
-> [!NOTE]
-> **Khushu is in Early Development.**
-> We are currently in the Alpha stage of our journey. While we strive for a seamless experience, you may encounter occasional bugs. Your patience and feedback help us build a better sanctuary for the Ummah.
+## What's in the app
 
----
+- **Home:** current and next prayer, today's five prayers, Hijri date, and a Qibla compass.
+- **Tasbih:** dhikr counter and collections.
+- **Quran:** surah list, reader, audio, search, and bookmarks.
+- **Widget:** home-screen prayer times widget.
+- **Settings:** prayer calculation, reminders and sounds, widget customization, appearance.
 
-<div align="center">﷽</div>
+## What I changed from the original
 
+### Widget
+- Show/hide switch for every widget item.
+- Shows only the five obligatory prayers: Fajr, Dhuhr, Asr, Maghrib, Isha (no Sunrise or extra timings).
+- Countdown shown as `HH:mm` (no seconds).
+- Prayer times shown in 24-hour format.
+- Active-prayer indicator is a pill behind the current prayer's time, with a customizable color (default `#7ED957`).
+- The widget refreshes at each prayer time, so the indicator moves on time.
 
-**Assalamu Alaikum wa Rahmatullahi wa Barakatuh,**
+### Home screen
+- Removed: starry/astronomy visual, Events feature (including its settings and catalog), Hijri month event browser, Mosque directory, the sunrise/sunset arc card, and the radio buttons and colored dots in Today's Prayers.
+- Today's Prayers is now display-only.
+- The Explore section is gone; the Qibla button is always visible.
+- Added a "NOW" label above the current prayer so it lines up with "NEXT PRAYER".
+- The location name moved under the "Today's Prayers" heading with a pin icon, and long names are truncated.
+- Pull-to-refresh now updates the GPS location when GPS mode is on, refreshes the widget, reschedules reminders, and always stops the spinner.
 
-Welcome to **Khushu**.
+### Qibla compass
+- Fixed the bearing formula.
+- Added magnetic declination correction (true north).
+- Added circular smoothing and a continuous tilt-handling method so the needle stays stable when the phone moves.
+- "N" and the north tick rotate with the compass.
+- The needle is hidden when no compass sensor is available.
+- Added a calibration hint (figure-8 motion) when the sensor reports low accuracy.
 
-In a world filled with digital noise, constant notifications, and endless scrolling, we built Khushu with a single intention (Niyyah): to give Muslims a beautiful, distraction-free space to connect with Allah (SWT).
+### Navigation and content
+- Study now contains only the Holy Quran. Learn and Hadith were removed.
+- The Pray (Salah) section was removed completely.
+- Bottom navigation: Home, Tasbih, Quran.
 
-**Our Promise to the Ummah:**
-Khushu is and will always be **100% Free and Private**. 
-There are no ads, no trackers, no subscriptions, and no selling of your data. Your worship is between you and your Creator. We simply want to provide the best tools to help you focus on what truly matters.
+### Quran
+- Search and a bookmark list on the surah list screen.
+- Bookmark list: delete button with confirmation dialog, and sorting by Latest first (default) or Oldest first.
+- Bookmarked ayahs show a filled bookmark icon, and unbookmarked ones show an outline.
+- Exit reminder: leaving the reader on an unbookmarked ayah shows a "Not bookmarked" dialog with a "Don't show this again" checkbox. It can be turned back on in Settings > Appearance.
+- Fixed a bookmark save/exit-check race that made the dialog appear after bookmarking.
+- Ayah playback has a 15-second loading timeout, an error state, and a Retry button.
+- Arabic script font changed to **QuranIndoPak** (see Credits).
 
----
+### Prayer reminders and sounds
+- Prayer times are saved per date and used as the single source for all reminders, so reminders match what the app shows.
+- Prayer-time reminders use `setAlarmClock()`. Pre-prayer reminders use exact alarms with separate alarms per prayer.
+- Declared `SCHEDULE_EXACT_ALARM`, with a notification prompt that opens the system setting when exact alarms are off.
+- Each alarm schedules the next one before posting its notification, and everything reschedules after boot, app update, time change, timezone change, and at midnight.
+- Per-prayer sound choice for Fajr, Dhuhr, Asr, Maghrib, Isha, and the pre-prayer reminder: Default, Adhan, Takbir, or Silent. `adhan.mp3` and `takbir.mp3` are bundled in `res/raw`.
 
-## ✨ Everything You Need. Nothing You Don't.
+### Settings and About
+- Removed the "History" item and the "Support Khushu" (crypto address) section.
+- All repository links point to https://github.com/farhun/khushu, including Report issue and the update check.
+- The Settings sheet now shows only the info button and version number, at the bottom.
+- Removed the first-install welcome modal.
+- Changed the installed app ID to `io.github.farhun.khushu` and the version to 0.1.
 
-Khushu is packed with accurate prayer times, sunpath visuals, immersive Salah tracking, deeply customizable Tasbeeh collections, and a complete suite for reading and listening to the Quran, Tafsir, and Hadith—all wrapped in a deeply immersive aesthetic designed to help you attain *Khushu* (true focus and humility) in your worship.
+## Known limitations / planned
+- Arabic prayer names in Today's Prayers and Tasbih still use the system fallback font, not QuranIndoPak.
+- Reminder timing still depends on phone settings: set Khushu's battery to Unrestricted and allow Alarms & reminders.
+- Planned: a first-launch permission screen (location, notifications, exact alarms) and faster Home screen startup.
+- Single-ayah playback still streams from the internet, even if the reciter was downloaded.
 
-<p align="center">
-  <kbd><img src="docs/images/screenshots/1.jpg" width="420" alt="Khushu stitched screenshot 1"></kbd>
-</p>
-<p align="center">
-  <kbd><img src="docs/images/screenshots/2.jpg" width="420" alt="Khushu stitched screenshot 2"></kbd>
-</p>
+## Credits
 
+### Quran script font
+**AlQuran IndoPak by QuranWBW** (`QuranIndoPak`), made by Ayman Siddiqui for [QuranWBW.com](https://quranwbw.com). It is based on the Al Qalam Quran Majeed fonts (© Al Qalam, © Ghandhara), with ayah-number glyphs from KFGQPC. Credits embedded in the font: Abdul Majeed Khan, Arif Karim, Shakir-ul-Qadree, Jawad.
 
----
+**Font license note:** the font's own notice states it was made for Sadaqa-e-Jaria (ongoing charity) and requires written notice to QuranWBW.com for modification, distribution, or development. This app is not sold and is free of charge. Anyone redistributing it should contact QuranWBW.com first and must not charge for an app that includes this font.
 
-## 💖 Support the Journey
+### Other
+- Quran script fallback font: Scheherazade New is no longer used by the Quran reader.
+- Uthmanic Hafs font is downloaded at runtime from the quran-android project (`hafs_newandroid.ttf`) when that script is selected.
+- Prayer time calculations use the `adhan2` library; optional API mode uses AlAdhan.
+- *[Add text source credit for the IndoPak Quran text (QuranWBW) if you use it, plus the original app's credits.]*
 
-While Khushu is completely free, developing, designing, and maintaining it takes hundreds of hours of love and effort. 
+## Building
 
-If you love the app and want to see it grow—if you want to help us reach more Muslims around the world and build even more amazing features—please consider supporting our development. Your donations go directly towards keeping this project alive, ad-free, and continuously improving.
+```
+./gradlew :app:assembleDebug
+./gradlew :app:assembleRelease
+```
 
-**Support via Crypto:**
-
-| Asset | Address |
-| :--- | :--- |
-| <img src="https://img.shields.io/badge/Bitcoin-F7931A?style=for-the-badge&logo=bitcoin&logoColor=white"> | `bc1q04zs40e9cakxuu2lw3r04jc2vmmv084rvz5kx9` |
-| <img src="https://img.shields.io/badge/Ethereum_/_Base-3C3C3D?style=for-the-badge&logo=ethereum&logoColor=white"> | `0x139aB14D67B1E0dAaEDe1CF5e3234B1Cc3644BE0` |
-| <img src="https://img.shields.io/badge/USDT_(TRON)-26A17B?style=for-the-badge&logo=tether&logoColor=white"> | `TDmZvrFGBKyP9opEL1FCzpvH9MXBmJ9r6q` |
-
----
-
-## 🛠️ Roadmap
-
-Khushu is growing fast. Here is what is coming next:
-
-*   **🕌 Muslim Mosque Registry:** A clean, community-helpful way to discover and keep track of mosques timings in local areas.
-*   **🧭 Qibla Direction:** A focused Qibla experience that feels calm and reliable instead of gimmicky.
-*   **🏠 Homescreen Widget** Show your prayer progress and next prayer time on your homescreen.
-*   **📖 Quran & Tafsir Polish:** Better Tafsir flow, richer reading ergonomics, and continued refinement in Quran study surfaces.
-*   **✨ Ongoing Product Polish:** More consistency across settings, prayer flows, notifications, and small interaction details throughout the app.
-
----
-
-## 🏗️ Technical Architecture & Setup
-
-Khushu is built with a modern, high-performance tech stack designed for fluid animations and a premium feel.
-
-*   **Language:** Kotlin 2.2.10
-*   **UI Framework:** Jetpack Compose (Material 3)
-*   **Architecture:** MVVM + Clean Architecture
-*   **Database:** Room (for local storage and privacy)
-*   **Animations:** Compose Graphics & Physics-based transitions
-
-### Build Instructions
-To build the project locally, you will need:
-- **Android Studio Ladybug** (or newer)
-- **JDK 17**
-- **Android SDK 35** (Target)
-
-1. Clone the repository: `git clone https://github.com/farhun/khushu.git`
-2. Open the project in Android Studio.
-3. Sync Gradle and run the `app` module on your device or emulator.
-
-### Distribution Flavors
-
-Khushu now has two build flavors:
-
-- `full`: the regular app build used for GitHub releases and the normal distribution path
-- `fdroid`: a compatibility flavor intended for F-Droid-style builds
-
-Useful commands:
-
-- Regular debug build: `./gradlew :app:assembleFullDebug`
-- Regular release build: `./gradlew :app:assembleFullRelease`
-- F-Droid debug build: `./gradlew :app:assembleFdroidDebug`
-- F-Droid release build (single APK): `./gradlew :app:assembleFdroidRelease -Pkhushu.singleApk=true`
-
-The `fdroid` flavor avoids Google Play Services location and uses bundled fonts instead of downloadable Google Fonts.
-
----
-
-## 🤝 Contribution
-
-This project is built by Muslims, for Muslims. We believe that coding, designing, and improving tools for the Ummah is a beautiful form of *Sadaqah Jariyah* (ongoing charity).
-
-If you are a developer, designer, or translator, we would love your help! 
-*   **Found a bug?** Open an issue to let us know.
-*   **Have a feature idea?** Let's discuss it.
-*   **Want to write code?** Check out our build instructions and open a Pull Request. 
-
-Every line of code that helps a fellow Muslim remember Allah is a reward written for you, Insha'Allah.
-
----
+Release builds are split by ABI. Use `arm64-v8a` for most modern phones, or the universal APK if you're unsure.
 
 ## 📄 License & Brand Policy
 
 **License:** This project is licensed under the **GNU General Public License v3.0 (GPLv3)**. See the [LICENSE](LICENSE) file for details.
-
-**Trademark & Brand Policy:** While the source code is open, the brand identity is strictly protected. The name **'Khushu'**, the **Khushu logo**, and all related visual assets are strictly copyrighted with all rights reserved. If you choose to fork or distribute this codebase, you **must entirely rebrand** your fork by removing the Khushu name and all related branding assets. Distributing a modified version that retains the original branding constitutes trademark infringement.

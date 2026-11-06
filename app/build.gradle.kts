@@ -5,16 +5,6 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-val gitHash: String = try {
-    ProcessBuilder("git", "rev-parse", "--short", "HEAD")
-        .start()
-        .inputStream
-        .bufferedReader()
-        .use { it.readText().trim() }
-} catch (e: Exception) {
-    "unknown"
-}
-
 android {
     namespace = "com.kaizen.khushu"
     compileSdk = 36
@@ -28,8 +18,8 @@ android {
         applicationId = "io.github.farhun.khushu"
         minSdk = 30
         targetSdk = 36
-        versionCode = 85
-        versionName = "0.24.11"
+        versionCode = 1
+        versionName = "0.1"
 
 
         buildConfigField("String", "AUDIO_BASE_URL", "\"https://example.com/audio/\"")
@@ -41,7 +31,6 @@ android {
     productFlavors {
         create("full") {
             dimension = "distribution"
-            versionNameSuffix = "+$gitHash"
         }
         create("fdroid") {
             dimension = "distribution"

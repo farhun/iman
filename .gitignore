@@ -53,3 +53,9 @@ docs/khushu-handoff/
 # docs/images/screenshots/
 scripts/data/
 alquran_meta.json
+
+# Build output
+**/build/
+app/full/
+app/fdroid/
+output-metadata.json

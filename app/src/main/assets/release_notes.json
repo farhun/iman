@@ -1,28 +1,35 @@
 [
   {
-    "versionCode": 84,
-    "versionName": "0.24.10",
-    "headline": "A stability and polish release focused on prayer flow, Tasbih refinement, and Arabic layout fixes.",
+    "versionCode": 1,
+    "versionName": "0.1",
+    "headline": "First release of this Khushu fork, focused on reliable prayer reminders, a customizable widget, and a simpler Quran-first experience.",
     "highlights": [
-      "Prayer completion now follows the real sequence instead of letting any row be checked at any time.",
-      "Tasbih now supports bundled count sounds and reliable custom prayer alarm sound selection.",
-      "Immersive Arabic and RTL layouts were corrected for Salah, Tasbih, and the bottom navigation indicator."
+      "Prayer and pre-prayer reminders now use one saved schedule and stronger alarms, with a sound choice for each prayer.",
+      "The home-screen widget has show/hide options, shows only the five prayers, and has a customizable active-prayer color.",
+      "The Quran reader has search, bookmarks, an exit reminder, and the QuranIndoPak script font."
     ],
     "sections": [
       {
-        "title": "Improved",
+        "title": "Added",
         "items": [
-          "Merged prayer card polish, smoother sun path visuals, and clearer Home prayer-source status.",
-          "Qibla helper and Home utility actions were refined for the 0.24.10 release candidate.",
-          "Tasbih collection setup and customization flow now behave more naturally."
+          "Per-prayer sound selection (Default, Adhan, Takbir, Silent), including the pre-prayer reminder.",
+          "Quran search, a bookmark list with sorting and delete confirmation, and an exit reminder for unbookmarked ayahs.",
+          "Retry option when ayah audio fails to load."
         ]
       },
       {
-        "title": "Fixed",
+        "title": "Improved",
         "items": [
-          "Custom prayer alarm sound selection now opens the picker and uses the chosen sound correctly.",
-          "Tasbih and Salah immersive widgets no longer drift out of view under Arabic system layout or RTL conditions.",
-          "Bookmark jumps to the correct ayah and non-Quran readers no longer show Quran-only settings."
+          "Home screen simplified: removed events, mosque directory, the sunrise/sunset arc, and prayer row markers.",
+          "Qibla compass is steadier and corrects for magnetic declination.",
+          "Pull-to-refresh now updates your GPS location, the widget, and your reminders."
+        ]
+      },
+      {
+        "title": "Changed",
+        "items": [
+          "Study now contains only the Holy Quran; the Pray section, Learn, and Hadith were removed.",
+          "Prayer times use the 24-hour format on the widget."
         ]
       }
     ]
