@@ -5,9 +5,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import com.kaizen.khushu.R
 
-val ScheherazadeNew = FontFamily(
-    Font(resId = R.font.scheherazade_new_regular, weight = FontWeight.Normal),
-    Font(resId = R.font.scheherazade_new_bold, weight = FontWeight.Bold),
+val QuranIndoPak = FontFamily(
+    Font(resId = R.font.quran_indopak_regular, weight = FontWeight.Normal),
+    Font(resId = R.font.quran_indopak_bold, weight = FontWeight.Bold),
 )
 
 val BeVietnamPro = FontFamily(
@@ -19,5 +19,5 @@ val BeVietnamPro = FontFamily(
 
 val Typography = createKhushuTypography(
     beVietnamPro = BeVietnamPro,
-    scheherazadeNew = ScheherazadeNew,
+    quranIndopak = QuranIndoPak,
 )

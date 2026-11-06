@@ -65,7 +65,7 @@ import com.kaizen.khushu.data.model.ParagraphBlock
 import com.kaizen.khushu.data.repository.UserSettings
 import com.kaizen.khushu.ui.components.AyahEndMarker
 import com.kaizen.khushu.ui.theme.BeVietnamPro
-import com.kaizen.khushu.ui.theme.ScheherazadeNew
+import com.kaizen.khushu.ui.theme.QuranIndoPak
 
 /**
  * Renders a single [ContentBlock] into Compose UI.
@@ -82,7 +82,7 @@ fun BlockRenderer(
     translationMap: Map<String, String> = emptyMap(),
     tajweedMap: Map<String, String> = emptyMap(),
     scriptMap: Map<String, String> = emptyMap(),
-    arabicFontFamily: FontFamily = ScheherazadeNew,
+    arabicFontFamily: FontFamily = QuranIndoPak,
     isHighlighted: Boolean = false,
     isBookmarked: Boolean = false,
     onBlockClick: (ContentBlock) -> Unit = {},
@@ -391,7 +391,7 @@ private fun AyahBlockView(
                         Text(
                             text = block.tafsirText,
                             style = MaterialTheme.typography.bodyMedium.copy(
-                                fontFamily = if (isSpa5k) ScheherazadeNew else BeVietnamPro,
+                                fontFamily = if (isSpa5k) QuranIndoPak else BeVietnamPro,
                                 fontSize = if (isSpa5k) (settings.translationSizeSp + 5f).sp else settings.translationSizeSp.sp,
                                 lineHeight = if (isSpa5k) ((settings.translationSizeSp + 5f) * 1.8f).sp else (settings.translationSizeSp * 1.6f).sp,
                                 textAlign = TextAlign.Right,
@@ -489,7 +489,7 @@ private fun AyahBlockView(
 /**
  * Reading mode: pure Arabic text flow, no action bar, no translation, no chips.
  * Uses a slightly larger line-height and justified/RTL rendering.
- * Font: ScheherazadeNew at the user's selected arabicSizeSp.
+ * Font: QuranIndoPak at the user's selected arabicSizeSp.
  */
 @Composable
 private fun ReadingModeAyah(
@@ -645,14 +645,14 @@ private fun HadithBlockView(
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Text(
                         text = block.textArabic,
-                        fontFamily = ScheherazadeNew,
+                        fontFamily = QuranIndoPak,
                         fontSize = settings.arabicSizeSp.sp,
                         lineHeight = (settings.arabicSizeSp * 1.75f).sp,
                         textAlign = TextAlign.Center,
                         color = fg,
                         style = MaterialTheme.typography.bodyLarge.copy(
                             textDirection = TextDirection.Rtl,
-                            fontFamily = ScheherazadeNew,
+                            fontFamily = QuranIndoPak,
                         ),
                         modifier = Modifier.fillMaxWidth(),
                     )

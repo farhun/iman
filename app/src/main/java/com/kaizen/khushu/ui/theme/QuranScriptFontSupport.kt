@@ -12,8 +12,8 @@ fun rememberArabicScriptFontFamily(script: String, availableScripts: Set<String>
     return remember(script, availableScripts) {
         when (script) {
             QuranScriptFontRepository.UTHMANIC_HAFS ->
-                QuranScriptFontRepository.getDownloadedFontFamily(context, script) ?: ScheherazadeNew
-            else -> ScheherazadeNew
+                QuranScriptFontRepository.getDownloadedFontFamily(context, script) ?: QuranIndoPak
+            else -> QuranIndoPak
         }
     }
 }

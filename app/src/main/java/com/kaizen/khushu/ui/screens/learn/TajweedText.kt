@@ -19,7 +19,7 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
-import com.kaizen.khushu.ui.theme.ScheherazadeNew
+import com.kaizen.khushu.ui.theme.QuranIndoPak
 
 @Composable
 fun TajweedText(
@@ -44,14 +44,14 @@ fun TajweedText(
     Text(
         text = annotatedString,
         modifier = modifier,
-        fontFamily = ScheherazadeNew,
+        fontFamily = QuranIndoPak,
         fontSize = fontSize,
         lineHeight = lineHeight,
         textAlign = TextAlign.Center,
         inlineContent = inlineContent,
         style = MaterialTheme.typography.bodyLarge.copy(
             textDirection = TextDirection.Rtl,
-            fontFamily = ScheherazadeNew,
+            fontFamily = QuranIndoPak,
         ),
     )
 }
@@ -65,7 +65,7 @@ private fun parseTajweed(markup: String, defaultColor: Color): AnnotatedString =
     // Regex for both <tajweed class=...>CONTENT</tajweed> and <span class=end>...</span>
     // Note: this assumes tags are not nested, which is true for quran.com data.
     val tagRegex = Regex("<(tajweed|span) class=([^> ]+)>([^<]*)</\\1>")
-    
+
     var lastIndex = 0
     tagRegex.findAll(markup).forEach { match ->
         // 1. Append plain text before the tag
@@ -116,28 +116,28 @@ private fun tajweedColor(rule: String, default: Color): Color = when (rule) {
     // Madd — prolongation (red)
     "madda_normal", "madda_permissible", "madda_obligatory", "madda_necessary" ->
         Color(0xFFFF5252)
-    
+
     // Ghunna — nasalization (green)
     "ghunnah" -> Color(0xFF4CAF50)
-    
+
     // Qalqalah — echo (light blue)
     "qalaqah" -> Color(0xFF40C4FF)
-    
+
     // Ikhfa — concealment (gray)
     "ikhafa", "ikhafa_shafawi" -> Color(0xFF9E9E9E)
-    
+
     // Idgham — assimilation (orange)
     "idgham_ghunnah", "idgham_wo_ghunnah", "idgham_mutajanisayn",
     "idgham_mutaqaribayn", "idgham_shafawi" -> Color(0xFFFF9800)
-    
+
     // Iqlab — conversion (purple)
     "iqlab" -> Color(0xFFCE93D8)
-    
+
     // Ham wasl / laam shamsiyah — light styling only
     "ham_wasl", "laam_shamsiyah" -> default.copy(alpha = 0.6f)
-    
+
     // slnt — silent letter (dim)
     "slnt" -> default.copy(alpha = 0.4f)
-    
+
     else -> default
 }

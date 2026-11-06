@@ -56,7 +56,7 @@ import androidx.compose.ui.unit.sp
 import com.kaizen.khushu.data.model.ContentSource
 import com.kaizen.khushu.data.model.ReflectionPost
 import com.kaizen.khushu.ui.theme.BeVietnamPro
-import com.kaizen.khushu.ui.theme.ScheherazadeNew
+import com.kaizen.khushu.ui.theme.QuranIndoPak
 
 /**
  * Unified bottom sheet for Tafsir + Reflections, matching Quran.com's side panel style.
@@ -233,13 +233,13 @@ private fun VerseHeader(
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             Text(
                 text = arabicText,
-                fontFamily = ScheherazadeNew,
+                fontFamily = QuranIndoPak,
                 fontSize = arabicSizeSp.sp,
                 lineHeight = (arabicSizeSp * 1.75f).sp,
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodyLarge.copy(
                     textDirection = TextDirection.Rtl,
-                    fontFamily = ScheherazadeNew,
+                    fontFamily = QuranIndoPak,
                     textAlign = TextAlign.Start,
                 ),
                 modifier = Modifier.fillMaxWidth()
@@ -290,7 +290,7 @@ private fun TafsirContent(
                 Text(
                     text = tafsirText,
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        fontFamily = if (isArabic) ScheherazadeNew else BeVietnamPro,
+                        fontFamily = if (isArabic) QuranIndoPak else BeVietnamPro,
                         fontSize = if (isArabic) (translationSizeSp + 6f).sp else translationSizeSp.sp,
                         lineHeight = if (isArabic) ((translationSizeSp + 6f) * 1.8f).sp else (translationSizeSp * 1.65f).sp,
                         textAlign = if (isArabic) TextAlign.Right else TextAlign.Left,

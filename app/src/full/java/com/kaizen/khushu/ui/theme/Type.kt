@@ -5,6 +5,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.googlefonts.Font as GoogleFontSpec
 import androidx.compose.ui.text.googlefonts.GoogleFont
 import com.kaizen.khushu.R
+import androidx.compose.ui.text.font.Font
 
 private val googleFontsProvider = GoogleFont.Provider(
     providerAuthority = "com.google.android.gms.fonts",
@@ -13,13 +14,8 @@ private val googleFontsProvider = GoogleFont.Provider(
 )
 
 private val beVietnamProFont = GoogleFont("Be Vietnam Pro")
-private val scheherazadeNewFont = GoogleFont("Scheherazade New")
 
-val ScheherazadeNew = FontFamily(
-    GoogleFontSpec(googleFont = scheherazadeNewFont, fontProvider = googleFontsProvider, weight = FontWeight.Normal),
-    GoogleFontSpec(googleFont = scheherazadeNewFont, fontProvider = googleFontsProvider, weight = FontWeight.Bold),
-)
-
+val QuranIndoPak = FontFamily(Font(R.font.quran_indopak))
 val BeVietnamPro = FontFamily(
     GoogleFontSpec(googleFont = beVietnamProFont, fontProvider = googleFontsProvider, weight = FontWeight.Normal),
     GoogleFontSpec(googleFont = beVietnamProFont, fontProvider = googleFontsProvider, weight = FontWeight.Medium),
@@ -29,5 +25,5 @@ val BeVietnamPro = FontFamily(
 
 val Typography = createKhushuTypography(
     beVietnamPro = BeVietnamPro,
-    scheherazadeNew = ScheherazadeNew,
+    quranIndopak = QuranIndoPak,
 )

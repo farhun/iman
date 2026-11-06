@@ -18,7 +18,7 @@ val DisplayFontFallback = FontFamily.Default
 
 fun createKhushuTypography(
     beVietnamPro: FontFamily,
-    scheherazadeNew: FontFamily,
+    quranIndopak: FontFamily,
 ): Typography {
     return Typography(
         displayLarge = TextStyle(

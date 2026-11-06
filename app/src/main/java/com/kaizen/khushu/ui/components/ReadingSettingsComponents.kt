@@ -43,7 +43,7 @@ import com.kaizen.khushu.data.repository.QuranScriptFontRepository
 import com.kaizen.khushu.data.repository.UserSettings
 import com.kaizen.khushu.ui.theme.Antonio
 import com.kaizen.khushu.ui.theme.BeVietnamPro
-import com.kaizen.khushu.ui.theme.ScheherazadeNew
+import com.kaizen.khushu.ui.theme.QuranIndoPak
 
 @Composable
 private fun SlidingSegmentedControl(
@@ -177,7 +177,7 @@ fun ReadingSettingsSheet(
                         CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
                             Text(
                                 text = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ",
-                                fontFamily = ScheherazadeNew,
+                                fontFamily = QuranIndoPak,
                                 fontSize = settings.arabicSizeSp.sp,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 textAlign = TextAlign.Center
@@ -440,7 +440,7 @@ fun ReadingSettingsSheet(
                                                             contentDescription = null,
                                                             tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                                         )
-                                                        
+
                                                         Column {
                                                             Text(
                                                                 text = reciter.name,
@@ -540,7 +540,7 @@ fun ThemePreviewCard(
     modifier: Modifier = Modifier
 ) {
     val borderColor = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent
-    
+
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
@@ -563,12 +563,12 @@ fun ThemePreviewCard(
                 Text(
                     text = "بِسْمِ اللَّهِ",
                     color = fgColor,
-                    fontFamily = ScheherazadeNew,
+                    fontFamily = QuranIndoPak,
                     fontSize = 18.sp
                 )
             }
         }
-        
+
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
@@ -599,7 +599,7 @@ fun ScriptPreviewCard(
         !isDownloaded -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
         else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
-    
+
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
@@ -622,13 +622,13 @@ fun ScriptPreviewCard(
                 Text(
                     text = sample,
                     color = contentColor,
-                    fontFamily = ScheherazadeNew,
+                    fontFamily = QuranIndoPak,
                     fontSize = 18.sp,
                     textAlign = TextAlign.Center
                 )
             }
         }
-        
+
         Text(
             text = when {
                 isDownloading -> "$label ${"%.0f".format(downloadProgress * 100)}%"
