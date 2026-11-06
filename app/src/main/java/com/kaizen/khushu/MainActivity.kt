@@ -57,7 +57,6 @@ import com.kaizen.khushu.data.local.TasbeehDatabase
 import com.kaizen.khushu.notifications.PrayerNotificationScheduler
 import com.kaizen.khushu.notifications.toPrayerNotificationScheduleConfig
 import com.kaizen.khushu.ui.components.PillNavBar
-import com.kaizen.khushu.ui.components.DeveloperWelcomeDialog
 import com.kaizen.khushu.ui.components.ReleaseNotesDialog
 import com.kaizen.khushu.ui.navigation.*
 import com.kaizen.khushu.ui.screens.onboarding.OnboardingScreen
@@ -288,10 +287,6 @@ private fun KhushuApp(
         activity?.isOnTasbeehImmersive = currentRoute?.startsWith("tasbeeh/immersive") == true
     }
     val currentDestination = AppDestinations.fromRoute(currentRoute) ?: AppDestinations.HOME
-    val showDeveloperWelcome =
-        !settings.developerWelcomeDismissed &&
-                currentRoute != ONBOARDING_ROUTE &&
-                pendingReleaseNotes == null
 
     LaunchedEffect(currentRoute, settings.lastSeenAppVersionCode) {
         if (currentRoute == ONBOARDING_ROUTE) return@LaunchedEffect
@@ -691,16 +686,6 @@ private fun KhushuApp(
                     navController.navigate(com.kaizen.khushu.ui.navigation.SETTINGS_ABOUT_ROUTE)
                 },
                 onDismiss = { showSettingsSheet = false }
-            )
-        }
-
-        if (showDeveloperWelcome) {
-            DeveloperWelcomeDialog(
-                onContinue = { settingsViewModel.setDeveloperWelcomeDismissed(true) },
-                onOpenSupport = {
-                    settingsViewModel.setDeveloperWelcomeDismissed(true)
-                    navController.navigate(SETTINGS_ABOUT_ROUTE)
-                }
             )
         }
 

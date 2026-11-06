@@ -1,11 +1,11 @@
 name: "🐛 Bug Report"
-description: "Help us improve Khushu by reporting a technical issue."
+description: "Help us improve Iman by reporting a technical issue."
 labels: ["bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        **JazakAllah Khair for reporting this bug!** Your help ensures Khushu remains a reliable tool for the Ummah.
+        **JazakAllah Khair for reporting this bug!** Your help ensures Iman remains a reliable tool for the Ummah.
   - type: textarea
     id: description
     attributes:

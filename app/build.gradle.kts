@@ -15,7 +15,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "io.github.farhun.khushu"
+        applicationId = "io.github.farhun.iman"
         minSdk = 30
         targetSdk = 36
         versionCode = 1

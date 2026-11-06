@@ -83,7 +83,7 @@ fun SettingsScreen(
                 )
 
                 SettingsMenuItem(
-                    title = "About Khushu",
+                    title = "About Iman",
                     subtitle = "Story, project links, and reporting",
                     imageVector = Icons.Default.Info,
                     onClick = onNavigateAbout,

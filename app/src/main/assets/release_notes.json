@@ -2,9 +2,9 @@
   {
     "versionCode": 1,
     "versionName": "0.1",
-    "headline": "First release of this Khushu fork, focused on reliable prayer reminders, a customizable widget, and a simpler Quran-first experience.",
+    "headline": "First release of Iman, focused on reliable prayer reminders, a customizable widget, and a simple Quran-first experience.",
     "highlights": [
-      "Prayer and pre-prayer reminders now use one saved schedule and stronger alarms, with a sound choice for each prayer.",
+      "Prayer and pre-prayer reminders use one saved schedule and stronger alarms, with a sound choice for each prayer.",
       "The home-screen widget has show/hide options, shows only the five prayers, and has a customizable active-prayer color.",
       "The Quran reader has search, bookmarks, an exit reminder, and the QuranIndoPak script font."
     ],
@@ -29,7 +29,7 @@
         "title": "Changed",
         "items": [
           "Study now contains only the Holy Quran; the Pray section, Learn, and Hadith were removed.",
-          "Prayer times use the 24-hour format on the widget."
+          "The widget shows prayer times in the 24-hour format."
         ]
       }
     ]

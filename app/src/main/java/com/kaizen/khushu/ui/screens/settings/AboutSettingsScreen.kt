@@ -40,8 +40,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kaizen.khushu.BuildConfig
 
-private const val KHUSHU_REPO_URL = "https://github.com/farhun/khushu"
-private const val KHUSHU_ISSUES_URL = "https://github.com/farhun/khushu/issues"
+private const val KHUSHU_REPO_URL = "https://github.com/farhun/iman"
+private const val KHUSHU_ISSUES_URL = "https://github.com/farhun/iman/issues"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,7 +64,7 @@ fun AboutSettingsScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeTopAppBar(
-                title = { SettingsTopBarTitle("About Khushu", scrollBehavior) },
+                title = { SettingsTopBarTitle("About Iman", scrollBehavior) },
                 navigationIcon = { SettingsBackButton(onBack) },
                 scrollBehavior = scrollBehavior
             )
@@ -82,7 +82,7 @@ fun AboutSettingsScreen(
 
             SectionHeader("Story")
             Text(
-                text = "Khushu is being built as a calmer kind of Muslim app: one that helps you return to salah, dhikr, and learning without turning worship into noise. The goal is not feature bloat. The goal is focus, clarity, and a product that feels intentional every time you open it.",
+                text = "Iman is a prayer companion for salah times, Quran reading, and dhikr.",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )

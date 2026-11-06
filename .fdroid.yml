@@ -2,11 +2,11 @@ Categories:
   - Reading
   - Time
 License: GPL-3.0-only
-SourceCode: https://github.com/farhun/khushu
-IssueTracker: https://github.com/farhun/khushu/issues
-Changelog: https://github.com/farhun/khushu/releases
+SourceCode: https://github.com/farhun/iman
+IssueTracker: https://github.com/farhun/iman/issues
+Changelog: https://github.com/farhun/iman/releases
 RepoType: git
-Repo: https://github.com/farhun/khushu.git
+Repo: https://github.com/farhun/iman.git
 CurrentVersion: "0.1"
 CurrentVersionCode: 1
 UpdateCheckMode: Tags

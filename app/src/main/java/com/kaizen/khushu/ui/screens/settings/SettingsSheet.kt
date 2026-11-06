@@ -191,7 +191,7 @@ private fun SettingsBrandingHeader(
             )
             Spacer(modifier = Modifier.width(18.dp))
             Text(
-                text = "Khushu",
+                text = "Iman",
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontFamily = Antonio,
                     fontSize = 28.sp,

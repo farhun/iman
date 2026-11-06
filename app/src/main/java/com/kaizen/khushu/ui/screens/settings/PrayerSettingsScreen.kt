@@ -720,7 +720,7 @@ private fun ExtraTimingCard(
     ) {
         SettingsToggleItem(
             title = "Show on surfaces",
-            subtitle = "Keep ${preference.label} visible in Khushu.",
+            subtitle = "Keep ${preference.label} visible in Iman.",
             checked = preference.selected,
             onCheckedChange = onSelectedToggle
         )

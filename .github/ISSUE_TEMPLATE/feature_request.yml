@@ -1,11 +1,11 @@
 name: "🚀 Feature Request"
-description: "Suggest a new idea or improvement for Khushu."
+description: "Suggest a new idea or improvement for Iman."
 labels: ["enhancement"]
 body:
   - type: markdown
     attributes:
       value: |
-        **Have a vision for Khushu?** We would love to hear how we can make the app more useful for your spiritual journey.
+        **Have a vision for Iman?** We would love to hear how we can make the app more useful for your spiritual journey.
   - type: textarea
     id: idea
     attributes:
@@ -17,7 +17,7 @@ body:
     id: why
     attributes:
       label: "The Why"
-      placeholder: "How will this help your Khushu or daily worship?"
+      placeholder: "How will this help your Iman or daily worship?"
     validations:
       required: true
   - type: textarea

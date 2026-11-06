@@ -55,13 +55,13 @@ sealed interface DownloadState {
 }
 
 object AppUpdateRepository {
-    private const val GITHUB_API_URL = "https://api.github.com/repos/farhun/khushu/releases/latest"
+    private const val GITHUB_API_URL = "https://api.github.com/repos/farhun/iman/releases/latest"
     private const val GITHUB_ACCEPT_HEADER = "application/vnd.github.v3+json"
 
     // Must match the authority declared in AndroidManifest.xml for the FileProvider.
     // Using applicationId so it resolves correctly across product flavors.
     private val PROVIDER_AUTHORITY: String by lazy { "${BuildConfig.APPLICATION_ID}.update_provider" }
-    private const val USER_AGENT = "Khushu/${BuildConfig.VERSION_NAME} (Android; +https://github.com/farhun/khushu)"
+    private const val USER_AGENT = "Iman/${BuildConfig.VERSION_NAME} (Android; +https://github.com/farhun/iman)"
 
     private val json = Json { ignoreUnknownKeys = true }
     private val client = OkHttpClient.Builder()
@@ -180,7 +180,7 @@ object AppUpdateRepository {
 
             val body = response.body ?: return@withContext DownloadState.Failed("Empty response body")
             val contentLength = body.contentLength()
-            val fileName = "khushu-update-${BuildConfig.VERSION_NAME}.apk"
+            val fileName = "iman-update-${BuildConfig.VERSION_NAME}.apk"
             val file = File(context.cacheDir, fileName)
 
             FileOutputStream(file).use { output ->

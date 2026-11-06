@@ -1,4 +1,4 @@
-# Khushu5 Content Toolchain
+# Iman5 Content Toolchain
 
 Tools to verify hadith/ayah references and generate the pre-packaged `khushu.db`.
 

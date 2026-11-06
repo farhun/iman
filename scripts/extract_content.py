@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Khushu5 Content Extractor
+Iman5 Content Extractor
 =========================
 Downloads Quran text, tajweed, translations, audio manifests, and hadith
 from quran.com and sunnah.com APIs for offline use in the app.
@@ -279,7 +279,7 @@ def convert_hadith_from_fawaz(collection: str):
 
 def main():
     print("=" * 50)
-    print("  Khushu5 Content Extractor")
+    print("  Iman5 Content Extractor")
     print("=" * 50)
     print()
 

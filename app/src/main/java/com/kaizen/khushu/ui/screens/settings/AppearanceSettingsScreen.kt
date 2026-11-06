@@ -148,7 +148,7 @@ fun AppearanceSettingsScreen(
 
                 SettingsToggleItem(
                     title = "Keep Screen Awake",
-                    subtitle = "Prevent the screen from sleeping while Khushu is open.",
+                    subtitle = "Prevent the screen from sleeping while Iman is open.",
                     checked = settings.keepScreenAwake,
                     onCheckedChange = viewModel::toggleKeepScreenAwake
                 )
@@ -171,7 +171,7 @@ fun AppearanceSettingsScreen(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "Choose which area opens first when Khushu launches.",
+                        text = "Choose which area opens first when Iman launches.",
                         style = MaterialTheme.typography.bodyMedium.copy(fontFamily = BeVietnamPro),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

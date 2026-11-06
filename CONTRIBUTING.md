@@ -1,11 +1,11 @@
-# Contributing to Khushu•
+# Contributing to Iman•
 
 **Assalamu Alaikum!** 
 
-JazakAllah Khair for your interest in contributing to Khushu. We are building this for the Ummah as a form of *Sadaqah Jariyah*, and we are honored to have you join us.
+JazakAllah Khair for your interest in contributing to Iman. We are building this for the Ummah as a form of *Sadaqah Jariyah*, and we are honored to have you join us.
 
 ## 🎨 Our Philosophy
-Khushu is built on three core pillars:
+Iman is built on three core pillars:
 1. **Focus:** No distractions, no ads, no trackers.
 2. **Beauty:** A "Pure Black" aesthetic designed for OLED screens and spiritual immersion.
 3. **Authenticity:** All Quran and Hadith data must come from verified and authentic sources.

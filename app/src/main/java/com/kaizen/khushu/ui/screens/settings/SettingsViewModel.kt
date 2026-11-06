@@ -233,10 +233,6 @@ class SettingsViewModel(
         viewModelScope.launch { repository.setOnboardingCompleted(completed) }
     }
 
-    fun setDeveloperWelcomeDismissed(dismissed: Boolean) {
-        viewModelScope.launch { repository.setDeveloperWelcomeDismissed(dismissed) }
-    }
-
     fun setStudyNoteDismissed(dismissed: Boolean) {
         viewModelScope.launch { repository.setStudyNoteDismissed(dismissed) }
     }
@@ -297,7 +293,7 @@ class SettingsViewModel(
             if (style != current) {
                 Toast.makeText(
                     appContext,
-                    "Updating app icon. Khushu will restart momentarily...",
+                    "Updating app icon. Iman will restart momentarily...",
                     Toast.LENGTH_SHORT,
                 ).show()
                 delay(1500L)

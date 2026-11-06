@@ -230,7 +230,6 @@ class SettingsRepository(private val context: Context) {
                 tasbihSoundEnabled = preferences[PreferencesKeys.TASBIH_SOUND_ENABLED] ?: true,
                 tasbihSoundId = preferences[PreferencesKeys.TASBIH_SOUND_ID] ?: "1",
                 onboardingCompleted = preferences[PreferencesKeys.ONBOARDING_COMPLETED] ?: false,
-                developerWelcomeDismissed = preferences[PreferencesKeys.DEVELOPER_WELCOME_DISMISSED] ?: false,
                 studyNoteDismissed = preferences[PreferencesKeys.STUDY_NOTE_DISMISSED] ?: false,
                 lastSeenAppVersionCode = preferences[PreferencesKeys.LAST_SEEN_APP_VERSION_CODE] ?: 0,
                 prayerCalculationMethod = preferences[PreferencesKeys.PRAYER_CALCULATION_METHOD]
@@ -476,10 +475,6 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setOnboardingCompleted(completed: Boolean) {
         context.dataStore.edit { it[PreferencesKeys.ONBOARDING_COMPLETED] = completed }
-    }
-
-    suspend fun setDeveloperWelcomeDismissed(dismissed: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.DEVELOPER_WELCOME_DISMISSED] = dismissed }
     }
 
     suspend fun setStudyNoteDismissed(dismissed: Boolean) {
@@ -744,7 +739,6 @@ data class UserSettings(
     val tasbihSoundEnabled: Boolean = true,
     val tasbihSoundId: String = "1",
     val onboardingCompleted: Boolean = false,
-    val developerWelcomeDismissed: Boolean = false,
     val studyNoteDismissed: Boolean = false,
     val lastSeenAppVersionCode: Int = 0,
     val prayerCalculationMethod: String = "MUSLIM_WORLD_LEAGUE",
