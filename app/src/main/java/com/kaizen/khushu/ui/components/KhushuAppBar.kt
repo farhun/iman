@@ -107,7 +107,7 @@ fun KhushuAppBar(
     }
 
     val hideDefaultTitle = titleContent == null && title.isBlank() && !showLogoTitle
-    
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -138,7 +138,7 @@ fun KhushuAppBar(
                             ) { isLogoTitle ->
                                 if (isLogoTitle) {
                                     Icon(
-                                        painter = painterResource(id = R.drawable.ic_khushu_logo),
+                                        painter = painterResource(id = R.drawable.ic_iman_logo),
                                         contentDescription = "Iman",
                                         tint = MaterialTheme.colorScheme.onSurface,
                                         modifier = Modifier.size(64.dp)
@@ -257,7 +257,7 @@ private fun AppBarIconButton(
     onClick: () -> Unit,
 ) {
     val expressiveShape = MaterialShapes.Cookie9Sided.toShape()
-    
+
     val containerColor = if (selected) {
         MaterialTheme.colorScheme.primaryContainer
     } else {

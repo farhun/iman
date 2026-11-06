@@ -58,10 +58,10 @@ fun KhushuLogoBadge(
 
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
-    
+
     // 1. Cumulative rotation — adds 90 deg on every click
     var targetRotation by remember { mutableStateOf(0f) }
-    
+
     // 2. Spring-based animations for "Natural" feel
     val rotation by animateFloatAsState(
         targetValue = targetRotation,
@@ -110,7 +110,7 @@ fun KhushuLogoBadge(
     ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_khushu_logo),
+                painter = painterResource(id = R.drawable.ic_iman_logo),
                 contentDescription = null,
                 modifier = Modifier
                     .size(iconSize)
@@ -123,4 +123,3 @@ fun KhushuLogoBadge(
         }
     }
 }
-

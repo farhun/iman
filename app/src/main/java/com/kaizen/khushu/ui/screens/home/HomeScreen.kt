@@ -456,7 +456,7 @@ private fun KhushuPullRefreshIndicator(
     darkTheme: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val logoRes = if (darkTheme) R.drawable.ic_khushu_logo else R.drawable.ic_khushu_logo_black
+    val logoRes = if (darkTheme) R.drawable.ic_iman_logo else R.drawable.ic_iman_logo_black
     val targetProgress = if (isRefreshing) 1f else progress.coerceIn(0f, 1f)
     val visibleProgress by
     animateFloatAsState(

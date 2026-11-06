@@ -5,7 +5,7 @@ Iman is an Android app for prayer times, Quran reading, and Tasbih. It focuses o
 - **Repository:** https://github.com/farhun/iman
 - **App ID:** `io.github.farhun.iman`
 
-> Iman is a modified fork of the open-source Khushu project by *[https://github.com/greykaizen/khushu/]*. Original code license: *[LICENSE](LICENSE)*. The original project's name and logo are not used here.
+> Iman is a modified fork of the open-source Khushu project *[https://github.com/greykaizen/khushu/]*. Original code license: *[LICENSE](LICENSE)*. The original project's name and logo are not used here (Following the Trademark & Brand Policy).
 
 ## What's in the app
 
@@ -25,7 +25,6 @@ Iman is an Android app for prayer times, Quran reading, and Tasbih. It focuses o
 - The widget refreshes at each prayer time so the indicator moves on time.
 
 ### Home screen
-- Removed: starry/astronomy visual, Events feature, Hijri month event browser, Mosque directory, the sunrise/sunset arc card, and the radio buttons and dots in Today's Prayers.
 - Today's Prayers is display-only, and the Qibla button is always visible.
 - Added a "NOW" label above the current prayer.
 - The location name sits under "Today's Prayers" with a pin icon, and long names are truncated.
@@ -38,7 +37,6 @@ Iman is an Android app for prayer times, Quran reading, and Tasbih. It focuses o
 - Added a calibration hint (figure-8 motion) when the sensor reports low accuracy.
 
 ### Navigation and content
-- Study contains only the Holy Quran. Learn, Hadith, and the Pray (Salah) section were removed.
 - Bottom navigation: Home, Tasbih, Quran.
 
 ### Quran
@@ -47,7 +45,7 @@ Iman is an Android app for prayer times, Quran reading, and Tasbih. It focuses o
 - Exit reminder: leaving the reader on an unbookmarked ayah shows a "Not bookmarked" dialog with a "Don't show this again" option, which can be turned back on in Settings > Appearance.
 - Fixed a bookmark save/exit-check race.
 - Ayah playback has a 15-second loading timeout, an error state, and a Retry button.
-- Arabic script font changed to **QuranIndoPak** (see Credits).
+- Arabic script font changed to **QuranIndoPak** (see [Credits](#credits)).
 
 ### Prayer reminders and sounds
 - Prayer times are saved per date and used as the single source for all reminders.
@@ -56,13 +54,7 @@ Iman is an Android app for prayer times, Quran reading, and Tasbih. It focuses o
 - Each alarm schedules the next one before posting; everything reschedules after boot, app update, time or timezone change, and at midnight.
 - Per-prayer sound choice for Fajr, Dhuhr, Asr, Maghrib, Isha, and the pre-prayer reminder: Default, Adhan, Takbir, or Silent. `adhan.mp3` and `takbir.mp3` are bundled in `res/raw`.
 
-### Settings, About, and branding
-- Removed the "History" item, the "Support" (crypto address) section, and the first-install welcome modal.
-- Renamed the app to Iman, with a new app ID and repository, and set the version to 0.1.
-- App logo and icons are being replaced.
-
 ## Known limitations / planned
-- Arabic prayer names in Today's Prayers and Tasbih still use the system fallback font.
 - Reminder timing depends on phone settings: set Iman's battery to Unrestricted and allow Alarms & reminders.
 - Planned: a first-launch permission screen (location, notifications, exact alarms) and faster Home screen startup.
 - Single-ayah playback still streams from the internet, even if the reciter was downloaded.
@@ -86,6 +78,9 @@ Iman is an Android app for prayer times, Quran reading, and Tasbih. It focuses o
 ```
 
 Release builds are split by ABI. Use `arm64-v8a` for most modern phones, or the universal APK if you're unsure.
+
+## Iman Logo & Branding
+Original visual identity created for the Iman project.
 
 ## 📄 License & Brand Policy
 
