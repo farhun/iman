@@ -292,9 +292,6 @@ class SettingsViewModel(
         viewModelScope.launch { repository.updateShowTranslation(show) }
     }
 
-    fun toggleShowTransliteration(show: Boolean) {
-        viewModelScope.launch { repository.updateShowTransliteration(show) }
-    }
 
     fun toggleShowWordByWord(show: Boolean) {
         viewModelScope.launch { repository.updateShowWordByWord(show) }
@@ -332,17 +329,7 @@ class SettingsViewModel(
         viewModelScope.launch { repository.setSelectedTranslationSource(source) }
     }
 
-    fun setSelectedTafsir(id: String, source: String) {
-        viewModelScope.launch { repository.setSelectedTafsir(id, source) }
-    }
 
-    fun setShowTafsir(show: Boolean) {
-        viewModelScope.launch { repository.setShowTafsir(show) }
-    }
-
-    fun setSelectedAudioSource(source: String) {
-        viewModelScope.launch { repository.setSelectedAudioSource(source) }
-    }
 
     fun updateLastReadTopicId(id: String) {
         viewModelScope.launch { repository.updateLastReadTopicId(id) }

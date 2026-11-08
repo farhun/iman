@@ -18,8 +18,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Chat
-import androidx.compose.material.icons.automirrored.filled.MenuBook
+
+
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.FormatQuote
@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -85,11 +86,10 @@ fun BlockRenderer(
     arabicFontFamily: FontFamily = QuranIndoPak,
     isHighlighted: Boolean = false,
     isBookmarked: Boolean = false,
+    isAyahPlaying: Boolean = false,
     onBlockClick: (ContentBlock) -> Unit = {},
     onPlayClick: ((ContentBlock) -> Unit)? = null,
     onBookmarkClick: ((ContentBlock) -> Unit)? = null,
-    onTafsirClick: ((ContentBlock) -> Unit)? = null,
-    onReflectionsClick: ((ContentBlock) -> Unit)? = null,
     source: ContentSource = ContentSource.QF,
     readingMode: String = "verse_by_verse",
     modifier: Modifier = Modifier,
@@ -110,12 +110,11 @@ fun BlockRenderer(
             arabicFontFamily = arabicFontFamily,
             isHighlighted = isHighlighted,
             isBookmarked = isBookmarked,
+            isAyahPlaying = isAyahPlaying,
             readingMode = readingMode,
             source = source,
             onPlayClick = { onPlayClick?.invoke(block) },
             onBookmarkClick = { onBookmarkClick?.invoke(block) },
-            onTafsirClick = { onTafsirClick?.invoke(block) },
-            onReflectionsClick = { onReflectionsClick?.invoke(block) },
             modifier = modifier.clickable { onBlockClick(block) }
         )
 
@@ -188,12 +187,11 @@ private fun AyahBlockView(
     arabicFontFamily: FontFamily,
     isHighlighted: Boolean,
     isBookmarked: Boolean,
+    isAyahPlaying: Boolean = false,
     readingMode: String,
     source: ContentSource = ContentSource.QF,
     onPlayClick: () -> Unit,
     onBookmarkClick: () -> Unit,
-    onTafsirClick: () -> Unit,
-    onReflectionsClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val isReadingMode = readingMode == "reading"
@@ -369,42 +367,8 @@ private fun AyahBlockView(
             }
         }
 
-        // ── Inline Tafsir ─────────────────────────────────────────────────────
-        if (settings.showTafsir && block.tafsirText != null) {
-            val isSpa5k = settings.selectedTafsirSource == "SPA5K"
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.6f),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 8.dp)
-            ) {
-                Column(modifier = Modifier.padding(14.dp)) {
-                    Text(
-                        "Tafsir",
-                        style = MaterialTheme.typography.labelSmall.copy(fontFamily = BeVietnamPro),
-                        color = primaryColor,
-                        modifier = Modifier.padding(bottom = 6.dp)
-                    )
-                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                        Text(
-                            text = block.tafsirText,
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontFamily = if (isSpa5k) QuranIndoPak else BeVietnamPro,
-                                fontSize = if (isSpa5k) (settings.translationSizeSp + 5f).sp else settings.translationSizeSp.sp,
-                                lineHeight = if (isSpa5k) ((settings.translationSizeSp + 5f) * 1.8f).sp else (settings.translationSizeSp * 1.6f).sp,
-                                textAlign = TextAlign.Right,
-                            ),
-                            color = contentColor.copy(alpha = 0.85f),
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-                }
-            }
-        }
 
-        // ── Bottom row: chips (left) + action icons (right) ──────────────────
+        // ── Bottom row: action icons ─────────────────────────────────────────
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -413,38 +377,14 @@ private fun AyahBlockView(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Left: content chips
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Tafsir chip — hide when inline tafsir already expanded
-                if (source.supportsTafsir && (!settings.showTafsir || block.tafsirText == null)) {
-                    VerseChip(
-                        icon = Icons.AutoMirrored.Filled.MenuBook,
-                        label = "Tafsir",
-                        contentColor = contentColor,
-                        onClick = onTafsirClick
-                    )
-                }
-                // Reflections chip — only visible if source supports it
-                if (source.supportsReflections) {
-                    VerseChip(
-                        icon = Icons.AutoMirrored.Filled.Chat,
-                        label = "Reflections",
-                        contentColor = contentColor,
-                        onClick = onReflectionsClick
-                    )
-                }
-            }
 
             // Right: action icons
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (source.supportsAudio) {
                     IconButton(onClick = onPlayClick, modifier = Modifier.size(32.dp)) {
                         Icon(
-                            Icons.Default.PlayArrow,
-                            contentDescription = "Play",
+                            if (isAyahPlaying) Icons.Default.Stop else Icons.Default.PlayArrow,
+                            contentDescription = if (isAyahPlaying) "Stop" else "Play",
                             tint = contentColor.copy(alpha = 0.45f),
                             modifier = Modifier.size(17.dp)
                         )

@@ -36,14 +36,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kaizen.khushu.data.model.AyahBlock
 import com.kaizen.khushu.data.model.ContentBlock
 import com.kaizen.khushu.data.model.ContentSource
-import com.kaizen.khushu.data.model.AVAILABLE_RECITERS
+
 import com.kaizen.khushu.ui.components.BlockActionSheet
 import com.kaizen.khushu.ui.components.ReadingSettingsSheet
 import com.kaizen.khushu.ui.components.TranslationPickerSheet
-import com.kaizen.khushu.ui.components.TafsirPickerSheet
-import com.kaizen.khushu.ui.components.VerseContentSheet
+
 import com.kaizen.khushu.data.repository.TranslationRepository
-import com.kaizen.khushu.data.repository.QuranAudioRepository
+
 import com.kaizen.khushu.ui.screens.learn.BlockRenderer
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
 import com.kaizen.khushu.ui.theme.BeVietnamPro
@@ -170,12 +169,9 @@ fun QuranReaderScreen(
     val translations by viewModel.currentTranslation
     val scriptMap by viewModel.scriptMap
     val isLoading by viewModel.isLoading
-    val tafsirText by viewModel.tafsirText
-    val isTafsirDownloading by viewModel.isTafsirDownloading
-    val tafsirDownloadProgress by viewModel.tafsirDownloadProgress
+
     val chapters by viewModel.chapters
-    val reflections by viewModel.reflections
-    val reflectionsLoading by viewModel.reflectionsLoading
+
     val settings by settingsViewModel.settings.collectAsState()
     var bookmarkedAyahKeys by remember(surahNumber) { mutableStateOf(settings.bookmarkedAyahs) }
     LaunchedEffect(settings.bookmarkedAyahs) {
@@ -217,6 +213,7 @@ fun QuranReaderScreen(
 
     val playingAyahIndex by quranAudioViewModel.playingAyahIndex
     val audioState by quranAudioViewModel.audioState
+    val currentAyahKey by quranAudioViewModel.currentAyahKey
 
     // --- Overscroll / Next Surah Logic ---
     val thresholdPx = with(density) { 240.dp.toPx() }
@@ -290,16 +287,12 @@ fun QuranReaderScreen(
 
     var showSettings by remember { mutableStateOf(false) }
     var showTranslationPicker by remember { mutableStateOf(false) }
-    var showTafsirPicker by remember { mutableStateOf(false) }
+
     var isTranslationDownloading by remember { mutableStateOf(false) }
     var translationDownloadProgress by remember { mutableFloatStateOf(0f) }
     // "verse_by_verse" or "reading"
     var readingMode by remember { mutableStateOf("verse_by_verse") }
 
-    // Verse content sheet (Tafsir / Reflections)
-    var activeVerseForSheet by remember { mutableStateOf<AyahBlock?>(null) }
-    var sheetInitialTab by remember { mutableIntStateOf(0) } // 0=Tafsir, 1=Reflections
-    val verseSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LaunchedEffect(surahNumber, settings.selectedTranslationLang) {
         viewModel.loadChapters()
@@ -307,9 +300,6 @@ fun QuranReaderScreen(
         viewModel.loadVerseMeta(context)
     }
 
-    LaunchedEffect(surahNumber, settings.showTafsir, settings.selectedTafsirId) {
-        viewModel.loadTafsirIfEnabled(context, settings, surahNumber)
-    }
 
     // Load script when selected script changes
     LaunchedEffect(settings.selectedScript) {
@@ -340,7 +330,7 @@ fun QuranReaderScreen(
     }
 
     // Convert ayahs to blocks for BlockRenderer
-    val blocks = remember(ayahs, translations, tafsirText, surah) {
+    val blocks = remember(ayahs, translations, surah) {
         ayahs.map { (num, text) ->
             val plainText = text.replace(Regex("<[^>]*>"), "")
 
@@ -351,7 +341,6 @@ fun QuranReaderScreen(
                 textUthmani = plainText,
                 tajweedMarkup = if (text.contains("<tajweed")) text else null,
                 translationEn = translations[num],
-                tafsirText = tafsirText[num],
                 verified = true
             )
         }
@@ -396,36 +385,6 @@ fun QuranReaderScreen(
                             }
                         },
                         actions = {
-                            IconButton(onClick = {
-                                if (audioState == QuranAudioViewModel.AudioState.Playing) {
-                                    quranAudioViewModel.pause()
-                                } else if (audioState == QuranAudioViewModel.AudioState.Paused) {
-                                    quranAudioViewModel.resume()
-                                } else {
-                                    val url =
-                                        QuranAudioRepository.getUrl(context, settings.selectedReciterId, surahNumber)
-                                    if (url != null) {
-                                        quranAudioViewModel.playSurah(surahNumber, url, settings.selectedReciterId)
-                                    }
-                                }
-                            }) {
-                                when (audioState) {
-                                    is QuranAudioViewModel.AudioState.Playing -> Icon(
-                                        Icons.Default.Pause,
-                                        "Pause",
-                                        tint = fg.copy(alpha = 0.7f)
-                                    )
-
-                                    is QuranAudioViewModel.AudioState.Loading -> CircularProgressIndicator(
-                                        modifier = Modifier.size(
-                                            20.dp
-                                        ), strokeWidth = 2.dp, color = fg.copy(alpha = 0.7f)
-                                    )
-
-                                    else -> Icon(Icons.Default.PlayArrow, "Play", tint = fg.copy(alpha = 0.7f))
-                                }
-                            }
-
                             IconButton(onClick = { showSettings = true }) {
                                 Icon(
                                     imageVector = Icons.Default.Settings,
@@ -572,17 +531,27 @@ fun QuranReaderScreen(
                                         arabicFontFamily = arabicScriptFontFamily,
                                         isHighlighted = playingAyahIndex == index,
                                         isBookmarked = isBookmarked,
+                                        isAyahPlaying = currentAyahKey == "$surahNumber:${block.ayah}" &&
+                                            (audioState == QuranAudioViewModel.AudioState.Loading ||
+                                                audioState == QuranAudioViewModel.AudioState.Playing),
                                         readingMode = readingMode,
                                         source = ContentSource.QF,
                                         onBlockClick = { activeBlock = it to index },
                                         onPlayClick = {
-                                            quranAudioViewModel.playAyah(
-                                                surahNumber,
-                                                index,
-                                                blocks,
-                                                settings.selectedReciterId,
-                                                sequence = false
-                                            )
+                                            val ayahIsActive = currentAyahKey == "$surahNumber:${block.ayah}" &&
+                                                (audioState == QuranAudioViewModel.AudioState.Loading ||
+                                                    audioState == QuranAudioViewModel.AudioState.Playing)
+                                            if (ayahIsActive) {
+                                                quranAudioViewModel.stopAyah()
+                                            } else {
+                                                quranAudioViewModel.playAyah(
+                                                    surahNumber,
+                                                    index,
+                                                    blocks,
+                                                    settings.selectedReciterId,
+                                                    sequence = false
+                                                )
+                                            }
                                         },
                                         onBookmarkClick = {
                                             haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
@@ -596,18 +565,7 @@ fun QuranReaderScreen(
                                             val msg = if (isBookmarked) "Bookmark removed" else "Bookmark added"
                                             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                                         },
-                                        onTafsirClick = {
-                                            sheetInitialTab = 0
-                                            activeVerseForSheet = block
-                                            if (!settings.showTafsir) {
-                                                settingsViewModel.setShowTafsir(true)
-                                            }
-                                        },
-                                        onReflectionsClick = {
-                                            sheetInitialTab = 1
-                                            activeVerseForSheet = block
-                                            viewModel.loadReflections(block.surah, block.ayah)
-                                        },
+
                                     )
                                     val ayahAudioError = audioState as? QuranAudioViewModel.AudioState.Error
                                     if (playingAyahIndex == index && ayahAudioError != null) {
@@ -726,13 +684,21 @@ fun QuranReaderScreen(
                                     activeBlock = null
                                 },
                                 onPlayAyah = {
-                                    quranAudioViewModel.playAyah(
-                                        surahNumber,
-                                        index,
-                                        blocks,
-                                        settings.selectedReciterId,
-                                        sequence = false
-                                    )
+                                    val ayahKey = (block as? AyahBlock)?.let { "$surahNumber:${it.ayah}" }
+                                    val ayahIsActive = ayahKey != null && currentAyahKey == ayahKey &&
+                                        (audioState == QuranAudioViewModel.AudioState.Loading ||
+                                            audioState == QuranAudioViewModel.AudioState.Playing)
+                                    if (ayahIsActive) {
+                                        quranAudioViewModel.stopAyah()
+                                    } else {
+                                        quranAudioViewModel.playAyah(
+                                            surahNumber,
+                                            index,
+                                            blocks,
+                                            settings.selectedReciterId,
+                                            sequence = false
+                                        )
+                                    }
                                     activeBlock = null
                                 },
                                 onPlayFromHere = {
@@ -752,32 +718,22 @@ fun QuranReaderScreen(
             }
 
             if (showSettings) {
-                val reciterDownloadStates = AVAILABLE_RECITERS.associate { reciter ->
-                    reciter.id to quranAudioViewModel.getReciterDownloadProgress(reciter.id)
-                        .collectAsState(initial = null).value
-                }
 
                 ReadingSettingsSheet(
                     settings = settings,
-                    supportsTafsirSelection = true,
+
                     isQuranContext = true,
-                    reciterDownloadStates = reciterDownloadStates,
-                    isReciterDownloaded = { quranAudioViewModel.isReciterDownloaded(it) },
+
                     onDismiss = { showSettings = false },
                     onThemeChange = { settingsViewModel.setReadingTheme(it) },
                     onArabicSizeChange = { settingsViewModel.setArabicSizeSp(it) },
                     onTranslationSizeChange = { settingsViewModel.setTranslationSizeSp(it) },
                     onShowTranslationChange = { settingsViewModel.toggleShowTranslation(it) },
-                    onShowTransliterationChange = { settingsViewModel.toggleShowTransliteration(it) },
                     onShowWordByWordChange = { settingsViewModel.toggleShowWordByWord(it) },
                     onKeepScreenOnChange = { settingsViewModel.toggleReadingKeepScreenOn(it) },
                     onShowTajweedChange = { settingsViewModel.toggleShowTajweed(it) },
                     onTranslationLangChange = { settingsViewModel.setSelectedTranslationLang(it) },
-                    onShowTafsirChange = { settingsViewModel.setShowTafsir(it) },
-                    onOpenTafsirPicker = {
-                        showSettings = false
-                        showTafsirPicker = true
-                    },
+
                     onReciterChange = { settingsViewModel.setSelectedReciterId(it) },
                     onScriptChange = { settingsViewModel.setSelectedScript(it) },
                     availableQuranScripts = availableQuranScripts,
@@ -785,10 +741,7 @@ fun QuranReaderScreen(
                         showSettings = false
                         showTranslationPicker = true
                     },
-                    onDownloadAudio = { reciterId ->
-                        quranAudioViewModel.downloadReciter(reciterId)
-                    },
-                    onAudioSourceChange = { settingsViewModel.setSelectedAudioSource(it) }
+
                 )
             }
 
@@ -829,66 +782,6 @@ fun QuranReaderScreen(
                         }
                     },
                     onDismiss = { showTranslationPicker = false }
-                )
-            }
-
-            if (showTafsirPicker) {
-                TafsirPickerSheet(
-                    selectedTafsirId = settings.selectedTafsirId,
-                    selectedSource = try {
-                        ContentSource.valueOf(settings.selectedTafsirSource)
-                    } catch (e: Exception) {
-                        ContentSource.SPA5K
-                    },
-                    currentSurah = surahNumber,
-                    isDownloading = isTafsirDownloading,
-                    progress = tafsirDownloadProgress,
-                    downloadingTafsirId = viewModel.downloadingTafsirId.value,
-                    onSelectSource = { source ->
-                        settingsViewModel.setSelectedTafsir(settings.selectedTafsirId, source.name)
-                    },
-                    onSelect = { meta ->
-                        if (com.kaizen.khushu.data.repository.TafsirRepository.isDownloaded(
-                                context,
-                                meta.id,
-                                surahNumber
-                            )
-                        ) {
-                            settingsViewModel.setSelectedTafsir(meta.id, meta.source.name)
-                            showTafsirPicker = false
-                        } else {
-                            viewModel.downloadTafsirForSurah(context, meta, surahNumber) {
-                                settingsViewModel.setSelectedTafsir(meta.id, meta.source.name)
-                                showTafsirPicker = false
-                            }
-                        }
-                    },
-                    onDismiss = { showTafsirPicker = false }
-                )
-            }
-
-            // ── Verse Content Sheet (Tafsir + Reflections) ────────────────────
-            activeVerseForSheet?.let { activeVerse ->
-                val verseKey = "${activeVerse.surah}:${activeVerse.ayah}"
-                val verseTranslation = translations[activeVerse.ayah]
-                    ?: activeVerse.translationEn.orEmpty()
-
-                VerseContentSheet(
-                    surah = activeVerse.surah,
-                    ayah = activeVerse.ayah,
-                    surahName = surah?.nameSimple ?: "Surah ${activeVerse.surah}",
-                    arabicText = activeVerse.textUthmani.orEmpty(),
-                    translationText = verseTranslation,
-                    tafsirText = activeVerse.tafsirText,
-                    isTafsirSource = ContentSource.QF.supportsTafsir,
-                    reflections = reflections[verseKey] ?: emptyList(),
-                    isReflectionsLoading = reflectionsLoading.contains(verseKey),
-                    isReflectionsSource = ContentSource.QF.supportsReflections,
-                    initialTab = sheetInitialTab,
-                    sheetState = verseSheetState,
-                    onDismiss = { activeVerseForSheet = null },
-                    arabicSizeSp = settings.arabicSizeSp,
-                    translationSizeSp = settings.translationSizeSp,
                 )
             }
 
