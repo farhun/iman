@@ -182,8 +182,6 @@ fun QuranReaderScreen(
         bookmarkedAyahKeys = settings.bookmarkedAyahs
     }
     val availableQuranScripts by settingsViewModel.availableQuranScripts.collectAsState()
-    val downloadingQuranScript by settingsViewModel.downloadingQuranScript.collectAsState()
-    val quranScriptDownloadProgress by settingsViewModel.quranScriptDownloadProgress.collectAsState()
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
     val density = LocalDensity.current
@@ -783,9 +781,6 @@ fun QuranReaderScreen(
                     onReciterChange = { settingsViewModel.setSelectedReciterId(it) },
                     onScriptChange = { settingsViewModel.setSelectedScript(it) },
                     availableQuranScripts = availableQuranScripts,
-                    downloadingQuranScript = downloadingQuranScript,
-                    quranScriptDownloadProgress = quranScriptDownloadProgress,
-                    onDownloadQuranScript = { settingsViewModel.downloadQuranScript(it) },
                     onOpenTranslationPicker = {
                         showSettings = false
                         showTranslationPicker = true

@@ -15,7 +15,6 @@ import com.kaizen.khushu.data.model.TafsirMeta
 import com.kaizen.khushu.data.repository.CatalogRepository
 import com.kaizen.khushu.data.repository.TafsirRepository
 import com.kaizen.khushu.data.repository.QuranReflectRepository
-import com.kaizen.khushu.data.repository.QuranScriptFontRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -147,7 +146,7 @@ class QuranViewModel(application: Application) : AndroidViewModel(application) {
 
     fun loadScript(context: android.content.Context, script: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (script == "uthmani" || script == QuranScriptFontRepository.UTHMANIC_HAFS) {
+            if (script == "uthmani") {
                 withContext(Dispatchers.Main) {
                     scriptMap.value = emptyMap()
                 }

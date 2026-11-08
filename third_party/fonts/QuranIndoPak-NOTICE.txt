@@ -1,0 +1,50 @@
+FONT: AlQuran IndoPak by QuranWBW
+=================================
+
+Used for the Arabic Quran text in the Quran reader.
+This font is NOT covered by the GPLv3 license of the Iman source code.
+It keeps its own terms, reproduced below.
+
+Notice 1: from the font's page on onlinewebfonts.com
+----------------------------------------------------
+Trademark: This font AlQuran-IndoPak-by-QuranWBW is made by Ayman
+Siddiqui and is based on Al Qalam Quran Majeed and Al Qalam Quran Majeed
+Web fonts, specially adjusted and edited to work with Special Naskh
+Nastaleeq (IndoPak) Quran Text of www.QuranWBW.com. The Ayah Numbers have
+been made using glyphs of Nastaleeq Font by King Fahad Glorious Quran
+Printing Complex (KFGQPC), and other unknown contributors may also have
+made efforts either directly or indirectly.
+[Made only for Sadaqa-e-Jaria purposes. No Copyright infringement
+intended.]
+NOT FOR SALE, NOT FOR MODIFICATION, NOT FOR DISTRIBUTION OR NOT FOR
+DEVELOPMENT WITHOUT WRITTEN NOTICE BY QURANWBW.COM
+
+Notice 2: from https://github.com/marwan/indopak-quran-text
+-----------------------------------------------------------
+Made by Ayman Siddiqui and R. Siddiqua for www.QuranWBW.com and
+www.Quran.com for Sadaqa-e-Jaria purposes only.
+DO NOT SELL, MANIPULATE, DISTRIBUTE WITHOUT CREDITS OR TAMPER IN ANY FORM
+OR MANNER.
+
+About the LICENSE.txt that came with the download
+-------------------------------------------------
+The copy downloaded from onlinewebfonts.com included a LICENSE.txt that
+says "CC BY 4.0, you must credit the author". That is the website's own
+label. It is not from the font's author, and it does not replace the two
+notices above. The strictest wording above is the one followed here.
+
+How Iman uses the font
+----------------------
+- Included unmodified (only the file name was lowercased, if applicable).
+- Credited in the README and in the app's About screen.
+- Iman is free, ad-free, and not sold.
+- The font is not relicensed under the project's GPLv3 license.
+
+Permission status
+-----------------
+Written notice sent to QuranWBW.com on: [DATE]
+Reply received: [yes / no]
+Their reply: [paste or summarize, and keep the email]
+
+If they decline or do not reply, remove the font and use a font with an
+open license (for example, Scheherazade New under the SIL Open Font License).

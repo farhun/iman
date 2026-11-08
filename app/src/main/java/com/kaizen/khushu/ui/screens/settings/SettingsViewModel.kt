@@ -41,8 +41,6 @@ class SettingsViewModel(
 ) : ViewModel() {
     private var hasAttemptedGpsRefresh = false
     val availableQuranScripts = MutableStateFlow(QuranScriptFontRepository.availableScripts(appContext))
-    val downloadingQuranScript = MutableStateFlow<String?>(null)
-    val quranScriptDownloadProgress = MutableStateFlow(0f)
 
     val settings: StateFlow<UserSettings> = repository.settingsFlow.stateIn(
         scope = viewModelScope,
@@ -129,30 +127,6 @@ class SettingsViewModel(
             }.getOrNull() ?: "Your area"
 
             repository.updateLocationLabel(label)
-        }
-    }
-
-    fun downloadQuranScript(script: String) {
-        if (downloadingQuranScript.value != null) return
-        if (QuranScriptFontRepository.isDownloaded(appContext, script)) {
-            availableQuranScripts.value = QuranScriptFontRepository.availableScripts(appContext)
-            return
-        }
-        if (script != QuranScriptFontRepository.UTHMANIC_HAFS) return
-
-        viewModelScope.launch {
-            downloadingQuranScript.value = script
-            quranScriptDownloadProgress.value = 0f
-            val downloaded = runCatching {
-                QuranScriptFontRepository.downloadUthmanicHafs(appContext) { progress ->
-                    quranScriptDownloadProgress.value = progress
-                }
-            }.getOrDefault(false)
-            if (downloaded) {
-                availableQuranScripts.value = QuranScriptFontRepository.availableScripts(appContext)
-            }
-            downloadingQuranScript.value = null
-            quranScriptDownloadProgress.value = 0f
         }
     }
 

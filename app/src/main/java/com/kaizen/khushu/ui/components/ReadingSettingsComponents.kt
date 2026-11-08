@@ -126,9 +126,6 @@ fun ReadingSettingsSheet(
     onReciterChange: (String) -> Unit,
     onScriptChange: (String) -> Unit,
     availableQuranScripts: Set<String> = QuranScriptFontRepository.bundledScripts(),
-    downloadingQuranScript: String? = null,
-    quranScriptDownloadProgress: Float = 0f,
-    onDownloadQuranScript: (String) -> Unit = {},
     onOpenTranslationPicker: () -> Unit,
     onDownloadAudio: (String) -> Unit,
     onAudioSourceChange: (String) -> Unit = {},
@@ -332,26 +329,20 @@ fun ReadingSettingsSheet(
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     listOf(
-                                        Triple("uthmani", "Uthmani", "ٱلصَّلَوٰةِ"),
+                                        Triple("uthmani", "Uthmani", "ٱلصَّلَوٰةِ"),
                                         Triple("indopak", "IndoPak", "الصلوة"),
                                         Triple("uthmani_simple", "Simple", "الصلوة"),
-                                        Triple("imlaei", "Imlaei", "الصلاة"),
-                                        Triple(QuranScriptFontRepository.UTHMANIC_HAFS, "Uthmanic Hafs", "ٱلصَّلَوٰةِ")
+                                        Triple("imlaei", "Imlaei", "الصلاة")
                                     ).forEach { (value, label, sample) ->
-                                        val isDownloaded = availableQuranScripts.contains(value)
-                                        val isDownloading = downloadingQuranScript == value
                                         ScriptPreviewCard(
                                             label = label,
                                             sample = sample,
                                             selected = settings.selectedScript == value,
-                                            isDownloaded = isDownloaded,
-                                            isDownloading = isDownloading,
-                                            downloadProgress = if (isDownloading) quranScriptDownloadProgress else 0f,
-                                            onClick = {
-                                                if (isDownloaded) onScriptChange(value)
-                                                else onDownloadQuranScript(value)
-                                            },
-                                            onDownloadClick = { onDownloadQuranScript(value) },
+                                            isDownloaded = true,
+                                            isDownloading = false,
+                                            downloadProgress = 0f,
+                                            onClick = { onScriptChange(value) },
+                                            onDownloadClick = {},
                                             modifier = Modifier.weight(1f)
                                         )
                                     }

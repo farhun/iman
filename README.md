@@ -5,70 +5,60 @@ Iman is an Android app for prayer times, Quran reading, and Tasbih. It focuses o
 - **Repository:** https://github.com/farhun/iman
 - **App ID:** `io.github.farhun.iman`
 
-> Iman is a modified fork of the open-source Khushu project *[https://github.com/greykaizen/khushu/]*. Original code license: *[LICENSE](LICENSE)*. The original project's name and logo are not used here (Following the Trademark & Brand Policy).
+## Origin and notice
 
-## What's in the app
+Iman is a modified version of the open-source [Khushu](https://github.com/greykaizen/khushu) project, whose source code is licensed under GPLv3. This version was modified in 2026.
 
-- **Home:** current and next prayer, today's five prayers, Hijri date, and a Qibla compass.
-- **Tasbih:** dhikr counter and collections.
-- **Quran:** surah list, reader, audio, search, and bookmarks.
-- **Widget:** home-screen prayer times widget.
-- **Settings:** prayer calculation, reminders and sounds, widget customization, appearance.
+Iman is an independent project. It is not affiliated with or endorsed by the original Khushu project, and the original name and logo are not used.
 
-## What I changed from the original
+## Features
 
-### Widget
-- Show/hide switch for every widget item.
-- Shows only the five obligatory prayers: Fajr, Dhuhr, Asr, Maghrib, Isha.
-- Countdown shown as `HH:mm`, and prayer times in 24-hour format.
-- Active-prayer indicator is a pill behind the current prayer's time, with a customizable color (default `#7ED957`).
-- The widget refreshes at each prayer time so the indicator moves on time.
+- **Prayer times:** Fajr, Dhuhr, Asr, Maghrib, and Isha, with the current and next prayer, the Hijri date, a choice of calculation methods, and automatic or manual location. Pull down on Home to refresh the location, prayer times, widget, and reminders.
+- **Reminders:** prayer-time and pre-prayer reminders that keep working after a reboot, an app update, or a time or timezone change. Choose a sound for each prayer and for the pre-prayer reminder: default, adhan, takbir, or silent.
+- **Widget:** a home-screen widget showing the five prayers, with show/hide switches for every item, a 24-hour display, an `HH:mm` countdown, and customizable colors, including the active-prayer indicator.
+- **Qibla compass:** corrected for magnetic declination and smoothed so the needle stays steady, with a hint to calibrate the compass when the sensor reports low accuracy.
+- **Quran:** a reader using the IndoPak script, with search, bookmarks that can be sorted and deleted, a reminder when you leave the reader without a bookmark (which can be turned off in Settings), audio with downloads and a retry option when loading fails, translations, and tafsir.
+- **Tasbih:** dhikr collections, an immersive counter, and customizable beads.
+- **Settings:** prayer calculation, reminders and sounds, widget, and appearance.
 
-### Home screen
-- Today's Prayers is display-only, and the Qibla button is always visible.
-- Added a "NOW" label above the current prayer.
-- The location name sits under "Today's Prayers" with a pin icon, and long names are truncated.
-- Pull-to-refresh updates the GPS location (when GPS mode is on), the widget, and the reminders, and always stops the spinner.
+## Notes
 
-### Qibla compass
-- Fixed the bearing formula and added magnetic declination correction.
-- Added smoothing and tilt handling so the needle stays stable.
-- "N" and the north tick rotate with the compass; the needle is hidden when no sensor exists.
-- Added a calibration hint (figure-8 motion) when the sensor reports low accuracy.
-
-### Navigation and content
-- Bottom navigation: Home, Tasbih, Quran.
-
-### Quran
-- Search and a bookmark list with sorting (Latest first by default) and delete with confirmation.
-- Bookmarked ayahs show a filled bookmark icon.
-- Exit reminder: leaving the reader on an unbookmarked ayah shows a "Not bookmarked" dialog with a "Don't show this again" option, which can be turned back on in Settings > Appearance.
-- Fixed a bookmark save/exit-check race.
-- Ayah playback has a 15-second loading timeout, an error state, and a Retry button.
-- Arabic script font changed to **QuranIndoPak** (see [Credits](#credits)).
-
-### Prayer reminders and sounds
-- Prayer times are saved per date and used as the single source for all reminders.
-- Prayer-time reminders use `setAlarmClock()`; pre-prayer reminders use exact alarms, one per prayer.
-- Declared `SCHEDULE_EXACT_ALARM`, with a prompt that opens the system setting when it's off.
-- Each alarm schedules the next one before posting; everything reschedules after boot, app update, time or timezone change, and at midnight.
-- Per-prayer sound choice for Fajr, Dhuhr, Asr, Maghrib, Isha, and the pre-prayer reminder: Default, Adhan, Takbir, or Silent. `adhan.mp3` and `takbir.mp3` are bundled in `res/raw`.
-
-## Known limitations / planned
-- Reminder timing depends on phone settings: set Iman's battery to Unrestricted and allow Alarms & reminders.
-- Planned: a first-launch permission screen (location, notifications, exact alarms) and faster Home screen startup.
-- Single-ayah playback still streams from the internet, even if the reciter was downloaded.
+- Reminder timing depends on phone settings. Set Iman's battery use to Unrestricted and allow Alarms & reminders.
+- Playing a single ayah streams it from the internet, even if the reciter's audio was downloaded.
 
 ## Credits
 
+All third-party assets and their terms are listed in [`third_party/NOTICES.md`](third_party/NOTICES.md).
+
+### Original project
+Khushu: https://github.com/greykaizen/khushu (GPLv3).
+
+### Audio
+The bundled adhan and takbir sounds come from **"Adhan Recordings from Doha, Qatar"** on the Internet Archive, which is marked with the [Public Domain Mark 1.0](https://creativecommons.org/publicdomain/mark/1.0/).
+
+- `adhan.mp3`: the Maghrib adhan from that item, renamed.
+- `takbir.mp3`: a shortened excerpt of the same recording.
+- Source: https://archive.org/details/adhan.recordings.from.doha.qatar
+
+Public domain material needs no attribution. It is credited here for transparency. Details and a record of the source are in [`third_party/audio/ADHAN-NOTICE.txt`](third_party/audio/ADHAN-NOTICE.txt).
+
 ### Quran script font
-**AlQuran IndoPak by QuranWBW** (`QuranIndoPak`), made by Ayman Siddiqui for [QuranWBW.com](https://quranwbw.com). It is based on the Al Qalam Quran Majeed fonts (© Al Qalam, © Ghandhara), with ayah-number glyphs from KFGQPC. Credits embedded in the font: Abdul Majeed Khan, Arif Karim, Shakir-ul-Qadree, Jawad.
+**AlQuran IndoPak by QuranWBW**, created by Ayman Siddiqui and R. Siddiqua for QuranWBW.com and Quran.com. Based on the Al Qalam Quran Majeed fonts, with ayah-number glyphs from KFGQPC. Provided for Sadaqa-e-Jaria (ongoing charity) purposes.
 
-**Font license note:** the font's own notice says it was made for Sadaqa-e-Jaria (ongoing charity) and requires written notice to QuranWBW.com for modification, distribution, or development. Iman is free of charge and must not be sold with this font. Contact QuranWBW.com before distributing.
+Source: https://github.com/marwan/indopak-quran-text
 
-### Other
-- The Uthmanic Hafs font is downloaded at runtime from the quran-android project when that script is selected.
-- Prayer times use the `adhan2` library; optional API mode uses AlAdhan.
+This font is **not** covered by this project's GPLv3 license. It keeps its own terms, which are reproduced in [`third_party/fonts/QuranIndoPak-NOTICE.txt`](third_party/fonts/QuranIndoPak-NOTICE.txt). It is used as downloaded, without modification, with attribution, in a free, non-commercial app.
+
+[Permission status: written notice sent to QuranWBW.com on DATE. Add their reply here once received.]
+
+### Data sources and libraries
+- Prayer times: the `adhan2` library, with an optional AlAdhan API mode.
+- Tafsir and Quran data: Quran.com API; verse reflections: Quran Reflect.
+- Quran audio: QuranicAudio, EveryAyah, and mp3quran.net.
+- [Add the source of the bundled Quran text and translations.]
+
+### Logo
+[Confirm and edit: "The Iman logo and icons are original artwork created for this project." If the logo came from elsewhere, give the source and license instead.]
 
 ## Building
 
@@ -79,9 +69,8 @@ Iman is an Android app for prayer times, Quran reading, and Tasbih. It focuses o
 
 Release builds are split by ABI. Use `arm64-v8a` for most modern phones, or the universal APK if you're unsure.
 
-## Iman Logo & Branding
-Original visual identity created for the Iman project.
+## License
 
-## 📄 License & Brand Policy
+This project's source code is licensed under the GNU General Public License v3.0 (GPLv3). See [LICENSE](LICENSE) for details.
 
-**License:** This project is licensed under the **GNU General Public License v3.0 (GPLv3)**. See the [LICENSE](LICENSE) file for details.
+Third-party fonts, audio, and other assets have their own terms and are not covered by the GPLv3 license. See [Credits](#credits) and [`third_party/`](third_party/).

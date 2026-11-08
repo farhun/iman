@@ -216,7 +216,8 @@ class SettingsRepository(private val context: Context) {
                 showTafsir = preferences[PreferencesKeys.SHOW_TAFSIR] ?: false,
                 selectedReciterId = preferences[PreferencesKeys.SELECTED_RECITER_ID] ?: "mishari",
                 selectedAudioSource = preferences[PreferencesKeys.SELECTED_AUDIO_SOURCE] ?: "MP3QURAN",
-                selectedScript = preferences[PreferencesKeys.SELECTED_SCRIPT] ?: "uthmani",
+                selectedScript = (preferences[PreferencesKeys.SELECTED_SCRIPT] ?: "uthmani")
+                    .let { if (it == "uthmanic_hafs") "uthmani" else it },
                 tasbeehDynamicColors = preferences[PreferencesKeys.TASBEEH_DYNAMIC_COLORS] ?: true,
                 stringElasticity = preferences[PreferencesKeys.STRING_ELASTICITY] ?: 1.8f,
                 wobbleStiffness = preferences[PreferencesKeys.WOBBLE_STIFFNESS] ?: 140f,
