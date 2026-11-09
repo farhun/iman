@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import com.kaizen.khushu.data.model.*
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
 import com.kaizen.khushu.ui.theme.Antonio
+import com.kaizen.khushu.ui.theme.AmiriQuran
 import com.kaizen.khushu.ui.theme.BeVietnamPro
 import com.kaizen.khushu.ui.theme.KhushuColors
 import java.util.UUID
@@ -367,7 +368,7 @@ fun TasbihBeadCustomizerSheet(
                     value = workingStyle.engravingText,
                     onValueChange = { if (it.length <= 10) workingStyle = workingStyle.copy(engravingText = it) },
                     label = { Text("Custom Text") },
-                    placeholder = { Text("e.g. الله") },
+                    placeholder = { Text("e.g. الله", fontFamily = AmiriQuran) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
                     singleLine = true
@@ -549,10 +550,10 @@ private fun BeadPreview(
             }
             path
         }
-        
+
         val noiseShader = GlobalNoiseShader.value
         val noiseBrush = remember(noiseShader) { ShaderBrush(noiseShader) }
-        
+
         // Hit-test: check if engraving center has left the shape bounds
         val shapeRegion = remember(beadShape, density) {
             val sizePx = with(density) { Size(100.dp.toPx(), 100.dp.toPx()) }
@@ -586,7 +587,7 @@ private fun BeadPreview(
             color = if (isInsideShape) Color.White.copy(alpha = 0.85f) else Color.Red.copy(alpha = 0.6f),
             style = MaterialTheme.typography.headlineLarge.copy(
                 fontSize = 24.sp,
-                fontFamily = Antonio,
+                fontFamily = if (style.engravingText.any { it in '\u0600'..'\u06FF' }) AmiriQuran else Antonio,
                 textAlign = TextAlign.Center
             ),
             modifier = Modifier

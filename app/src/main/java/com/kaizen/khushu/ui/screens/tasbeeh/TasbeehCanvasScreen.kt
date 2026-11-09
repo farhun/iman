@@ -47,6 +47,7 @@ import com.kaizen.khushu.data.model.TasbeehCanvasPresetDomain
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
 import com.kaizen.khushu.ui.theme.Antonio
 import com.kaizen.khushu.ui.theme.BeVietnamPro
+import com.kaizen.khushu.ui.theme.AmiriQuran
 import com.kaizen.khushu.ui.theme.KhushuColors
 
 @Composable
@@ -59,7 +60,7 @@ fun TasbeehCanvasScreen(
     val view = LocalView.current
     val window = (LocalContext.current as Activity).window
     val context = LocalContext.current
-    
+
     DisposableEffect(Unit) {
         val controller = WindowCompat.getInsetsController(window, view)
         controller.hide(androidx.core.view.WindowInsetsCompat.Type.systemBars())
@@ -228,9 +229,9 @@ fun TasbeehCanvasScreen(
                 text = {
                     Text(
                         when (type) {
-                            TasbeehCanvasViewModel.GuidanceType.STRING_REMOVED -> 
+                            TasbeehCanvasViewModel.GuidanceType.STRING_REMOVED ->
                                 "Since String widget is removed, for counting tasbih you have to use volume up/down buttons now for doing tasbih."
-                            TasbeehCanvasViewModel.GuidanceType.BLIND_MODE_WARNING -> 
+                            TasbeehCanvasViewModel.GuidanceType.BLIND_MODE_WARNING ->
                                 "If you remove string and counter then you won't be able to track the count and would have to rely on volume up/down. Consider adding some widget to track count, or if you wanted a minimal look try the Stealth Mode (save the canvas and stealth mode toggle is right outside)."
                             else -> ""
                         }
@@ -335,7 +336,7 @@ fun TasbeehCanvasWidgetItem(
                 detectTransformGestures { _, pan, zoom, _ ->
                     val w = currentWidget
                     val newOffsetX = (w.offsetX + (pan.x / screenWidth)).coerceIn(0f, 1f)
-                    val newOffsetY = if (w is TasbihWidget.StringBeadWidget) 0.5f 
+                    val newOffsetY = if (w is TasbihWidget.StringBeadWidget) 0.5f
                                     else (w.offsetY + (pan.y / screenHeight)).coerceIn(0f, 1f)
                     val newScale = (w.scale * zoom).coerceIn(0.2f, 5f)
 
@@ -352,7 +353,7 @@ fun TasbeehCanvasWidgetItem(
             }
     ) {
         val renderHeight = if (widget is TasbihWidget.StringBeadWidget) screenHeight else 0f
-        
+
         Box(modifier = if (renderHeight > 0) Modifier.height(with(androidx.compose.ui.platform.LocalDensity.current) { renderHeight.toDp() }) else Modifier) {
             TasbihWidgetRenderer(
                 widget = widget,
@@ -408,7 +409,7 @@ private fun AddTasbihWidgetSheet(
                     modifier = Modifier.weight(1f),
                     onClick = { onAdd(TasbihWidget.DhikrNameWidget(id = "name_${System.currentTimeMillis()}")) }
                 ) {
-                    Text("سبحان الله", fontSize = 18.sp, color = Color.White)
+                    Text("سبحان الله", fontSize = 18.sp, color = Color.White, fontFamily = AmiriQuran)
                 }
             }
             Spacer(Modifier.height(12.dp))
@@ -492,8 +493,8 @@ private fun TasbihPresetsSheet(
                                     Text("${preset.widgets.size} widgets", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
                                     Spacer(Modifier.weight(1f))
                                     Icon(
-                                        Icons.Default.Delete, 
-                                        null, 
+                                        Icons.Default.Delete,
+                                        null,
                                         tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f),
                                         modifier = Modifier.size(16.dp).clickable { onDelete(preset.id) }
                                     )

@@ -66,7 +66,7 @@ import com.kaizen.khushu.data.model.ParagraphBlock
 import com.kaizen.khushu.data.repository.UserSettings
 import com.kaizen.khushu.ui.components.AyahEndMarker
 import com.kaizen.khushu.ui.theme.BeVietnamPro
-import com.kaizen.khushu.ui.theme.QuranIndoPak
+import com.kaizen.khushu.ui.theme.AmiriQuran
 
 /**
  * Renders a single [ContentBlock] into Compose UI.
@@ -83,7 +83,7 @@ fun BlockRenderer(
     translationMap: Map<String, String> = emptyMap(),
     tajweedMap: Map<String, String> = emptyMap(),
     scriptMap: Map<String, String> = emptyMap(),
-    arabicFontFamily: FontFamily = QuranIndoPak,
+    arabicFontFamily: FontFamily = AmiriQuran,
     isHighlighted: Boolean = false,
     isBookmarked: Boolean = false,
     isAyahPlaying: Boolean = false,
@@ -429,7 +429,7 @@ private fun AyahBlockView(
 /**
  * Reading mode: pure Arabic text flow, no action bar, no translation, no chips.
  * Uses a slightly larger line-height and justified/RTL rendering.
- * Font: QuranIndoPak at the user's selected arabicSizeSp.
+ * Font: AmiriQuran at the user's selected arabicSizeSp.
  */
 @Composable
 private fun ReadingModeAyah(
@@ -585,14 +585,14 @@ private fun HadithBlockView(
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Text(
                         text = block.textArabic,
-                        fontFamily = QuranIndoPak,
+                        fontFamily = AmiriQuran,
                         fontSize = settings.arabicSizeSp.sp,
                         lineHeight = (settings.arabicSizeSp * 1.75f).sp,
                         textAlign = TextAlign.Center,
                         color = fg,
                         style = MaterialTheme.typography.bodyLarge.copy(
                             textDirection = TextDirection.Rtl,
-                            fontFamily = QuranIndoPak,
+                            fontFamily = AmiriQuran,
                         ),
                         modifier = Modifier.fillMaxWidth(),
                     )

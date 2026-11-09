@@ -8,5 +8,7 @@ This folder records the source and terms of everything in Iman that was not writ
 | `adhan.mp3`, `takbir.mp3` | Internet Archive, "Adhan Recordings from Doha, Qatar" | Public Domain Mark 1.0 | `audio/ADHAN-NOTICE.txt` |
 | AlQuran IndoPak by QuranWBW (font) | https://github.com/marwan/indopak-quran-text | Own terms, see notice. Not GPLv3 | `fonts/QuranIndoPak-NOTICE.txt` |
 | Libraries (`adhan2`, Jetpack Compose, Room, Media3, OkHttp, and others) | See `app/build.gradle.kts` and `gradle/libs.versions.toml` | Each library's own license | Not copied here |
+| Ayah-by-ayah audio | EveryAyah, everyayah.com | Streamed, not bundled. See the site's terms | |
+| Translations (downloadable) | Quran Foundation and QuranEnc | See each service's terms | |
 
 When you add a new font, sound, image, or data file that someone else made, add a row here and a notice file next to it.

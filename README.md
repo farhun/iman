@@ -17,14 +17,14 @@ Iman is an independent project. It is not affiliated with or endorsed by the ori
 - **Reminders:** prayer-time and pre-prayer reminders that keep working after a reboot, an app update, or a time or timezone change. Choose a sound for each prayer and for the pre-prayer reminder: default, adhan, takbir, or silent.
 - **Widget:** a home-screen widget showing the five prayers, with show/hide switches for every item, a 24-hour display, an `HH:mm` countdown, and customizable colors, including the active-prayer indicator.
 - **Qibla compass:** corrected for magnetic declination and smoothed so the needle stays steady, with a hint to calibrate the compass when the sensor reports low accuracy.
-- **Quran:** a reader using the IndoPak script, with search, bookmarks that can be sorted and deleted, a reminder when you leave the reader without a bookmark (which can be turned off in Settings), audio with downloads and a retry option when loading fails, translations, and tafsir.
+- **Quran:** a reader using the IndoPak script, with search, bookmarks that can be sorted and deleted, a reminder when you leave the reader without a bookmark (which can be turned off in Settings), ayah-by-ayah audio with a retry option when loading fails, and downloadable translations.
 - **Tasbih:** dhikr collections, an immersive counter, and customizable beads.
 - **Settings:** prayer calculation, reminders and sounds, widget, and appearance.
 
 ## Notes
 
 - Reminder timing depends on phone settings. Set Iman's battery use to Unrestricted and allow Alarms & reminders.
-- Playing a single ayah streams it from the internet, even if the reciter's audio was downloaded.
+- Ayah audio streams from the internet, so it needs a connection.
 
 ## Credits
 
@@ -52,10 +52,10 @@ This font is **not** covered by this project's GPLv3 license. It keeps its own t
 [Permission status: written notice sent to QuranWBW.com on DATE. Add their reply here once received.]
 
 ### Data sources and libraries
-- Prayer times: the `adhan2` library, with an optional AlAdhan API mode.
-- Tafsir and Quran data: Quran.com API; verse reflections: Quran Reflect.
-- Quran audio: QuranicAudio, EveryAyah, and mp3quran.net.
-- [Add the source of the bundled Quran text and translations.]
+- Prayer times: the `adhan2` library, with an optional AlAdhan API mode (aladhan.com).
+- Ayah-by-ayah audio: EveryAyah (everyayah.com).
+- Translations: Quran Foundation (quran.com) and QuranEnc (quranenc.com). [Add the fawazahmed0 API if the catalog output confirms it.] Bundled English and Urdu translations: [add translator names].
+- [Add the source of the bundled Quran text.]
 
 ### Logo
 [Confirm and edit: "The Iman logo and icons are original artwork created for this project." If the logo came from elsewhere, give the source and license instead.]

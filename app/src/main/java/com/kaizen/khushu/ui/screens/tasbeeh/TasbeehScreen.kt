@@ -51,6 +51,7 @@ import com.kaizen.khushu.ui.components.KhushuAppBar
 import com.kaizen.khushu.ui.navigation.AppDestinations
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
 import com.kaizen.khushu.ui.theme.BeVietnamPro
+import com.kaizen.khushu.ui.theme.AmiriQuran
 import com.kaizen.khushu.ui.util.add
 import com.kaizen.khushu.ui.util.rememberMorphShape
 import dev.chrisbanes.haze.HazeState
@@ -75,7 +76,7 @@ fun TasbeehScreen(
     val isListMode = settings.tasbeehListMode
     var query by remember { mutableStateOf("") }
     var selectedCollection by remember { mutableStateOf<TasbeehCollection?>(null) }
-    
+
     val expressiveShape = MaterialShapes.Cookie9Sided.toShape()
 
     val filtered = remember(collections, query) {
@@ -85,7 +86,7 @@ fun TasbeehScreen(
                     it.items.any { item -> item.name.contains(query, ignoreCase = true) }
         }
     }
-    
+
     // Shape morphing for view toggles
     val gridProgress by animateFloatAsState(
         targetValue = if (!isListMode) 1f else 0f,
@@ -95,7 +96,7 @@ fun TasbeehScreen(
         targetValue = if (isListMode) 1f else 0f,
         label = "list_morph_progress"
     )
-    
+
     val gridMorphShape = rememberMorphShape(
         start = MaterialShapes.Circle,
         end = MaterialShapes.Cookie9Sided,
@@ -165,7 +166,7 @@ fun TasbeehScreen(
                 items = filtered,
                 key = { _, it -> "real_${it.id}" }
             ) { index, collection ->
-                val isVisible = true 
+                val isVisible = true
 
                 val alpha by animateFloatAsState(
                     targetValue = if (isVisible) 1f else 0f,
@@ -265,7 +266,7 @@ private fun CollectionDetailSheet(
     var showBeadCustomizer by remember { mutableStateOf(false) }
     var showPresets by remember { mutableStateOf(false) }
     var showCustomization by remember { mutableStateOf(false) }
-    
+
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val settings by settingsViewModel.settings.collectAsStateWithLifecycle()
@@ -420,7 +421,7 @@ private fun CollectionDetailSheet(
                             Text(
                                 text = collection.title?.takeIf { it.isNotBlank() } ?: "Collection",
                                 style = MaterialTheme.typography.headlineMedium,
-                                fontFamily = BeVietnamPro,
+                                fontFamily = if (collection.title?.any { it in '\u0600'..'\u06FF' } == true) AmiriQuran else BeVietnamPro,
                                 fontWeight = FontWeight.Medium,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.weight(1f),
@@ -461,6 +462,7 @@ private fun CollectionDetailSheet(
                             Text(
                                 text = item.name,
                                 style = MaterialTheme.typography.bodyLarge,
+                                fontFamily = if (item.name.any { it in '\u0600'..'\u06FF' }) AmiriQuran else BeVietnamPro,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.weight(1f),
                             )
@@ -527,7 +529,7 @@ private fun CollectionDetailSheet(
         PrepPresetsPickerSheet(
             presets = presets,
             onLoad = { canvasViewModel.loadPreset(it) },
-            onCustomizeMyOwn = { 
+            onCustomizeMyOwn = {
                 showPresets = false
                 onDismiss()
                 onCustomizeCanvas()
@@ -615,12 +617,12 @@ private fun PrepPreviewCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surfaceContainerHighest)
-                    .padding(vertical = 6.dp), 
+                    .padding(vertical = 6.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = title, 
+                        text = title,
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -674,8 +676,8 @@ private fun PrepPresetsPickerSheet(
                         Column(Modifier.padding(12.dp)) {
                             Text(preset.name, style = MaterialTheme.typography.labelLarge, maxLines = 1)
                             Text(
-                                "${preset.widgets.size} widgets", 
-                                style = MaterialTheme.typography.labelSmall, 
+                                "${preset.widgets.size} widgets",
+                                style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                             )
                         }
@@ -684,7 +686,7 @@ private fun PrepPresetsPickerSheet(
             }
 
             Spacer(Modifier.height(24.dp))
-            
+
             Button(
                 onClick = onCustomizeMyOwn,
                 modifier = Modifier.fillMaxWidth(),
@@ -799,7 +801,7 @@ private fun CollectionCard(
                     Text(
                         text = collection.title,
                         style = MaterialTheme.typography.headlineMedium,
-                        fontFamily = BeVietnamPro,
+                        fontFamily = if (collection.title.any { it in '\u0600'..'\u06FF' }) AmiriQuran else BeVietnamPro,
                         color = contentColor,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -817,6 +819,7 @@ private fun CollectionCard(
                         Text(
                             text = "· ${item.name}",
                             style = MaterialTheme.typography.bodySmall,
+                            fontFamily = if (item.name.any { it in '\u0600'..'\u06FF' }) AmiriQuran else BeVietnamPro,
                             color = contentColor.copy(alpha = 0.8f),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -924,6 +927,7 @@ private fun CollectionCard(
                     Text(
                         text = collection.title,
                         style = MaterialTheme.typography.titleMedium,
+                        fontFamily = if (collection.title.any { it in '\u0600'..'\u06FF' }) AmiriQuran else BeVietnamPro,
                         fontWeight = FontWeight.Bold,
                         color = contentColor,
                         maxLines = 1,
@@ -940,6 +944,7 @@ private fun CollectionCard(
                         Text(
                             text = item.name,
                             style = MaterialTheme.typography.bodyLarge,
+                            fontFamily = if (item.name.any { it in '\u0600'..'\u06FF' }) AmiriQuran else BeVietnamPro,
                             color = contentColor,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,

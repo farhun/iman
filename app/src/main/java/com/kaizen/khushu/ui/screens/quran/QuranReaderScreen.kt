@@ -46,7 +46,7 @@ import com.kaizen.khushu.data.repository.TranslationRepository
 import com.kaizen.khushu.ui.screens.learn.BlockRenderer
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
 import com.kaizen.khushu.ui.theme.BeVietnamPro
-import com.kaizen.khushu.ui.theme.QuranIndoPak
+import com.kaizen.khushu.ui.theme.AmiriQuran
 import com.kaizen.khushu.ui.theme.rememberArabicScriptFontFamily
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -433,7 +433,7 @@ fun QuranReaderScreen(
                                         Text(
                                             text = it.nameArabic,
                                             style = MaterialTheme.typography.displaySmall.copy(
-                                                fontFamily = QuranIndoPak,
+                                                fontFamily = AmiriQuran,
                                                 color = fg
                                             ),
                                             textAlign = TextAlign.Center
@@ -490,7 +490,7 @@ fun QuranReaderScreen(
                                         Text(
                                             text = "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ",
                                             textAlign = TextAlign.Center,
-                                            fontFamily = QuranIndoPak,
+                                            fontFamily = AmiriQuran,
                                             fontSize = 26.sp,
                                             color = fg.copy(alpha = 0.85f),
                                             modifier = Modifier.fillMaxWidth()

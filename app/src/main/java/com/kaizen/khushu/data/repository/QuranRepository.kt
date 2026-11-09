@@ -69,8 +69,6 @@ object QuranRepository {
         scriptCache[script]?.let { return it }
         val filename = when (script) {
             "indopak" -> "indopak.json"
-            "uthmani_simple" -> "uthmani_simple.json"
-            "imlaei" -> "imlaei.json"
             else -> "uthmani.json"
         }
         return try {

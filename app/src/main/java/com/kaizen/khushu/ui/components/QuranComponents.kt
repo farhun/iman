@@ -13,7 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kaizen.khushu.ui.theme.QuranIndoPak
+import com.kaizen.khushu.ui.theme.AmiriQuran
 
 fun Int.toArabicIndic() = this.toString().map { c ->
     when (c) {
@@ -38,7 +38,7 @@ fun AyahEndMarker(number: Int, fg: Color) {
             lineHeight = 32.sp,
             softWrap = false,
             color = fg.copy(alpha = 0.6f),
-            fontFamily = QuranIndoPak,
+            fontFamily = AmiriQuran,
             textAlign = TextAlign.Center
         )
         // The number inside
@@ -46,7 +46,7 @@ fun AyahEndMarker(number: Int, fg: Color) {
             text = number.toArabicIndic(),
             fontSize = 12.sp,
             color = fg,
-            fontFamily = QuranIndoPak,
+            fontFamily = AmiriQuran,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
             modifier = Modifier.offset(y = 2.dp)

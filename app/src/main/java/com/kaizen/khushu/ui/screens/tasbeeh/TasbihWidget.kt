@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.kaizen.khushu.data.model.CustomBeadStyle
 import com.kaizen.khushu.data.model.DhikrItem
+import com.kaizen.khushu.ui.theme.AmiriQuran
 import kotlin.math.abs
 import kotlin.math.exp
 import kotlinx.serialization.Serializable
@@ -445,6 +446,7 @@ fun TasbihWidgetRenderer(
                         text = currentItem?.name ?: "سُبْحَانَ اللَّهِ",
                         style =
                                 TextStyle(
+                                        fontFamily = AmiriQuran,
                                         color = Color(widget.color),
                                         fontSize = MaterialTheme.typography.headlineLarge.fontSize,
                                         fontWeight =
@@ -535,6 +537,7 @@ fun TasbihWidgetRenderer(
                     text = widget.text,
                     style =
                             TextStyle(
+                                    fontFamily = if (widget.text.any { it in '\u0600'..'\u06FF' }) AmiriQuran else null,
                                     color = Color(widget.color),
                                     fontSize = widget.fontSize.sp,
                                     fontWeight =

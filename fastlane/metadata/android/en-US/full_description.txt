@@ -5,6 +5,6 @@
 <li>Prayer and pre-prayer reminders, with a sound choice for each prayer: default, adhan, takbir, or silent</li>
 <li>Home-screen widget with show/hide options and a customizable active-prayer color</li>
 <li>Qibla compass</li>
-<li>Quran reader with search, bookmarks, translations, tafsir, and audio</li>
+<li>Quran reader with search, bookmarks, translations, and ayah-by-ayah audio</li>
 <li>Tasbih collections with immersive counters and customizable bead styles</li>
 </ul>

@@ -3,7 +3,7 @@ package com.kaizen.khushu.data.repository
 import android.content.Context
 
 object QuranScriptFontRepository {
-    private val bundledScripts = setOf("uthmani", "indopak", "uthmani_simple", "imlaei")
+    private val bundledScripts = setOf("uthmani", "indopak")
 
     fun bundledScripts(): Set<String> = bundledScripts
 

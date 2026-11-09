@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.sp
 import com.kaizen.khushu.data.model.SurahMeta
 import com.kaizen.khushu.ui.theme.Antonio
 import com.kaizen.khushu.ui.theme.BeVietnamPro
-import com.kaizen.khushu.ui.theme.QuranIndoPak
+import com.kaizen.khushu.ui.theme.AmiriQuran
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -352,7 +352,7 @@ private fun SurahListItem(
         // Arabic name right-aligned
         Text(
             text = surah.nameArabic,
-            fontFamily = QuranIndoPak,
+            fontFamily = AmiriQuran,
             fontSize = 22.sp,
             color = MaterialTheme.colorScheme.primary,
             textAlign = TextAlign.End

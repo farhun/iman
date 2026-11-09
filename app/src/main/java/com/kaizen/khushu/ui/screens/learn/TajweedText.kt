@@ -19,7 +19,7 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
-import com.kaizen.khushu.ui.theme.QuranIndoPak
+import com.kaizen.khushu.ui.theme.AmiriQuran
 
 @Composable
 fun TajweedText(
@@ -44,14 +44,14 @@ fun TajweedText(
     Text(
         text = annotatedString,
         modifier = modifier,
-        fontFamily = QuranIndoPak,
+        fontFamily = AmiriQuran,
         fontSize = fontSize,
         lineHeight = lineHeight,
         textAlign = TextAlign.Center,
         inlineContent = inlineContent,
         style = MaterialTheme.typography.bodyLarge.copy(
             textDirection = TextDirection.Rtl,
-            fontFamily = QuranIndoPak,
+            fontFamily = AmiriQuran,
         ),
     )
 }

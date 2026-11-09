@@ -59,7 +59,7 @@ object AppUpdateRepository {
     private const val GITHUB_ACCEPT_HEADER = "application/vnd.github.v3+json"
 
     // Must match the authority declared in AndroidManifest.xml for the FileProvider.
-    // Using applicationId so it resolves correctly across product flavors.
+    // Using applicationId so it resolves correctly across application variants.
     private val PROVIDER_AUTHORITY: String by lazy { "${BuildConfig.APPLICATION_ID}.update_provider" }
     private const val USER_AGENT = "Iman/${BuildConfig.VERSION_NAME} (Android; +https://github.com/farhun/iman)"
 
@@ -70,17 +70,17 @@ object AppUpdateRepository {
         .followRedirects(true)
         .build()
 
-    /** Whether this build supports in-app updates (full/GitHub flavor only). */
-    val isUpdateableBuild: Boolean get() = BuildConfig.FLAVOR == "full"
+    /** Whether this build supports in-app updates. */
+    val isUpdateableBuild: Boolean get() = true
 
     /**
      * Checks for an update on GitHub. Returns [UpdateCheckResult.Error] immediately
-     * if called on a non-updateable build (F-Droid).
+     * if called on a non-updateable build.
      */
     suspend fun checkForUpdate(): UpdateCheckResult = withContext(Dispatchers.IO) {
         if (!isUpdateableBuild) {
             return@withContext UpdateCheckResult.Error(
-                "In-app updates are not available on this build. Please update through F-Droid.",
+                "In-app updates are not available on this build.",
                 isRetryable = false
             )
         }
@@ -131,20 +131,18 @@ object AppUpdateRepository {
                 return@withContext UpdateCheckResult.UpToDate
             }
 
-            // Look for a 'full' APK asset — prefer universal, fall back to ABI-specific.
+            // Prefer the universal APK, then fall back to an ABI-specific APK.
             val apkAsset = release.assets.find {
-                it.name.contains("full", ignoreCase = true) &&
-                        it.name.endsWith(".apk", ignoreCase = true) &&
+                it.name.endsWith(".apk", ignoreCase = true) &&
                         it.name.contains("universal", ignoreCase = true)
             } ?: release.assets.find {
-                it.name.contains("full", ignoreCase = true) &&
-                        it.name.endsWith(".apk", ignoreCase = true)
+                it.name.endsWith(".apk", ignoreCase = true)
             }
 
             if (apkAsset == null) {
                 val assetNames = release.assets.joinToString(", ") { it.name }
                 return@withContext UpdateCheckResult.Error(
-                    "No full-APK asset found in latest release (found: $assetNames)",
+                    "No APK asset found in latest release (found: $assetNames)",
                     isRetryable = false
                 )
             }

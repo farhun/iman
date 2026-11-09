@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -44,6 +45,7 @@ import com.kaizen.khushu.data.repository.QuranScriptFontRepository
 import com.kaizen.khushu.data.repository.UserSettings
 import com.kaizen.khushu.ui.theme.Antonio
 import com.kaizen.khushu.ui.theme.BeVietnamPro
+import com.kaizen.khushu.ui.theme.AmiriQuran
 import com.kaizen.khushu.ui.theme.QuranIndoPak
 
 @Composable
@@ -168,7 +170,7 @@ fun ReadingSettingsSheet(
                         CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
                             Text(
                                 text = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ",
-                                fontFamily = QuranIndoPak,
+                                fontFamily = AmiriQuran,
                                 fontSize = settings.arabicSizeSp.sp,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 textAlign = TextAlign.Center
@@ -283,13 +285,13 @@ fun ReadingSettingsSheet(
                                 ) {
                                     listOf(
                                         Triple("uthmani", "Uthmani", "ٱلصَّلَوٰةِ"),
-                                        Triple("indopak", "IndoPak", "الصلوة"),
-                                        Triple("uthmani_simple", "Simple", "الصلوة"),
-                                        Triple("imlaei", "Imlaei", "الصلاة")
+                                        Triple("indopak", "IndoPak", "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِیْمِ ")
                                     ).forEach { (value, label, sample) ->
                                         ScriptPreviewCard(
                                             label = label,
                                             sample = sample,
+                                            sampleFontFamily = if (value == "indopak") QuranIndoPak else AmiriQuran,
+                                            referenceLabel = if (value == "indopak") "1:1" else null,
                                             selected = settings.selectedScript == value,
                                             isDownloaded = true,
                                             isDownloading = false,
@@ -456,7 +458,7 @@ fun ThemePreviewCard(
                 Text(
                     text = "بِسْمِ اللَّهِ",
                     color = fgColor,
-                    fontFamily = QuranIndoPak,
+                    fontFamily = AmiriQuran,
                     fontSize = 18.sp
                 )
             }
@@ -476,6 +478,8 @@ fun ThemePreviewCard(
 fun ScriptPreviewCard(
     label: String,
     sample: String,
+    sampleFontFamily: FontFamily,
+    referenceLabel: String? = null,
     selected: Boolean,
     isDownloaded: Boolean = true,
     isDownloading: Boolean = false,
@@ -511,14 +515,29 @@ fun ScriptPreviewCard(
             color = containerBg,
             shadowElevation = 1.dp
         ) {
-            Box(contentAlignment = Alignment.Center) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
                 Text(
                     text = sample,
                     color = contentColor,
-                    fontFamily = QuranIndoPak,
-                    fontSize = 18.sp,
+                    fontFamily = sampleFontFamily,
+                    fontSize = if (referenceLabel == null) 18.sp else 10.sp,
+                    maxLines = 1,
+                    softWrap = false,
                     textAlign = TextAlign.Center
                 )
+                referenceLabel?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontFamily = BeVietnamPro,
+                        fontSize = 9.sp,
+                        lineHeight = 10.sp,
+                        color = contentColor
+                    )
+                }
             }
         }
 

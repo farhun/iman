@@ -15,7 +15,8 @@ private val googleFontsProvider = GoogleFont.Provider(
 
 private val beVietnamProFont = GoogleFont("Be Vietnam Pro")
 
-val QuranIndoPak = FontFamily(Font(R.font.quran_indopak))
+val QuranIndoPak = FontFamily(Font(R.font.quran_neo_arabic))
+val AmiriQuran = FontFamily(Font(R.font.amiri_quran))
 val BeVietnamPro = FontFamily(
     GoogleFontSpec(googleFont = beVietnamProFont, fontProvider = googleFontsProvider, weight = FontWeight.Normal),
     GoogleFontSpec(googleFont = beVietnamProFont, fontProvider = googleFontsProvider, weight = FontWeight.Medium),
@@ -25,5 +26,5 @@ val BeVietnamPro = FontFamily(
 
 val Typography = createKhushuTypography(
     beVietnamPro = BeVietnamPro,
-    quranIndopak = QuranIndoPak,
+    quranIndopak = AmiriQuran,
 )

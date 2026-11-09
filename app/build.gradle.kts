@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.kaizen.khushu"
     compileSdk = 36
-    val singleApkBuild = providers.gradleProperty("khushu.singleApk").orNull == "true"
+
     dependenciesInfo {
         includeInApk = false
         includeInBundle = false
@@ -27,15 +27,6 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    flavorDimensions += "distribution"
-    productFlavors {
-        create("full") {
-            dimension = "distribution"
-        }
-        create("fdroid") {
-            dimension = "distribution"
-        }
-    }
 
     buildTypes {
         release {
@@ -50,7 +41,7 @@ android {
 
     splits {
         abi {
-            isEnable = !singleApkBuild
+            isEnable = true
             reset()
             include("armeabi-v7a", "arm64-v8a")
             isUniversalApk = true
@@ -86,7 +77,7 @@ dependencies {
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.graphics.shapes)
     implementation(libs.androidx.compose.material.icons.extended)
-    add("fullImplementation", libs.androidx.compose.ui.text.google.fonts)
+    implementation(libs.androidx.compose.ui.text.google.fonts)
     implementation(libs.haze)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
