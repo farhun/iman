@@ -7,7 +7,8 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <!-- Splash screen — light mode: light accent bg, dark accent icon -->
-    <color name="splash_background">#27847d</color>
-    <color name="splash_icon_color">@android:color/white</color>
+    <!-- Match the launcher icon background. -->
+    <color name="splash_background">#293041</color>
+    <color name="splash_icon_color">#B0C6FE</color>
+    <color name="notification_icon_background">#7ca0fc</color>
 </resources>

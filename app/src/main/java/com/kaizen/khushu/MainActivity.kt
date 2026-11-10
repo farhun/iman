@@ -266,7 +266,7 @@ private fun KhushuApp(
     media3Controller: MediaController?
 ) {
     var showCreateSheet by remember { mutableStateOf(false) }
-    var showSettingsSheet by remember { mutableStateOf(false) }
+
     val navController = rememberNavController()
     val settings by settingsViewModel.settings.collectAsState()
     val appContext = LocalContext.current.applicationContext
@@ -364,7 +364,9 @@ private fun KhushuApp(
                             viewModel = homeViewModel,
                             hazeState = hazeState,
                             contentPadding = screenContentPadding,
-                            onSettingsClick = { showSettingsSheet = true }
+                            onSettingsClick = {
+                                navController.navigate(SETTINGS_ROUTE) { launchSingleTop = true }
+                            }
                         )
                     }
 
@@ -385,7 +387,9 @@ private fun KhushuApp(
                             },
                             onEditCollection = { showCreateSheet = true },
                             onCustomizeCanvas = { navController.navigate("tasbeeh/canvas") },
-                            onSettingsClick = { showSettingsSheet = true },
+                            onSettingsClick = {
+                                navController.navigate(SETTINGS_ROUTE) { launchSingleTop = true }
+                            },
                             hazeState = hazeState,
                             contentPadding = screenContentPadding
                         )
@@ -451,7 +455,6 @@ private fun KhushuApp(
                         popExitTransition = { subScreenPopExit() },
                     ) {
                         SettingsScreen(
-                            viewModel = settingsViewModel,
                             onNavigateCounter = {
                                 navController.navigate(SETTINGS_COUNTER_ROUTE)
                             },
@@ -463,6 +466,9 @@ private fun KhushuApp(
                             },
                             onNavigatePrayer = {
                                 navController.navigate(com.kaizen.khushu.ui.navigation.SETTINGS_PRAYER_ROUTE)
+                            },
+                            onNavigateTasbeeh = {
+                                navController.navigate(SETTINGS_TASBEEH_ROUTE)
                             },
                             onNavigateAbout = {
                                 navController.navigate(com.kaizen.khushu.ui.navigation.SETTINGS_ABOUT_ROUTE)
@@ -538,26 +544,7 @@ private fun KhushuApp(
                     }
 
                     composable(
-                        route = CUSTOMIZE_ROUTE,
-                        enterTransition = { subScreenEnter() },
-                        exitTransition = { subScreenExit() },
-                        popEnterTransition = { subScreenPopEnter() },
-                        popExitTransition = { subScreenPopExit() },
-                    ) {
-                        CustomizeScreen(
-                            settingsViewModel = settingsViewModel,
-                            onNavigateTasbeeh = {
-                                navController.navigate(CUSTOMIZE_TASBEEH_ROUTE)
-                            },
-                            onBack = {
-                                navController.popBackStack()
-                            }
-                        )
-                    }
-
-
-                    composable(
-                        route = CUSTOMIZE_TASBEEH_ROUTE,
+                        route = SETTINGS_TASBEEH_ROUTE,
                         enterTransition = { subScreenEnter() },
                         exitTransition = { subScreenExit() },
                         popEnterTransition = { subScreenPopEnter() },
@@ -670,24 +657,6 @@ private fun KhushuApp(
             )
         }
 
-        if (showSettingsSheet) {
-            SettingsSheet(
-                viewModel = settingsViewModel,
-                onNavigateSettings = {
-                    showSettingsSheet = false
-                    navController.navigate(SETTINGS_ROUTE)
-                },
-                onNavigateCustomize = {
-                    showSettingsSheet = false
-                    navController.navigate(CUSTOMIZE_ROUTE)
-                },
-                onNavigateAbout = {
-                    showSettingsSheet = false
-                    navController.navigate(com.kaizen.khushu.ui.navigation.SETTINGS_ABOUT_ROUTE)
-                },
-                onDismiss = { showSettingsSheet = false }
-            )
-        }
 
         pendingReleaseNotes?.let { note ->
             ReleaseNotesDialog(

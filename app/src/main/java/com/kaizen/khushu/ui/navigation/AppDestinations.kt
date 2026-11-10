@@ -9,11 +9,11 @@ const val SETTINGS_APPEARANCE_ROUTE = "settings/appearance"
 const val SETTINGS_PRAYER_ROUTE = "settings/prayer"
 const val SETTINGS_WIDGET_ROUTE = "settings/widget"
 const val SETTINGS_ABOUT_ROUTE = "settings/about"
-const val CUSTOMIZE_ROUTE = "customize"
-const val ONBOARDING_ROUTE = "onboarding"
-const val CUSTOMIZE_PALETTE_ROUTE = "customize/palette"
 
-const val CUSTOMIZE_TASBEEH_ROUTE = "customize/tasbeeh"
+const val ONBOARDING_ROUTE = "onboarding"
+
+
+const val SETTINGS_TASBEEH_ROUTE = "settings/tasbeeh"
 
 // Immersive & Editor Routes
 const val TASBEEH_IMMERSIVE_ROUTE = "tasbeeh/immersive/{collectionId}"

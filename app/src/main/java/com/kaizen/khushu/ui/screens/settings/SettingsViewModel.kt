@@ -18,11 +18,11 @@ import com.kaizen.khushu.data.model.defaultCustomBeadStyle
 import com.kaizen.khushu.data.repository.QuranScriptFontRepository
 import com.kaizen.khushu.data.repository.SettingsRepository
 import com.kaizen.khushu.data.repository.UserSettings
-import com.kaizen.khushu.util.AppIconManager
+
 import com.kaizen.khushu.widget.PrayerWidgetProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -47,7 +47,7 @@ class SettingsViewModel(
         started = SharingStarted.Eagerly,
         initialValue = UserSettings(
             hapticsEnabled = true,
-            dynamicColor = true,
+            dynamicColor = false,
             pureBlack = false,
             keepScreenAwake = true,
             volumeCounting = false,
@@ -61,7 +61,7 @@ class SettingsViewModel(
             tasbeehListMode = true,
             startupTab = "home",
             tasbihBeadStyle = "CLASSIC_AMBER",
-            showTajweed = false,
+
             customBeadStyles = listOf(defaultCustomBeadStyle()),
             activeBeadStyleId = DEFAULT_CUSTOM_BEAD_STYLE_ID,
             tasbihSoundEnabled = true,
@@ -260,21 +260,6 @@ class SettingsViewModel(
         viewModelScope.launch { repository.updateTasbihBeadStyle(style) }
     }
 
-    fun setLogoStyle(style: String) {
-        val current = settings.value.logoStyle
-        viewModelScope.launch {
-            repository.updateLogoStyle(style)        // DataStore → instant in-app UI update
-            if (style != current) {
-                Toast.makeText(
-                    appContext,
-                    "Updating app icon. Iman will restart momentarily...",
-                    Toast.LENGTH_SHORT,
-                ).show()
-                delay(1500L)
-                AppIconManager.apply(appContext, style)
-            }
-        }
-    }
 
     fun setReadingTheme(theme: String) {
         viewModelScope.launch { repository.updateReadingTheme(theme) }
@@ -293,10 +278,6 @@ class SettingsViewModel(
     }
 
 
-    fun toggleShowWordByWord(show: Boolean) {
-        viewModelScope.launch { repository.updateShowWordByWord(show) }
-    }
-
     fun toggleReadingKeepScreenOn(keep: Boolean) {
         viewModelScope.launch { repository.updateReadingKeepScreenOn(keep) }
     }
@@ -309,9 +290,6 @@ class SettingsViewModel(
         viewModelScope.launch { repository.updateQuranExitReminderDisabled(disabled) }
     }
 
-    fun toggleShowTajweed(show: Boolean) {
-        viewModelScope.launch { repository.updateShowTajweed(show) }
-    }
 
     fun setSelectedReciterId(id: String) {
         viewModelScope.launch { repository.updateSelectedReciterId(id) }

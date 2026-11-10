@@ -48,6 +48,10 @@ import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
 import com.kaizen.khushu.ui.theme.BeVietnamPro
 import com.kaizen.khushu.ui.theme.AmiriQuran
 import com.kaizen.khushu.ui.theme.rememberArabicScriptFontFamily
+import com.kaizen.khushu.ui.theme.colorSeeds
+import com.kaizen.khushu.ui.theme.DefaultSeedColor
+import com.materialkolor.PaletteStyle
+import com.materialkolor.dynamicColorScheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -80,7 +84,7 @@ private fun contentColor(theme: String): Color {
 }
 
 @Composable
-private fun readingColorScheme(readingTheme: String, dynamicColor: Boolean): ColorScheme {
+private fun readingColorScheme(readingTheme: String, dynamicColor: Boolean, colorSeed: String): ColorScheme {
     val context = LocalContext.current
     val isSystemDark = androidx.compose.foundation.isSystemInDarkTheme()
     val isDark = when (readingTheme) {
@@ -90,12 +94,33 @@ private fun readingColorScheme(readingTheme: String, dynamicColor: Boolean): Col
         else -> isSystemDark
     }
 
-    return when {
-        isDark && dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> dynamicDarkColorScheme(context)
-        isDark -> darkColorScheme()
-        !isDark && dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> dynamicLightColorScheme(context)
-        else -> lightColorScheme()
+    val neutralScheme = if (isDark) darkColorScheme() else lightColorScheme()
+    val generatedColorScheme = when {
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ->
+            if (isDark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        else -> dynamicColorScheme(
+            seedColor = colorSeeds[colorSeed] ?: DefaultSeedColor,
+            isDark = isDark,
+            isAmoled = false,
+            style = PaletteStyle.TonalSpot,
+        )
     }
+    return neutralScheme.copy(
+        primary = generatedColorScheme.primary,
+        onPrimary = generatedColorScheme.onPrimary,
+        primaryContainer = generatedColorScheme.primaryContainer,
+        onPrimaryContainer = generatedColorScheme.onPrimaryContainer,
+        inversePrimary = generatedColorScheme.inversePrimary,
+        secondary = generatedColorScheme.secondary,
+        onSecondary = generatedColorScheme.onSecondary,
+        secondaryContainer = generatedColorScheme.secondaryContainer,
+        onSecondaryContainer = generatedColorScheme.onSecondaryContainer,
+        tertiary = generatedColorScheme.tertiary,
+        onTertiary = generatedColorScheme.onTertiary,
+        tertiaryContainer = generatedColorScheme.tertiaryContainer,
+        onTertiaryContainer = generatedColorScheme.onTertiaryContainer,
+        surfaceTint = neutralScheme.surface,
+    )
 }
 
 @Composable
@@ -283,7 +308,7 @@ fun QuranReaderScreen(
         quranAudioViewModel.setController(media3Controller)
     }
 
-    val scheme = readingColorScheme(settings.readingTheme, settings.dynamicColor)
+    val scheme = readingColorScheme(settings.readingTheme, settings.dynamicColor, settings.colorSeed)
 
     var showSettings by remember { mutableStateOf(false) }
     var showTranslationPicker by remember { mutableStateOf(false) }
@@ -332,14 +357,11 @@ fun QuranReaderScreen(
     // Convert ayahs to blocks for BlockRenderer
     val blocks = remember(ayahs, translations, surah) {
         ayahs.map { (num, text) ->
-            val plainText = text.replace(Regex("<[^>]*>"), "")
-
             AyahBlock(
                 surah = surahNumber,
                 ayah = num,
                 display = "Surah ${surah?.nameSimple ?: surahNumber}, Ayah $num",
-                textUthmani = plainText,
-                tajweedMarkup = if (text.contains("<tajweed")) text else null,
+                textUthmani = text,
                 translationEn = translations[num],
                 verified = true
             )
@@ -729,9 +751,8 @@ fun QuranReaderScreen(
                     onArabicSizeChange = { settingsViewModel.setArabicSizeSp(it) },
                     onTranslationSizeChange = { settingsViewModel.setTranslationSizeSp(it) },
                     onShowTranslationChange = { settingsViewModel.toggleShowTranslation(it) },
-                    onShowWordByWordChange = { settingsViewModel.toggleShowWordByWord(it) },
                     onKeepScreenOnChange = { settingsViewModel.toggleReadingKeepScreenOn(it) },
-                    onShowTajweedChange = { settingsViewModel.toggleShowTajweed(it) },
+
                     onTranslationLangChange = { settingsViewModel.setSelectedTranslationLang(it) },
 
                     onReciterChange = { settingsViewModel.setSelectedReciterId(it) },

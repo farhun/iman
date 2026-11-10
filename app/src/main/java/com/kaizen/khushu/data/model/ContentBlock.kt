@@ -35,7 +35,7 @@ data class AyahBlock(
     val verified: Boolean = false,
     val textUthmani: String? = null,
     val translationEn: String? = null,
-    val tajweedMarkup: String? = null,
+
 ) : ContentBlock()
 
 @Serializable
@@ -67,6 +67,6 @@ class DividerBlock : ContentBlock()
 @SerialName("arabic")
 data class ArabicBlock(
     val text: String,
-    val tajweed: String? = null,
+
     val translation: String = "",
 ) : ContentBlock()

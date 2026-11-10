@@ -367,6 +367,7 @@ class PrayerNotificationScheduler(
         )
         val notification = NotificationCompat.Builder(appContext, EXACT_ALARM_PERMISSION_CHANNEL)
             .setSmallIcon(com.kaizen.khushu.R.drawable.ic_notification_glyph)
+            .setColor(com.kaizen.khushu.R.color.notification_icon_background)
             .setContentTitle("Enable exact alarms")
             .setContentText("Allow exact alarms to receive prayer reminders on time.")
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

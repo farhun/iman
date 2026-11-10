@@ -117,9 +117,8 @@ fun ReadingSettingsSheet(
     onArabicSizeChange: (Float) -> Unit,
     onTranslationSizeChange: (Float) -> Unit,
     onShowTranslationChange: (Boolean) -> Unit,
-    onShowWordByWordChange: (Boolean) -> Unit,
     onKeepScreenOnChange: (Boolean) -> Unit,
-    onShowTajweedChange: (Boolean) -> Unit,
+
     onTranslationLangChange: (String) -> Unit,
     onReciterChange: (String) -> Unit,
     onScriptChange: (String) -> Unit,
@@ -168,13 +167,25 @@ fun ReadingSettingsSheet(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Rtl) {
-                            Text(
-                                text = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ",
-                                fontFamily = AmiriQuran,
-                                fontSize = settings.arabicSizeSp.sp,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                textAlign = TextAlign.Center
-                            )
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = if (settings.selectedScript == "indopak")
+                                        "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِیْمِ "
+                                    else "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
+                                    fontFamily = if (settings.selectedScript == "indopak") QuranIndoPak else AmiriQuran,
+                                    fontSize = settings.arabicSizeSp.sp,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    textAlign = TextAlign.Center
+                                )
+                                if (settings.selectedScript == "indopak") {
+                                    Text(
+                                        text = "1:1",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontFamily = BeVietnamPro,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.55f)
+                                    )
+                                }
+                            }
                         }
                         if (settings.showTranslation) {
                             Spacer(Modifier.height(8.dp))
@@ -284,20 +295,13 @@ fun ReadingSettingsSheet(
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     listOf(
-                                        Triple("uthmani", "Uthmani", "ٱلصَّلَوٰةِ"),
-                                        Triple("indopak", "IndoPak", "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِیْمِ ")
-                                    ).forEach { (value, label, sample) ->
+                                        "uthmani" to "Uthmani",
+                                        "indopak" to "IndoPak"
+                                    ).forEach { (value, label) ->
                                         ScriptPreviewCard(
                                             label = label,
-                                            sample = sample,
-                                            sampleFontFamily = if (value == "indopak") QuranIndoPak else AmiriQuran,
-                                            referenceLabel = if (value == "indopak") "1:1" else null,
                                             selected = settings.selectedScript == value,
-                                            isDownloaded = true,
-                                            isDownloading = false,
-                                            downloadProgress = 0f,
                                             onClick = { onScriptChange(value) },
-                                            onDownloadClick = {},
                                             modifier = Modifier.weight(1f)
                                         )
                                     }
@@ -330,10 +334,8 @@ fun ReadingSettingsSheet(
                                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
                                 Spacer(Modifier.height(12.dp))
                                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                                    SettingToggle(label = "Tajweed Colors", checked = settings.showTajweed, onCheckedChange = onShowTajweedChange)
-                                    SettingToggle(label = "Show Translation", checked = settings.showTranslation, onCheckedChange = onShowTranslationChange)
 
-                                    SettingToggle(label = "Show Word-by-Word", checked = settings.showWordByWord, onCheckedChange = onShowWordByWordChange)
+                                    SettingToggle(label = "Show Translation", checked = settings.showTranslation, onCheckedChange = onShowTranslationChange)
                                 }
                             }
                             }
@@ -477,25 +479,13 @@ fun ThemePreviewCard(
 @Composable
 fun ScriptPreviewCard(
     label: String,
-    sample: String,
-    sampleFontFamily: FontFamily,
-    referenceLabel: String? = null,
     selected: Boolean,
-    isDownloaded: Boolean = true,
-    isDownloading: Boolean = false,
-    downloadProgress: Float = 0f,
     onClick: () -> Unit,
-    onDownloadClick: () -> Unit = onClick,
     modifier: Modifier = Modifier
 ) {
     val borderColor = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent
     val containerBg = if (selected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceContainerHigh
-    val contentColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-    val labelColor = when {
-        selected -> MaterialTheme.colorScheme.primary
-        !isDownloaded -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-        else -> MaterialTheme.colorScheme.onSurfaceVariant
-    }
+    val contentColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
 
     Column(
         modifier = modifier
@@ -515,62 +505,17 @@ fun ScriptPreviewCard(
             color = containerBg,
             shadowElevation = 1.dp
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
+            Box(contentAlignment = Alignment.Center) {
                 Text(
-                    text = sample,
+                    text = label,
+                    style = MaterialTheme.typography.labelMedium,
+                    fontFamily = BeVietnamPro,
                     color = contentColor,
-                    fontFamily = sampleFontFamily,
-                    fontSize = if (referenceLabel == null) 18.sp else 10.sp,
-                    maxLines = 1,
-                    softWrap = false,
-                    textAlign = TextAlign.Center
-                )
-                referenceLabel?.let {
-                    Text(
-                        text = it,
-                        style = MaterialTheme.typography.labelSmall,
-                        fontFamily = BeVietnamPro,
-                        fontSize = 9.sp,
-                        lineHeight = 10.sp,
-                        color = contentColor
-                    )
-                }
-            }
-        }
-
-        Text(
-            text = when {
-                isDownloading -> "$label ${"%.0f".format(downloadProgress * 100)}%"
-                !isDownloaded -> "$label ↓"
-                else -> label
-            },
-            style = MaterialTheme.typography.labelMedium,
-            fontFamily = BeVietnamPro,
-            color = labelColor,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
-        )
-        if (!isDownloaded && !isDownloading) {
-            IconButton(
-                onClick = onDownloadClick,
-                modifier = Modifier.size(24.dp)
-            ) {
-                Icon(
-                    Icons.Default.Download,
-                    contentDescription = "Download $label",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(18.dp)
+                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
                 )
             }
         }
-        if (isDownloading) {
-            LinearProgressIndicator(
-                progress = { downloadProgress },
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+        Spacer(Modifier.height(16.dp))
     }
 }
 

@@ -9,10 +9,10 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.TouchApp
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
@@ -20,15 +20,15 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsViewModel,
     onNavigateCounter: () -> Unit,
     onNavigateAppearance: () -> Unit,
     onNavigateWidget: () -> Unit,
     onNavigatePrayer: () -> Unit,
+    onNavigateTasbeeh: () -> Unit,
     onNavigateAbout: () -> Unit,
     onBack: () -> Unit
 ) {
-    val settings by viewModel.settings.collectAsState()
+
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     Scaffold(
@@ -80,6 +80,13 @@ fun SettingsScreen(
                     subtitle = "Haptics and hardware behavior",
                     imageVector = Icons.Default.TouchApp,
                     onClick = onNavigateCounter
+                )
+
+                SettingsMenuItem(
+                    title = "Tasbih Screen",
+                    subtitle = "Customize the tasbih screen and canvas",
+                    imageVector = Icons.Default.Tune,
+                    onClick = onNavigateTasbeeh
                 )
 
                 SettingsMenuItem(

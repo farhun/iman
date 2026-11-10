@@ -65,7 +65,7 @@ object PrayerNotificationPublisher {
                 )
         )
             .setSmallIcon(R.drawable.ic_notification_glyph)
-            .setColor(ContextCompat.getColor(context, R.color.splash_background))
+            .setColor(ContextCompat.getColor(context, R.color.notification_icon_background))
             .setContentTitle(content.title)
             .setContentText(content.utilityLine)
             .setStyle(NotificationCompat.BigTextStyle().bigText(content.expandedText))

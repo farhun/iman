@@ -72,7 +72,7 @@ import com.kaizen.khushu.ui.theme.AmiriQuran
  * Renders a single [ContentBlock] into Compose UI.
  *
  * [fg] and [bg] come from the reading screen's theme (dark / paper / light).
- * [settings] provides Arabic text size and tajweed preference.
+ * [settings] provides Arabic text size and script preference.
  */
 @Composable
 fun BlockRenderer(
@@ -81,7 +81,6 @@ fun BlockRenderer(
     fg: Color,
     bg: Color,
     translationMap: Map<String, String> = emptyMap(),
-    tajweedMap: Map<String, String> = emptyMap(),
     scriptMap: Map<String, String> = emptyMap(),
     arabicFontFamily: FontFamily = AmiriQuran,
     isHighlighted: Boolean = false,
@@ -105,7 +104,6 @@ fun BlockRenderer(
             fg = fg,
             bg = bg,
             translationMap = translationMap,
-            tajweedMap = tajweedMap,
             scriptMap = scriptMap,
             arabicFontFamily = arabicFontFamily,
             isHighlighted = isHighlighted,
@@ -182,7 +180,6 @@ private fun AyahBlockView(
     fg: Color,
     bg: Color,
     translationMap: Map<String, String>,
-    tajweedMap: Map<String, String>,
     scriptMap: Map<String, String>,
     arabicFontFamily: FontFamily,
     isHighlighted: Boolean,
@@ -208,8 +205,6 @@ private fun AyahBlockView(
             block,
             settings,
             contentColor,
-            fg,
-            tajweedMap,
             scriptMap,
             arabicFontFamily,
             inlineContent = remember(block.ayah, contentColor) {
@@ -283,31 +278,12 @@ private fun AyahBlockView(
 
         // ── Arabic text ───────────────────────────────────────────────────────
         val verseKey = "${block.surah}:${block.ayah}"
-        val tajweedMarkup = if (settings.selectedScript == "uthmani")
-            tajweedMap[verseKey] ?: block.tajweedMarkup
-        else null
-
         val plainArabicText = if (settings.selectedScript != "uthmani")
             scriptMap[verseKey] ?: block.textUthmani
         else block.textUthmani
 
-        val showTajweed = settings.showTajweed && tajweedMarkup != null
-
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-            if (showTajweed) {
-                TajweedText(
-                    markup = tajweedMarkup!!,
-                    fontSize = settings.arabicSizeSp.sp,
-                    lineHeight = (settings.arabicSizeSp * 1.8f).sp,
-                    color = contentColor,
-                    inlineContent = inlineContent,
-                    appendMarker = true,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
-                        .padding(top = 6.dp, bottom = 4.dp)
-                )
-            } else if (plainArabicText != null) {
+            if (plainArabicText != null) {
                 val annotatedString = remember(plainArabicText, contentColor) {
                     buildAnnotatedString {
                         append(plainArabicText)
@@ -436,36 +412,18 @@ private fun ReadingModeAyah(
     block: AyahBlock,
     settings: UserSettings,
     contentColor: Color,
-    fg: Color,
-    tajweedMap: Map<String, String>,
     scriptMap: Map<String, String>,
     arabicFontFamily: FontFamily,
     inlineContent: Map<String, androidx.compose.foundation.text.InlineTextContent>,
     modifier: Modifier = Modifier,
 ) {
     val verseKey = "${block.surah}:${block.ayah}"
-    val tajweedMarkup = if (settings.selectedScript == "uthmani")
-        tajweedMap[verseKey] ?: block.tajweedMarkup
-    else null
     val plainArabicText = if (settings.selectedScript != "uthmani")
         scriptMap[verseKey] ?: block.textUthmani
     else block.textUthmani
-    val showTajweed = settings.showTajweed && tajweedMarkup != null
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        if (showTajweed) {
-            TajweedText(
-                markup = tajweedMarkup!!,
-                fontSize = settings.arabicSizeSp.sp,
-                lineHeight = (settings.arabicSizeSp * 2.0f).sp,
-                color = contentColor,
-                inlineContent = inlineContent,
-                appendMarker = true,
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 2.dp)
-            )
-        } else if (plainArabicText != null) {
+        if (plainArabicText != null) {
             val annotatedString = remember(plainArabicText) {
                 buildAnnotatedString {
                     append(plainArabicText)
@@ -622,7 +580,6 @@ private fun HadithBlockView(
                             fontFamily = BeVietnamPro,
                             fontWeight = FontWeight.SemiBold,
                         ),
-                        color = fg.copy(alpha = 0.6f),
                     )
                 }
             }
@@ -753,29 +710,19 @@ private fun ArabicBlockView(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                if (block.tajweed != null && settings.showTajweed) {
-                    TajweedText(
-                        markup = block.tajweed,
-                        fontSize = settings.arabicSizeSp.sp,
-                        lineHeight = (settings.arabicSizeSp * 1.75f).sp,
-                        color = fg,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                } else {
-                    Text(
-                        text = block.text,
+                Text(
+                    text = block.text,
+                    fontFamily = arabicFontFamily,
+                    fontSize = settings.arabicSizeSp.sp,
+                    lineHeight = (settings.arabicSizeSp * 1.75f).sp,
+                    color = fg,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        textDirection = TextDirection.Rtl,
                         fontFamily = arabicFontFamily,
-                        fontSize = settings.arabicSizeSp.sp,
-                        lineHeight = (settings.arabicSizeSp * 1.75f).sp,
-                        color = fg,
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            textDirection = TextDirection.Rtl,
-                            fontFamily = arabicFontFamily,
-                            textAlign = TextAlign.Center,
-                        ),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
+                        textAlign = TextAlign.Center,
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
 
             if (block.translation.isNotBlank()) {

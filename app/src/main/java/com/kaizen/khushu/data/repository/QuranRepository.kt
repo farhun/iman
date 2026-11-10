@@ -20,7 +20,7 @@ data class VerseMeta(
 
 object QuranRepository {
     private var chaptersCache: List<SurahMeta>? = null
-    private var tajweedMap: Map<String, String>? = null
+
     private var uthmaniMap: Map<String, String>? = null
     private var verseMetaMap: Map<String, VerseMeta>? = null
     private val scriptCache = ConcurrentHashMap<String, Map<String, String>>()
@@ -82,21 +82,6 @@ object QuranRepository {
         }
     }
 
-    private fun loadTajweed(context: Context): Map<String, String> {
-        tajweedMap?.let { return it }
-        val raw = try {
-            context.assets.open("quran/uthmani_tajweed.json").bufferedReader().use { it.readText() }
-        } catch (_: Exception) {
-            return emptyMap()
-        }
-        return try {
-            val map = json.decodeFromString<Map<String, String>>(raw)
-            tajweedMap = map
-            map
-        } catch (_: Exception) {
-            emptyMap()
-        }
-    }
 
     private fun loadUthmani(context: Context): Map<String, String> {
         uthmaniMap?.let { return it }
@@ -115,7 +100,6 @@ object QuranRepository {
     }
 
     fun getAyahs(context: Context, surahNumber: Int): List<Pair<Int, String>> {
-        val tajweed = loadTajweed(context)
         val uthmani = loadUthmani(context)
 
         val chapters = getChapters(context)
@@ -124,7 +108,7 @@ object QuranRepository {
         val result = mutableListOf<Pair<Int, String>>()
         for (i in 1..surah.versesCount) {
             val key = "$surahNumber:$i"
-            val text = tajweed[key] ?: uthmani[key] ?: ""
+            val text = uthmani[key] ?: ""
             result.add(i to text)
         }
         return result

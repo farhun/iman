@@ -13,7 +13,7 @@ import com.materialkolor.PaletteStyle
 
 // Map for O(1) lookups
 val colorSeeds = mapOf(
-    "default" to Color(0xFF424746), // Neutral Charcoal for Default/System fallback
+    "default" to Color(0xFF293041),
     "teal"    to Color(0xFF004D40),
     "green"   to Color(0xFF1B5E20),
     "amber"   to Color(0xFF795548),
@@ -23,19 +23,19 @@ val colorSeeds = mapOf(
 )
 
 // The fallback for Android 11 or when dynamic is off
-val DefaultSeedColor = Color(0xFF424746)
+val DefaultSeedColor = Color(0xFF293041)
 
 @Composable
 fun KhushuTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     pureBlack: Boolean = false,
     colorSeed: String = "default",
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
 
-    var colorScheme = when {
+    val generatedColorScheme = when {
         // If Dynamic Color is ON, wallpaper always wins (on supported devices)
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
@@ -51,6 +51,23 @@ fun KhushuTheme(
             )
         }
     }
+    val neutralScheme = if (darkTheme) androidx.compose.material3.darkColorScheme() else androidx.compose.material3.lightColorScheme()
+    var colorScheme = neutralScheme.copy(
+        primary = generatedColorScheme.primary,
+        onPrimary = generatedColorScheme.onPrimary,
+        primaryContainer = generatedColorScheme.primaryContainer,
+        onPrimaryContainer = generatedColorScheme.onPrimaryContainer,
+        inversePrimary = generatedColorScheme.inversePrimary,
+        secondary = generatedColorScheme.secondary,
+        onSecondary = generatedColorScheme.onSecondary,
+        secondaryContainer = generatedColorScheme.secondaryContainer,
+        onSecondaryContainer = generatedColorScheme.onSecondaryContainer,
+        tertiary = generatedColorScheme.tertiary,
+        onTertiary = generatedColorScheme.onTertiary,
+        tertiaryContainer = generatedColorScheme.tertiaryContainer,
+        onTertiaryContainer = generatedColorScheme.onTertiaryContainer,
+        surfaceTint = neutralScheme.surface,
+    )
 
     // Manual overrides for true OLED black
     if (darkTheme && pureBlack) {

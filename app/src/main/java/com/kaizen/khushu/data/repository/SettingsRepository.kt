@@ -50,12 +50,11 @@ class SettingsRepository(private val context: Context) {
         val TASBEEH_LIST_MODE = booleanPreferencesKey("tasbeeh_list_mode")
         val STARTUP_TAB = stringPreferencesKey("startup_tab")
         val TASBIH_BEAD_STYLE = stringPreferencesKey("tasbih_bead_style")
-        val LOGO_STYLE = stringPreferencesKey("logo_style")
+
         val READING_THEME = stringPreferencesKey("reading_theme")
         val ARABIC_SIZE_SP = floatPreferencesKey("arabic_size_sp")
         val TRANSLATION_SIZE_SP = floatPreferencesKey("translation_size_sp")
         val SHOW_TRANSLATION = booleanPreferencesKey("show_translation")
-        val SHOW_WORD_BY_WORD = booleanPreferencesKey("show_word_by_word")
         val READING_KEEP_SCREEN_ON = booleanPreferencesKey("reading_keep_screen_on")
         val LAST_READ_TOPIC_ID = stringPreferencesKey("last_read_topic_id")
         val BOOKMARKED_TOPIC_IDS = stringSetPreferencesKey("bookmarked_topic_ids")
@@ -63,7 +62,7 @@ class SettingsRepository(private val context: Context) {
         val MASTERED_TOPIC_IDS = stringSetPreferencesKey("mastered_topic_ids")
         val SHOW_CONTINUE_READING = booleanPreferencesKey("show_continue_reading")
         val QURAN_EXIT_REMINDER_DISABLED = booleanPreferencesKey("quran_exit_reminder_disabled")
-        val SHOW_TAJWEED = booleanPreferencesKey("show_tajweed")
+
         val SELECTED_TRANSLATION_LANG = stringPreferencesKey("selected_translation_lang")
         val SELECTED_TRANSLATION_SOURCE = stringPreferencesKey("selected_translation_source")
 
@@ -170,7 +169,7 @@ class SettingsRepository(private val context: Context) {
 
             UserSettings(
                 hapticsEnabled = preferences[PreferencesKeys.HAPTICS_ENABLED] ?: true,
-                dynamicColor = preferences[PreferencesKeys.DYNAMIC_COLOR] ?: true,
+                dynamicColor = preferences[PreferencesKeys.DYNAMIC_COLOR] ?: false,
                 pureBlack = preferences[PreferencesKeys.PURE_BLACK] ?: false,
                 keepScreenAwake = preferences[PreferencesKeys.KEEP_SCREEN_AWAKE] ?: true,
                 volumeCounting = preferences[PreferencesKeys.VOLUME_COUNTING] ?: false,
@@ -184,12 +183,11 @@ class SettingsRepository(private val context: Context) {
                 tasbeehListMode = preferences[PreferencesKeys.TASBEEH_LIST_MODE] ?: true,
                 startupTab = preferences[PreferencesKeys.STARTUP_TAB] ?: "home",
                 tasbihBeadStyle = preferences[PreferencesKeys.TASBIH_BEAD_STYLE] ?: "CLASSIC_AMBER",
-                logoStyle = preferences[PreferencesKeys.LOGO_STYLE] ?: "DYNAMIC",
+
                 readingTheme = preferences[PreferencesKeys.READING_THEME] ?: "AUTO",
                 arabicSizeSp = preferences[PreferencesKeys.ARABIC_SIZE_SP] ?: 32f,
                 translationSizeSp = preferences[PreferencesKeys.TRANSLATION_SIZE_SP] ?: 16f,
                 showTranslation = preferences[PreferencesKeys.SHOW_TRANSLATION] ?: true,
-                showWordByWord = preferences[PreferencesKeys.SHOW_WORD_BY_WORD] ?: true,
                 readingKeepScreenOn = preferences[PreferencesKeys.READING_KEEP_SCREEN_ON] ?: true,
                 lastReadTopicId = preferences[PreferencesKeys.LAST_READ_TOPIC_ID],
                 bookmarkedAyahs = preferences[PreferencesKeys.BOOKMARKED_TOPIC_IDS] ?: emptySet(),
@@ -203,7 +201,7 @@ class SettingsRepository(private val context: Context) {
                 masteredTopicIds = preferences[PreferencesKeys.MASTERED_TOPIC_IDS] ?: emptySet(),
                 showContinueReading = preferences[PreferencesKeys.SHOW_CONTINUE_READING] ?: true,
                 quranExitReminderDisabled = preferences[PreferencesKeys.QURAN_EXIT_REMINDER_DISABLED] ?: false,
-                showTajweed = preferences[PreferencesKeys.SHOW_TAJWEED] ?: false,
+
                 selectedTranslationLang = preferences[PreferencesKeys.SELECTED_TRANSLATION_LANG] ?: "en_20",
                 selectedTranslationSource = preferences[PreferencesKeys.SELECTED_TRANSLATION_SOURCE] ?: "FAWAZ",
                 selectedReciterId = preferences[PreferencesKeys.SELECTED_RECITER_ID] ?: "everyayah_mishari",
@@ -570,9 +568,6 @@ class SettingsRepository(private val context: Context) {
         context.dataStore.edit { it[PreferencesKeys.TASBIH_BEAD_STYLE] = style }
     }
 
-    suspend fun updateLogoStyle(style: String) {
-        context.dataStore.edit { it[PreferencesKeys.LOGO_STYLE] = style }
-    }
 
     suspend fun updateReadingTheme(theme: String) {
         context.dataStore.edit { it[PreferencesKeys.READING_THEME] = theme }
@@ -590,10 +585,6 @@ class SettingsRepository(private val context: Context) {
         context.dataStore.edit { it[PreferencesKeys.SHOW_TRANSLATION] = show }
     }
 
-
-    suspend fun updateShowWordByWord(show: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.SHOW_WORD_BY_WORD] = show }
-    }
 
     suspend fun updateReadingKeepScreenOn(keep: Boolean) {
         context.dataStore.edit { it[PreferencesKeys.READING_KEEP_SCREEN_ON] = keep }
@@ -646,9 +637,6 @@ class SettingsRepository(private val context: Context) {
         context.dataStore.edit { it[PreferencesKeys.QURAN_EXIT_REMINDER_DISABLED] = disabled }
     }
 
-    suspend fun updateShowTajweed(show: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.SHOW_TAJWEED] = show }
-    }
 
     suspend fun updateSelectedTranslationLang(lang: String) {
         context.dataStore.edit { it[PreferencesKeys.SELECTED_TRANSLATION_LANG] = lang }
@@ -686,12 +674,11 @@ data class UserSettings(
     val tasbeehListMode: Boolean,
     val startupTab: String,
     val tasbihBeadStyle: String,
-    val logoStyle: String = "DYNAMIC",
+
     val readingTheme: String = "DARK",
     val arabicSizeSp: Float = 32f,
     val translationSizeSp: Float = 16f,
     val showTranslation: Boolean = true,
-    val showWordByWord: Boolean = true,
     val readingKeepScreenOn: Boolean = true,
     val lastReadTopicId: String? = null,
     val bookmarkedAyahs: Set<String> = emptySet(),
@@ -699,7 +686,7 @@ data class UserSettings(
     val masteredTopicIds: Set<String> = emptySet(),
     val showContinueReading: Boolean = true,
     val quranExitReminderDisabled: Boolean = false,
-    val showTajweed: Boolean = false,
+
     val selectedTranslationLang: String = "en_20",
     val selectedTranslationSource: String = "FAWAZ",
     val selectedReciterId: String = "everyayah_mishari",
