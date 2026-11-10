@@ -436,6 +436,16 @@ class SettingsViewModel(
         }
     }
 
+    fun isLocationServicesEnabled(): Boolean {
+        val locationManager = appContext.getSystemService(LocationManager::class.java) ?: return false
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            locationManager.isLocationEnabled
+        } else {
+            locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) ||
+                    locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        }
+    }
+
     fun refreshLocation() {
         refreshLocation(showProviderError = true) { location ->
             location?.let { (lat, lng) -> setLocation(lat, lng) }

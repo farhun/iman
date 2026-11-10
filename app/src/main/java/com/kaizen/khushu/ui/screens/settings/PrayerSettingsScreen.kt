@@ -1,7 +1,9 @@
 package com.kaizen.khushu.ui.screens.settings
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.media.RingtoneManager
 import android.net.Uri
@@ -19,6 +21,7 @@ import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
@@ -30,6 +33,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -49,6 +53,8 @@ import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
+import com.kaizen.khushu.MainActivity
 import com.kaizen.khushu.data.repository.EXTRA_PRAYER_TIMINGS
 import com.kaizen.khushu.receiver.PrayerAlarmReceiver
 import java.text.SimpleDateFormat
@@ -136,6 +142,42 @@ private data class ExtraTimingPreference(
     val notificationEnabled: Boolean,
 )
 
+private fun Context.findActivity(): Activity? {
+    var current = this
+    while (current is ContextWrapper) {
+        if (current is Activity) return current
+        current = current.baseContext
+    }
+    return current as? Activity
+}
+
+private fun openAppLocationPermissionSettings(context: Context) {
+    val permissionIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        Intent("android.intent.action.MANAGE_APP_PERMISSION").apply {
+            putExtra("android.provider.extra.APP_PACKAGE", context.packageName)
+            putExtra("android.provider.extra.PERMISSION_NAME", Manifest.permission.ACCESS_FINE_LOCATION)
+        }.takeIf { it.resolveActivity(context.packageManager) != null }
+    } else null
+    val appDetailsIntent = Intent(
+        android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+        Uri.parse("package:${context.packageName}")
+    )
+    val activity = context.findActivity()
+    fun launch(intent: Intent) {
+        if (activity != null) activity.startActivity(intent)
+        else context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+    try {
+        launch(permissionIntent ?: appDetailsIntent)
+    } catch (_: Exception) {
+        try {
+            launch(appDetailsIntent)
+        } catch (_: Exception) {
+            Toast.makeText(context.applicationContext, "Open app settings to allow location access.", Toast.LENGTH_LONG).show()
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrayerSettingsScreen(
@@ -151,13 +193,46 @@ fun PrayerSettingsScreen(
     } else {
         "Not refreshed yet"
     }
+    var showLocationServicesDialog by remember { mutableStateOf(false) }
+    val locationPrefs = remember(context) {
+        context.getSharedPreferences(MainActivity.LOCATION_PREFS, Context.MODE_PRIVATE)
+    }
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { grants ->
         if (grants[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
             grants[Manifest.permission.ACCESS_COARSE_LOCATION] == true
         ) {
-            viewModel.refreshLocation()
+            viewModel.toggleUseGpsLocation(true)
+            if (viewModel.isLocationServicesEnabled()) viewModel.refreshLocation()
+            else showLocationServicesDialog = true
+        } else {
+            viewModel.toggleUseGpsLocation(false)
+        }
+    }
+    val requestGpsAccess = {
+        val hasLocationPermission =
+            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                    android.content.pm.PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                    android.content.pm.PackageManager.PERMISSION_GRANTED
+        if (hasLocationPermission) {
+            viewModel.toggleUseGpsLocation(true)
+            if (viewModel.isLocationServicesEnabled()) viewModel.refreshLocation()
+            else showLocationServicesDialog = true
+        } else {
+            val activity = context.findActivity()
+            val canShowRationale = activity?.shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) == true ||
+                    activity?.shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION) == true
+            if (locationPrefs.getBoolean(MainActivity.LOCATION_REQUESTED, false) && !canShowRationale) {
+                locationPrefs.edit().putBoolean(MainActivity.PENDING_GPS_ENABLE, true).apply()
+                openAppLocationPermissionSettings(context)
+            } else {
+                locationPrefs.edit().putBoolean(MainActivity.LOCATION_REQUESTED, true).apply()
+                locationPermissionLauncher.launch(
+                    arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+                )
+            }
         }
     }
     val notificationsPermissionLauncher = rememberLauncherForActivityResult(
@@ -189,6 +264,23 @@ fun PrayerSettingsScreen(
     val sources = listOf("LOCAL", "API")
     val alertStyleOptions = listOf("CUSTOM_SOUND", "SYSTEM_SOUND", "VIBRATION", "SILENT")
     val prayerSoundOptions = listOf("DEFAULT", "ADHAN", "TAKBIR", "SILENT")
+
+    if (showLocationServicesDialog) {
+        AlertDialog(
+            onDismissRequest = { showLocationServicesDialog = false },
+            title = { Text("Enable device location") },
+            text = { Text("Turn on device location services to find your current location for prayer times.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showLocationServicesDialog = false
+                    context.startActivity(Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                }) { Text("Open location settings") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLocationServicesDialog = false }) { Text("Not now") }
+            }
+        )
+    }
 
     val prayerNotificationPreferences = listOf(
         PrayerNotificationPreference(
@@ -302,12 +394,20 @@ fun PrayerSettingsScreen(
                     subtitle = "Automatically refresh your location for accurate timings.",
                     checked = settings.useGpsLocation,
                     onCheckedChange = { enabled ->
-                        viewModel.toggleUseGpsLocation(enabled)
-                        if (enabled) {
-                            viewModel.refreshLocation()
-                        }
+                        if (enabled) requestGpsAccess() else viewModel.toggleUseGpsLocation(false)
                     }
                 )
+
+                if (!settings.useGpsLocation) {
+                    FilledTonalButton(
+                        onClick = requestGpsAccess,
+                        modifier = Modifier.padding(horizontal = 20.dp)
+                    ) {
+                        Icon(Icons.Default.MyLocation, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("GPS Access", fontFamily = PlusJakartaSans, style = MaterialTheme.typography.titleSmall)
+                    }
+                }
 
                 if (settings.useGpsLocation) {
                     Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -316,14 +416,7 @@ fun PrayerSettingsScreen(
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             FilledTonalButton(
-                                onClick = {
-                                    locationPermissionLauncher.launch(
-                                        arrayOf(
-                                            Manifest.permission.ACCESS_FINE_LOCATION,
-                                            Manifest.permission.ACCESS_COARSE_LOCATION
-                                        )
-                                    )
-                                },
+                                onClick = requestGpsAccess,
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Icon(Icons.Default.MyLocation, contentDescription = null)
@@ -336,7 +429,7 @@ fun PrayerSettingsScreen(
                             }
 
                             OutlinedButton(
-                                onClick = viewModel::refreshLocation,
+                                onClick = requestGpsAccess,
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Icon(Icons.Default.Refresh, contentDescription = null)

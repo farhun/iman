@@ -6,9 +6,11 @@ import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import android.Manifest
 import android.content.ComponentName
+import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.enableEdgeToEdge
@@ -80,6 +82,10 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     companion object {
         const val DEBUG_FORCE_ONBOARDING = false // SET TO FALSE FOR RELEASE
+        const val LOCATION_PREFS = "location_permission_flow"
+        const val LOCATION_REQUESTED = "location_requested"
+        const val FIRST_LOCATION_PROMPT_SHOWN = "first_location_prompt_shown_v2"
+        const val PENDING_GPS_ENABLE = "pending_gps_enable"
     }
 
     private lateinit var settingsRepository: SettingsRepository
@@ -98,6 +104,7 @@ class MainActivity : ComponentActivity() {
     var isOnTasbeehImmersive: Boolean = false
 
     private var controllerFuture: ListenableFuture<MediaController>? = null
+    private var hasPausedSinceResume = false
     private val media3Controller: MediaController?
         get() = if (controllerFuture?.isDone == true) controllerFuture?.get() else null
 
@@ -109,6 +116,43 @@ class MainActivity : ComponentActivity() {
         super.onStart()
         val sessionToken = SessionToken(this, ComponentName(this, PlaybackService::class.java))
         controllerFuture = MediaController.Builder(this, sessionToken).buildAsync()
+    }
+
+    override fun onPause() {
+        hasPausedSinceResume = true
+        super.onPause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!hasPausedSinceResume || !::settingsViewModel.isInitialized) return
+        hasPausedSinceResume = false
+        val prefs = getSharedPreferences(LOCATION_PREFS, MODE_PRIVATE)
+        val hasLocationPermission = hasLocationPermission()
+        if (prefs.getBoolean(PENDING_GPS_ENABLE, false)) {
+            prefs.edit().remove(PENDING_GPS_ENABLE).apply()
+            if (hasLocationPermission) {
+                enableGpsAndRefresh()
+            } else {
+                settingsViewModel.toggleUseGpsLocation(false)
+            }
+        } else if (hasLocationPermission && settingsViewModel.settings.value.useGpsLocation) {
+            homeViewModel.refreshPrayerData()
+        } else if (!hasLocationPermission && settingsViewModel.settings.value.useGpsLocation) {
+            settingsViewModel.toggleUseGpsLocation(false)
+        }
+    }
+
+    private fun hasLocationPermission(): Boolean =
+        checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+
+    private fun enableGpsAndRefresh() {
+        settingsViewModel.toggleUseGpsLocation(true)
+        lifecycleScope.launch {
+            settingsRepository.settingsFlow.first { it.useGpsLocation }
+            homeViewModel.refreshPrayerData()
+        }
     }
 
     override fun onStop() {
@@ -189,6 +233,90 @@ class MainActivity : ComponentActivity() {
             }
 
             val settings by settingsViewModel.settings.collectAsState()
+            var showFirstLocationExplanation by remember { mutableStateOf(false) }
+            var showFirstLocationDeniedDialog by remember { mutableStateOf(false) }
+            var showLocationServicesDialog by remember { mutableStateOf(false) }
+            var firstLaunchLocationRequest by remember { mutableStateOf(false) }
+            val locationPermissionLauncher = rememberLauncherForActivityResult(
+                ActivityResultContracts.RequestMultiplePermissions()
+            ) { grants ->
+                if (grants[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                    grants[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+                ) {
+                    firstLaunchLocationRequest = false
+                    enableGpsAndRefresh()
+                    showLocationServicesDialog = !settingsViewModel.isLocationServicesEnabled()
+                } else {
+                    settingsViewModel.toggleUseGpsLocation(false)
+                    if (firstLaunchLocationRequest) showFirstLocationDeniedDialog = true
+                    firstLaunchLocationRequest = false
+                }
+            }
+            LaunchedEffect(isLoaded) {
+                val prefs = getSharedPreferences(LOCATION_PREFS, MODE_PRIVATE)
+                if (isLoaded && hasLocationPermission()) {
+                    prefs.edit().putBoolean(FIRST_LOCATION_PROMPT_SHOWN, true).apply()
+                } else if (isLoaded) {
+                    if (settings.useGpsLocation) settingsViewModel.toggleUseGpsLocation(false)
+                    if (!prefs.getBoolean(FIRST_LOCATION_PROMPT_SHOWN, false)) {
+                        prefs.edit().putBoolean(FIRST_LOCATION_PROMPT_SHOWN, true).apply()
+                        showFirstLocationExplanation = true
+                    }
+                }
+            }
+            if (showFirstLocationExplanation) {
+                AlertDialog(
+                    onDismissRequest = {
+                        showFirstLocationExplanation = false
+                        showFirstLocationDeniedDialog = true
+                    },
+                    title = { Text("Location access") },
+                    text = { Text("Allow location access to automatically calculate accurate prayer times based on your current location.") },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            showFirstLocationExplanation = false
+                            getSharedPreferences(LOCATION_PREFS, MODE_PRIVATE).edit()
+                                .putBoolean(LOCATION_REQUESTED, true).apply()
+                            firstLaunchLocationRequest = true
+                            locationPermissionLauncher.launch(
+                                arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+                            )
+                        }) { Text("Continue") }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = {
+                            showFirstLocationExplanation = false
+                            showFirstLocationDeniedDialog = true
+                        }) { Text("Not now") }
+                    }
+                )
+            }
+            if (showFirstLocationDeniedDialog) {
+                AlertDialog(
+                    onDismissRequest = { showFirstLocationDeniedDialog = false },
+                    title = { Text("Location permission not granted") },
+                    text = { Text("Prayer times will continue using your saved location. You can enable device GPS later in Settings.") },
+                    confirmButton = {
+                        TextButton(onClick = { showFirstLocationDeniedDialog = false }) { Text("Got it") }
+                    }
+                )
+            }
+            if (showLocationServicesDialog) {
+                AlertDialog(
+                    onDismissRequest = { showLocationServicesDialog = false },
+                    title = { Text("Enable device location") },
+                    text = { Text("Turn on device location services to find your current location for prayer times.") },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            showLocationServicesDialog = false
+                            startActivity(android.content.Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                        }) { Text("Open location settings") }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showLocationServicesDialog = false }) { Text("Not now") }
+                    }
+                )
+            }
             val darkTheme =
                 when (settings.themeMode) {
                     "Light" -> false
