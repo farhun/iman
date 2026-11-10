@@ -56,7 +56,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import com.kaizen.khushu.ui.navigation.AppDestinations
 import androidx.compose.ui.text.font.FontWeight
-import com.kaizen.khushu.ui.theme.BeVietnamPro
+import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import com.kaizen.khushu.ui.theme.LocalThemeTransitionController
 import com.kaizen.khushu.ui.theme.colorSeeds
 
@@ -130,7 +130,7 @@ fun AppearanceSettingsScreen(
                                 label = {
                                     Text(
                                         text = label,
-                                        fontFamily = BeVietnamPro,
+                                        fontFamily = PlusJakartaSans,
                                         style = MaterialTheme.typography.titleMedium
                                     )
                                 }
@@ -165,14 +165,14 @@ fun AppearanceSettingsScreen(
                     Text(
                         text = "Startup screen",
                         style = MaterialTheme.typography.bodyLarge.copy(
-                            fontFamily = BeVietnamPro,
+                            fontFamily = PlusJakartaSans,
                             fontWeight = FontWeight.SemiBold
                         ),
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = "Choose which area opens first when Iman launches.",
-                        style = MaterialTheme.typography.bodyMedium.copy(fontFamily = BeVietnamPro),
+                        style = MaterialTheme.typography.bodyMedium.copy(fontFamily = PlusJakartaSans),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(12.dp))
@@ -189,7 +189,7 @@ fun AppearanceSettingsScreen(
                             FilterChip(
                                 selected = settings.startupTab == route,
                                 onClick = { viewModel.setStartupTab(route) },
-                                label = { Text(label, fontFamily = BeVietnamPro) }
+                                label = { Text(label, fontFamily = PlusJakartaSans) }
                             )
                         }
                     }

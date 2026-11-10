@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,8 +29,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kaizen.khushu.data.model.SurahMeta
-import com.kaizen.khushu.ui.theme.Antonio
-import com.kaizen.khushu.ui.theme.BeVietnamPro
+import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
+import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import com.kaizen.khushu.ui.theme.AmiriQuran
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
 
@@ -38,6 +39,7 @@ import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
 fun QuranSurahListScreen(
     onSurahTap: (Int) -> Unit,
     onBookmarkedAyahTap: (Int, Int) -> Unit,
+    onSettingsClick: () -> Unit,
     viewModel: QuranViewModel,
     settingsViewModel: SettingsViewModel,
     modifier: Modifier = Modifier
@@ -75,7 +77,7 @@ fun QuranSurahListScreen(
                         Column {
                             Text(
                                 text = "Quran",
-                                fontFamily = Antonio,
+                                fontFamily = PlusJakartaSansBold,
                                 fontSize = 32.sp,
                                 fontWeight = FontWeight.Normal,
                                 color = MaterialTheme.colorScheme.onBackground
@@ -93,6 +95,9 @@ fun QuranSurahListScreen(
                         }
                         IconButton(onClick = { showBookmarks = true }) {
                             Icon(Icons.Default.Bookmark, contentDescription = "Bookmarks")
+                        }
+                        IconButton(onClick = onSettingsClick) {
+                            Icon(Icons.Default.Settings, contentDescription = "Settings")
                         }
                     },
                     scrollBehavior = scrollBehavior,
@@ -204,7 +209,7 @@ private fun QuranBookmarksSheet(
             Text(
                 "Bookmarks",
                 style = MaterialTheme.typography.headlineSmall,
-                fontFamily = BeVietnamPro,
+                fontFamily = PlusJakartaSans,
                 modifier = Modifier.padding(bottom = 10.dp)
             )
             Row(
@@ -321,7 +326,7 @@ private fun SurahListItem(
             Text(
                 text = surah.id.toString(),
                 style = MaterialTheme.typography.labelMedium.copy(
-                    fontFamily = BeVietnamPro,
+                    fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.Bold,
                     fontSize = 12.sp
                 ),
@@ -335,7 +340,7 @@ private fun SurahListItem(
             Text(
                 text = surah.nameSimple,
                 style = MaterialTheme.typography.titleMedium.copy(
-                    fontFamily = BeVietnamPro,
+                    fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 ),
@@ -344,7 +349,7 @@ private fun SurahListItem(
             Spacer(Modifier.height(2.dp))
             Text(
                 text = "${surah.revelationPlace.replaceFirstChar { it.uppercase() }} · ${surah.versesCount} verses",
-                style = MaterialTheme.typography.bodySmall.copy(fontFamily = BeVietnamPro),
+                style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
             )
         }

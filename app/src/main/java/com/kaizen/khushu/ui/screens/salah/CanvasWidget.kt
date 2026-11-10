@@ -33,15 +33,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
-import com.kaizen.khushu.ui.theme.Antonio
-import com.kaizen.khushu.ui.theme.BeVietnamPro
+import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
+import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import kotlinx.serialization.Serializable
 import java.time.LocalTime
 
 fun String.resolveFontFamily(): FontFamily {
     return when (this) {
-        "Antonio" -> Antonio
-        "BeVietnamPro" -> BeVietnamPro
+        "PlusJakartaSansBold" -> PlusJakartaSansBold
+        "PlusJakartaSans" -> PlusJakartaSans
         else -> FontFamily.Default
     }
 }
@@ -172,7 +172,7 @@ sealed interface CanvasWidget {
         val fontSizeSp: Float = 180f,
         val fontWeight: Int = 400,
         val isOutline: Boolean = false,
-        val fontName: String = "Antonio",
+        val fontName: String = "PlusJakartaSansBold",
     ) : CanvasWidget
 
     @Serializable
@@ -190,7 +190,7 @@ sealed interface CanvasWidget {
         val showSeconds: Boolean = false,
         val use24Hour: Boolean = true,
         val isOutline: Boolean = false,
-        val fontName: String = "BeVietnamPro",
+        val fontName: String = "PlusJakartaSans",
     ) : CanvasWidget
 
     @Serializable
@@ -211,6 +211,6 @@ sealed interface CanvasWidget {
         val textAlign: String = "Center",
         val verticalAlign: String = "Center",
         val isOutline: Boolean = false,
-        val fontName: String = "BeVietnamPro",
+        val fontName: String = "PlusJakartaSans",
     ) : CanvasWidget
 }

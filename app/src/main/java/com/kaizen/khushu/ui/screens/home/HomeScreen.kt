@@ -31,6 +31,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -62,6 +66,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -87,7 +92,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kaizen.khushu.R
 import com.kaizen.khushu.ui.components.KhushuAppBar
-import com.kaizen.khushu.ui.theme.BeVietnamPro
+import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import dev.chrisbanes.haze.HazeState
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -282,12 +287,12 @@ private fun QiblaCompassDialog(
             ) {
                 Text(
                     text = "Qibla Direction",
-                    style = MaterialTheme.typography.titleLarge.copy(fontFamily = BeVietnamPro),
+                    style = MaterialTheme.typography.titleLarge.copy(fontFamily = PlusJakartaSans),
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = locationLabel.ifBlank { "Current location" },
-                    style = MaterialTheme.typography.bodySmall.copy(fontFamily = BeVietnamPro),
+                    style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 4.dp)
                 )
@@ -344,7 +349,7 @@ private fun QiblaCompassDialog(
                         Text(
                             text = "N",
                             style = MaterialTheme.typography.labelLarge.copy(
-                                fontFamily = BeVietnamPro,
+                                fontFamily = PlusJakartaSans,
                                 fontWeight = FontWeight.Bold
                             ),
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
@@ -357,14 +362,14 @@ private fun QiblaCompassDialog(
                 Spacer(modifier = Modifier.height(14.dp))
                 Text(
                     text = "${bearingDegrees.roundToInt()}° ${compassPointLabel(bearingDegrees)} to Makkah",
-                    style = MaterialTheme.typography.titleMedium.copy(fontFamily = BeVietnamPro),
+                    style = MaterialTheme.typography.titleMedium.copy(fontFamily = PlusJakartaSans),
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center
                 )
                 Text(
                     text = heading?.let { "Facing ${it.roundToInt()}° now" }
                         ?: "Compass sensor unavailable on this device",
-                    style = MaterialTheme.typography.bodySmall.copy(fontFamily = BeVietnamPro),
+                    style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(top = 6.dp)
@@ -372,7 +377,7 @@ private fun QiblaCompassDialog(
                 if (needsCalibration) {
                     Text(
                         text = "Compass needs calibration. Move your phone in a figure-8 motion.",
-                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = BeVietnamPro),
+                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                         color = MaterialTheme.colorScheme.error,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(top = 6.dp)
@@ -380,7 +385,7 @@ private fun QiblaCompassDialog(
                 }
                 Text(
                     text = "Coordinates: ${"%.4f".format(Locale.US, latitude)}, ${"%.4f".format(Locale.US, longitude)}",
-                    style = MaterialTheme.typography.bodySmall.copy(fontFamily = BeVietnamPro),
+                    style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(top = 8.dp)
@@ -437,7 +442,7 @@ private fun HomeHijriBadge(
             text = label,
             style =
                 MaterialTheme.typography.bodyMedium.copy(
-                    fontFamily = BeVietnamPro,
+                    fontFamily = PlusJakartaSans,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 ),
@@ -697,21 +702,22 @@ fun HomeScreen(
             }
         }
 
-    Box(modifier = modifier.fillMaxSize()) {
-        Box(modifier = Modifier.fillMaxSize().nestedScroll(pullRefreshConnection)) {
-            LazyColumn(
-                state = listState,
-                contentPadding =
-                    PaddingValues(
-                        top = contentPadding.calculateTopPadding() + 22.dp,
-                        bottom = 0.dp
-                    ),
-                modifier =
-                    Modifier.fillMaxSize().graphicsLayer {
-                        translationY = animatedPullOffsetPx
-                    }
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = contentPadding.calculateTopPadding())
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .nestedScroll(pullRefreshConnection),
             ) {
-                item {
+                Column(modifier = Modifier.fillMaxSize()) {
                     val sunriseTime = (displayPrayers + displayExtraTimings)
                         .firstOrNull {
                             it.name.contains("shuruq", ignoreCase = true) ||
@@ -721,63 +727,73 @@ fun HomeScreen(
                         .firstOrNull { it.name.equals("Maghrib", ignoreCase = true) }
                         ?.time ?: ""
 
-                    if (displayPrayers.isEmpty()) {
-                        PrayerSunMergedCardShimmer(
-                            modifier = Modifier.padding(horizontal = 14.dp)
-                        )
-                    } else {
-                        PrayerSunMergedCard(
-                            currentPrayer = currentPrayer,
-                            nextPrayer = nextPrayer,
-                            sunT = sunArcT,
-                            allPrayers = displayPrayers,
-                            makruhZones = uiState.makruhZones,
-                            darkTheme = darkTheme,
-                            sunriseTime = sunriseTime,
-                            sunsetTime = sunsetTime,
-                            modifier = Modifier.padding(horizontal = 14.dp)
-                        )
+                    PrayerSunMergedCard(
+                        currentPrayer = currentPrayer,
+                        nextPrayer = nextPrayer,
+                        sunT = sunArcT,
+                        allPrayers = displayPrayers,
+                        makruhZones = uiState.makruhZones,
+                        darkTheme = darkTheme,
+                        sunriseTime = sunriseTime,
+                        sunsetTime = sunsetTime,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 22.dp, start = 14.dp, end = 14.dp),
+                    )
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)),
+                        shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
+                        color = MaterialTheme.colorScheme.surfaceContainerLow,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                    ) {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            LazyColumn(
+                                state = listState,
+                                contentPadding = PaddingValues(
+                                    bottom = contentPadding.calculateBottomPadding() +
+                                            WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 32.dp
+                                ),
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .graphicsLayer { translationY = animatedPullOffsetPx },
+                            ) {
+                                item {
+                                    PrayerSlab(
+                                        prayers = displayPrayers,
+                                        extraTimings =
+                                            if (uiState.showExtraPrayerTimingsOnHome) displayExtraTimings
+                                            else emptyList(),
+                                        activePrayerName = currentPrayer?.name,
+                                        onQiblaClick = { selectedQuickAction = HomeQuickAction.QIBLA },
+                                        ayahRef = uiState.ayahRef,
+                                        darkTheme = darkTheme,
+                                        locationLabel = uiState.locationLabel,
+                                        source = uiState.calculationSource,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                }
+                            }
+                            KhushuPullRefreshIndicator(
+                                progress = if (thresholdReached || uiState.isRefreshing) 1f else pullProgress,
+                                isRefreshing = uiState.isRefreshing,
+                                darkTheme = darkTheme,
+                                modifier = Modifier.align(Alignment.TopCenter)
+                                    .padding(top = 14.dp)
+                                    .size(52.dp)
+                                    .graphicsLayer {
+                                        translationY = (animatedPullOffsetPx * 0.22f) - with(density) { 8.dp.toPx() }
+                                    }
+                            )
+                        }
                     }
                 }
-
-                item { Spacer(modifier = Modifier.height(14.dp)) }
-
-
-                item {
-                    PrayerSlab(
-                        prayers = displayPrayers,
-                        extraTimings =
-                            if (uiState.showExtraPrayerTimingsOnHome) displayExtraTimings
-                            else emptyList(),
-                        activePrayerName = currentPrayer?.name,
-                        onQiblaClick = { selectedQuickAction = HomeQuickAction.QIBLA },
-                        //                    ayahText = uiState.ayahText,
-                        ayahRef = uiState.ayahRef,
-                        darkTheme = darkTheme,
-                        locationLabel = uiState.locationLabel,
-                        source = uiState.calculationSource,
-                        bottomPadding = contentPadding.calculateBottomPadding(),
-                        modifier = Modifier.fillParentMaxHeight()
-                    )
-                }
             }
-
-            KhushuPullRefreshIndicator(
-                // Lock fill at 100% the instant threshold is reached so there's no
-                // dip during the async gap before isRefreshing becomes true.
-                progress = if (thresholdReached || uiState.isRefreshing) 1f else pullProgress,
-                isRefreshing = uiState.isRefreshing,
-                darkTheme = darkTheme,
-                modifier =
-                    Modifier.align(Alignment.TopCenter)
-                        .padding(top = contentPadding.calculateTopPadding() + 14.dp)
-                        .size(52.dp)
-                        .graphicsLayer {
-                            translationY =
-                                (animatedPullOffsetPx * 0.22f) -
-                                        with(density) { 8.dp.toPx() }
-                        }
-            )
         }
 
         KhushuAppBar(

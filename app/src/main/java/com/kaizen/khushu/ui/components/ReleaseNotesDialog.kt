@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.kaizen.khushu.data.model.ReleaseNote
-import com.kaizen.khushu.ui.theme.BeVietnamPro
+import com.kaizen.khushu.ui.theme.PlusJakartaSans
 
 @Composable
 fun ReleaseNotesDialog(
@@ -57,7 +57,7 @@ fun ReleaseNotesDialog(
                     Text(
                         text = note.versionName,
                         style = MaterialTheme.typography.headlineMedium,
-                        fontFamily = BeVietnamPro,
+                        fontFamily = PlusJakartaSans,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface,
                     )

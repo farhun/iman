@@ -77,7 +77,7 @@ fun PillNavBar(
         Box(
             modifier = modifier
                 .clip(PillShape)
-                .background(Color.Black.copy(alpha = 0.2f))
+                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.2f))
                 .border(
                     width = 1.dp,
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),

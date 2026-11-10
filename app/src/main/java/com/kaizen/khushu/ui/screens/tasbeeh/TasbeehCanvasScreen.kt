@@ -45,8 +45,8 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kaizen.khushu.data.model.TasbeehCanvasPresetDomain
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
-import com.kaizen.khushu.ui.theme.Antonio
-import com.kaizen.khushu.ui.theme.BeVietnamPro
+import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
+import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import com.kaizen.khushu.ui.theme.AmiriQuran
 import com.kaizen.khushu.ui.theme.KhushuColors
 
@@ -402,7 +402,7 @@ private fun AddTasbihWidgetSheet(
                     modifier = Modifier.weight(1f),
                     onClick = { onAdd(TasbihWidget.CounterWidget(id = "counter_${System.currentTimeMillis()}")) }
                 ) {
-                    Text("33", fontSize = 40.sp, color = Color.White, fontFamily = Antonio)
+                    Text("33", fontSize = 40.sp, color = Color.White, fontFamily = PlusJakartaSansBold)
                 }
                 WidgetPreviewCard(
                     title = "Dhikr Name",

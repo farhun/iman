@@ -41,7 +41,7 @@ import com.kaizen.khushu.data.repository.UserSettings
 import com.kaizen.khushu.data.repository.WidgetVisibilityItems
 import com.kaizen.khushu.widget.PrayerWidgetProvider
 import kotlinx.coroutines.launch
-import com.kaizen.khushu.ui.theme.BeVietnamPro
+import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.hypot
@@ -223,7 +223,7 @@ fun WidgetSettingsScreen(
                         Text(
                             text = "Indicator Color",
                             style = MaterialTheme.typography.bodyLarge.copy(
-                                fontFamily = BeVietnamPro,
+                                fontFamily = PlusJakartaSans,
                                 fontWeight = FontWeight.SemiBold
                             )
                         )
@@ -258,7 +258,7 @@ fun WidgetSettingsScreen(
                         Text(
                             text = "Font Color",
                             style = MaterialTheme.typography.bodyLarge.copy(
-                                fontFamily = BeVietnamPro,
+                                fontFamily = PlusJakartaSans,
                                 fontWeight = FontWeight.SemiBold
                             )
                         )
@@ -355,7 +355,7 @@ private fun WidgetVisibilityToggle(
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.bodyLarge.copy(fontFamily = BeVietnamPro)
+            style = MaterialTheme.typography.bodyLarge.copy(fontFamily = PlusJakartaSans)
         )
         Switch(checked = checked, onCheckedChange = onCheckedChange)
     }
@@ -532,7 +532,7 @@ fun AdvancedColorPickerSheet(
                     shape = RoundedCornerShape(24.dp),
                     border = BorderStroke(1.dp, Color.LightGray)
                 ) {
-                    Text("Back", color = Color.Gray, fontFamily = BeVietnamPro)
+                    Text("Back", color = Color.Gray, fontFamily = PlusJakartaSans)
                 }
                 Button(
                     onClick = { onColorSelected(currentColor) },
@@ -542,7 +542,7 @@ fun AdvancedColorPickerSheet(
                     border = BorderStroke(1.dp, Color.LightGray),
                     elevation = ButtonDefaults.buttonElevation(0.dp)
                 ) {
-                    Text("Select", color = Color.Gray, fontFamily = BeVietnamPro)
+                    Text("Select", color = Color.Gray, fontFamily = PlusJakartaSans)
                 }
             }
         }
@@ -568,7 +568,7 @@ private fun ColorPaletteSlider(
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    fontFamily = BeVietnamPro,
+                    fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.SemiBold
                 )
             )
@@ -600,7 +600,7 @@ private fun ColorPaletteSlider(
         Text(
             text = "Transparency (${(opacity * 100).toInt()}%)",
             style = MaterialTheme.typography.bodyLarge.copy(
-                fontFamily = BeVietnamPro,
+                fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.SemiBold
             )
         )
@@ -670,10 +670,10 @@ private fun WidgetPreview(settings: UserSettings) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Star, null, tint = fontColor, modifier = Modifier.size(12.dp))
                         Spacer(Modifier.width(4.dp))
-                        Text("Fri, 5 June", color = fontColor, fontSize = 11.sp, fontFamily = BeVietnamPro)
+                        Text("Fri, 5 June", color = fontColor, fontSize = 11.sp, fontFamily = PlusJakartaSans)
                     }
                 }
-                if (showHijri) Text("19 Dhul-Hijjah", color = fontColor, fontSize = 11.sp, fontFamily = BeVietnamPro)
+                if (showHijri) Text("19 Dhul-Hijjah", color = fontColor, fontSize = 11.sp, fontFamily = PlusJakartaSans)
             }
         }
 
@@ -687,7 +687,7 @@ private fun WidgetPreview(settings: UserSettings) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.MyLocation, null, tint = subFontColor, modifier = Modifier.size(12.dp))
                         Spacer(Modifier.width(4.dp))
-                        Text("Düsseldorf", color = subFontColor, fontSize = 10.sp, fontFamily = BeVietnamPro)
+                        Text("Düsseldorf", color = subFontColor, fontSize = 10.sp, fontFamily = PlusJakartaSans)
                     }
                 }
                 if (showNextPrayer || showCountdown) {
@@ -696,11 +696,11 @@ private fun WidgetPreview(settings: UserSettings) {
                             "Fajr in",
                             color = subFontColor,
                             fontSize = 10.sp,
-                            fontFamily = BeVietnamPro
+                            fontFamily = PlusJakartaSans
                         )
                         if (showCountdown) {
                             if (showNextPrayer) Spacer(Modifier.width(4.dp))
-                            Text("02:15", color = subFontColor, fontSize = 10.sp, fontFamily = BeVietnamPro)
+                            Text("02:15", color = subFontColor, fontSize = 10.sp, fontFamily = PlusJakartaSans)
                         }
                     }
                 }
@@ -726,7 +726,7 @@ private fun WidgetPreview(settings: UserSettings) {
                             label,
                             color = if (isActive) fontColor else subFontColor,
                             fontSize = 9.sp,
-                            fontFamily = BeVietnamPro
+                            fontFamily = PlusJakartaSans
                         )
                         Box(
                             modifier = Modifier
@@ -740,7 +740,7 @@ private fun WidgetPreview(settings: UserSettings) {
                                 time,
                                 color = if (isActive) Color.Black else fontColor,
                                 fontSize = 9.sp,
-                                fontFamily = BeVietnamPro
+                                fontFamily = PlusJakartaSans
                             )
                         }
                     }

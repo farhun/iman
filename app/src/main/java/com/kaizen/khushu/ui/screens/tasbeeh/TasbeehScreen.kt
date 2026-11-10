@@ -1,60 +1,65 @@
 package com.kaizen.khushu.ui.screens.tasbeeh
-import androidx.compose.ui.graphics.ShaderBrush
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.*
+
+
+
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.*
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.MaterialShapes
 
 import androidx.compose.runtime.*
+
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialShapes
+import androidx.compose.material3.ExperimentalMaterial3Api
+
+
+import androidx.compose.ui.geometry.Offset
+
+
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
 
 import com.kaizen.khushu.data.model.CustomBeadStyle
 import com.kaizen.khushu.data.model.TasbeehCanvasPresetDomain
-import com.kaizen.khushu.data.repository.UserSettings
 import com.kaizen.khushu.data.model.TasbeehCollection
-
-
-
-import androidx.graphics.shapes.RoundedPolygon
-import com.kaizen.khushu.R
-import com.kaizen.khushu.ui.components.KhushuAppBar
+import com.kaizen.khushu.data.repository.UserSettings
 import com.kaizen.khushu.ui.navigation.AppDestinations
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
-import com.kaizen.khushu.ui.theme.BeVietnamPro
 import com.kaizen.khushu.ui.theme.AmiriQuran
-import com.kaizen.khushu.ui.util.add
+import com.kaizen.khushu.ui.theme.PlusJakartaSans
+import com.kaizen.khushu.R
+
 import com.kaizen.khushu.ui.util.rememberMorphShape
-import dev.chrisbanes.haze.HazeState
+import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
+
+
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -67,17 +72,15 @@ fun TasbeehScreen(
     onEditCollection: () -> Unit,
     onCustomizeCanvas: () -> Unit,
     onSettingsClick: () -> Unit,
-    hazeState: HazeState,
+    hazeState: dev.chrisbanes.haze.HazeState,
     contentPadding: PaddingValues = PaddingValues(),
     modifier: Modifier = Modifier,
 ) {
     val collections by viewModel.collections.collectAsStateWithLifecycle(initialValue = emptyList())
     val settings by settingsViewModel.settings.collectAsStateWithLifecycle()
-    val isListMode = settings.tasbeehListMode
+    var searchActive by remember { mutableStateOf(false) }
     var query by remember { mutableStateOf("") }
     var selectedCollection by remember { mutableStateOf<TasbeehCollection?>(null) }
-
-    val expressiveShape = MaterialShapes.Cookie9Sided.toShape()
 
     val filtered = remember(collections, query) {
         if (query.isBlank()) collections
@@ -87,148 +90,92 @@ fun TasbeehScreen(
         }
     }
 
-    // Shape morphing for view toggles
-    val gridProgress by animateFloatAsState(
-        targetValue = if (!isListMode) 1f else 0f,
-        label = "grid_morph_progress"
-    )
-    val listProgress by animateFloatAsState(
-        targetValue = if (isListMode) 1f else 0f,
-        label = "list_morph_progress"
-    )
-
-    val gridMorphShape = rememberMorphShape(
-        start = MaterialShapes.Circle,
-        end = MaterialShapes.Cookie9Sided,
-        progress = gridProgress
-    )
+    val expressiveShape = MaterialShapes.Cookie9Sided.toShape()
+    val listProgress by animateFloatAsState(targetValue = 1f, label = "list_morph_progress")
     val listMorphShape = rememberMorphShape(
         start = MaterialShapes.Circle,
         end = MaterialShapes.Cookie9Sided,
-        progress = listProgress
+        progress = listProgress,
     )
 
+
     Box(modifier = modifier.fillMaxSize()) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(if (isListMode) 1 else 2),
-            contentPadding = contentPadding.add(start = 20.dp, end = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            item(key = "search", span = { GridItemSpan(maxLineSpan) }) {
-                SearchBar(
-                    query = query,
-                    onQueryChange = { query = it },
-                    modifier = Modifier.padding(top = 32.dp, bottom = 4.dp),
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                LargeTopAppBar(
+                    title = {
+                        Text(
+                            text = AppDestinations.TASBEEH.label,
+                            fontFamily = PlusJakartaSansBold,
+                            fontSize = 32.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = MaterialTheme.colorScheme.onBackground,
+                        )
+                    },
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                searchActive = !searchActive
+                                if (!searchActive) query = ""
+                            }
+                        ) {
+                            Icon(Icons.Default.Search, contentDescription = "Search Tasbih")
+                        }
+                        IconButton(onClick = onSettingsClick) {
+                            Icon(Icons.Default.Settings, contentDescription = "Settings")
+                        }
+                    },
+                    colors = TopAppBarDefaults.largeTopAppBarColors(
+                        containerColor = Color.Transparent,
+                        scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
+                        titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    ),
                 )
-            }
-
-            item(key = "view_toggle", span = { GridItemSpan(maxLineSpan) }) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
-                    horizontalArrangement = Arrangement.End,
+            },
+        ) { paddingValues ->
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = paddingValues.calculateTopPadding()),
+                color = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
+            ) {
+                LazyColumn(
+                    contentPadding = PaddingValues(bottom = 120.dp),
+                    modifier = Modifier.fillMaxSize(),
                 ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_toggle),
-                        contentDescription = "Grid view",
-                        tint = if (!isListMode) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(
-                                if (!isListMode) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
-                                else Color.Transparent
+                    if (searchActive) {
+                        item(key = "tasbih-search") {
+                            OutlinedTextField(
+                                value = query,
+                                onValueChange = { query = it },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                                placeholder = { Text("Search Tasbih") },
+                                singleLine = true,
                             )
-                            .clickable { settingsViewModel.toggleTasbeehListMode(false) }
-                            .padding(10.dp),
-                    )
-                    Icon(
-                        painter = painterResource(R.drawable.ic_list_view),
-                        contentDescription = "List view",
-                        tint = if (isListMode) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(
-                                if (isListMode) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
-                                else Color.Transparent
-                            )
-                            .clickable { settingsViewModel.toggleTasbeehListMode(true) }
-                            .padding(10.dp),
-                    )
-                }
-            }
-
-            itemsIndexed(
-                items = filtered,
-                key = { _, it -> "real_${it.id}" }
-            ) { index, collection ->
-                val isVisible = true
-
-                val alpha by animateFloatAsState(
-                    targetValue = if (isVisible) 1f else 0f,
-                    animationSpec = tween(400),
-                    label = "card_alpha"
-                )
-
-                val scale by animateFloatAsState(
-                    targetValue = if (isVisible) 1f else 0.9f,
-                    animationSpec = tween(400, easing = FastOutSlowInEasing),
-                    label = "card_scale"
-                )
-
-                val (resolvedBg, resolvedContent) = if (settings.tasbeehDynamicColors) {
-                    when (index % 3) {
-                        0 -> MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
-                        1 -> MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
-                        else -> MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
+                        }
                     }
-                } else {
-                    Color(collection.colorInt) to Color.White
-                }
-
-                CollectionCard(
-                    collection = collection,
-                    isListMode = isListMode,
-                    containerColor = resolvedBg,
-                    contentColor = resolvedContent,
-                    settings = settings,
-                    onTap = { selectedCollection = collection },
-                    modifier = Modifier.graphicsLayer {
-                        this.alpha = alpha
-                        this.scaleX = scale
-                        this.scaleY = scale
+                    items(filtered, key = { "real_${it.id}" }) { collection ->
+                        TasbihCollectionListItem(
+                            collection = collection,
+                            customBeadStyle = settings.customBeadStyles.find { it.id == settings.activeBeadStyleId },
+                            beadStyle = if (settings.tasbihBeadStyle == "DARK_ONYX") BeadStyle.DARK_ONYX else BeadStyle.CLASSIC_AMBER,
+                            onClick = { selectedCollection = collection },
+                        )
                     }
-                )
+                }
             }
         }
-
-        KhushuAppBar(
-            title = AppDestinations.TASBEEH.label,
-            onSettingsClick = onSettingsClick,
-            modifier = Modifier.align(Alignment.TopCenter),
-        )
     }
 
     // Safely unwrap to prevent NullPointerExceptions on Dismiss/Delete
     selectedCollection?.let { collection ->
-        val index = collections.indexOf(collection)
-        val (resolvedBg, resolvedContent) = if (settings.tasbeehDynamicColors && index != -1) {
-            when (index % 3) {
-                0 -> MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
-                1 -> MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
-                else -> MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
-            }
-        } else {
-            Color(collection.colorInt) to Color.White
-        }
-
         CollectionDetailSheet(
             collection = collection,
-            accentColor = if (settings.tasbeehDynamicColors) resolvedBg else MaterialTheme.colorScheme.primary,
+            accentColor = MaterialTheme.colorScheme.primary,
             settingsViewModel = settingsViewModel,
             canvasViewModel = canvasViewModel,
             onDismiss = { selectedCollection = null },
@@ -421,7 +368,7 @@ private fun CollectionDetailSheet(
                             Text(
                                 text = collection.title?.takeIf { it.isNotBlank() } ?: "Collection",
                                 style = MaterialTheme.typography.headlineMedium,
-                                fontFamily = if (collection.title?.any { it in '\u0600'..'\u06FF' } == true) AmiriQuran else BeVietnamPro,
+                                fontFamily = if (collection.title?.any { it in '\u0600'..'\u06FF' } == true) AmiriQuran else PlusJakartaSans,
                                 fontWeight = FontWeight.Medium,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.weight(1f),
@@ -462,7 +409,7 @@ private fun CollectionDetailSheet(
                             Text(
                                 text = item.name,
                                 style = MaterialTheme.typography.bodyLarge,
-                                fontFamily = if (item.name.any { it in '\u0600'..'\u06FF' }) AmiriQuran else BeVietnamPro,
+                                fontFamily = if (item.name.any { it in '\u0600'..'\u06FF' }) AmiriQuran else PlusJakartaSans,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.weight(1f),
                             )
@@ -702,303 +649,69 @@ private fun PrepPresetsPickerSheet(
 }
 
 @Composable
-private fun SearchBar(
-    query: String,
-    onQueryChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    TextField(
-        value = query,
-        onValueChange = onQueryChange,
-        placeholder = {
-            Text(
-                "Search Tasbih",
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-            )
-        },
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(20.dp),
-            )
-        },
-        singleLine = true,
-        shape = CircleShape,
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.Transparent,
-            unfocusedContainerColor = Color.Transparent,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-        ),
-        modifier = modifier
-            .fillMaxWidth()
-            .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), CircleShape),
-    )
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun CollectionCard(
+private fun TasbihCollectionListItem(
     collection: TasbeehCollection,
-    isListMode: Boolean,
-    containerColor: Color,
-    contentColor: Color,
-    settings: com.kaizen.khushu.data.repository.UserSettings,
-    onTap: () -> Unit,
-    modifier: Modifier = Modifier
+    customBeadStyle: CustomBeadStyle?,
+    beadStyle: BeadStyle,
+    onClick: () -> Unit,
 ) {
-    val customBeadStyle = settings.customBeadStyles.find { it.id == settings.activeBeadStyleId }
-    val legacyBeadStyle = if (settings.tasbihBeadStyle == "DARK_ONYX") BeadStyle.DARK_ONYX else BeadStyle.CLASSIC_AMBER
 
-    if (isListMode) {
-        Box(
-            modifier = modifier
-                .fillMaxWidth()
-                .height(150.dp)
-                .clip(RoundedCornerShape(24.dp))
-                .background(containerColor)
-                .clickable(onClick = onTap)
-        ) {
-            // --- Islamic Background Pattern ---
-            Canvas(modifier = Modifier.size(200.dp).align(Alignment.CenterEnd).offset(x = 60.dp, y = 30.dp)) {
-                val starSize = size.minDimension
-                val squareSize = starSize * 0.707f
-                val starColor = contentColor
-                val starAlpha = 0.1f
-
-                drawContext.canvas.save()
-                drawContext.transform.rotate(0f, center)
-                drawRect(
-                    color = starColor,
-                    topLeft = androidx.compose.ui.geometry.Offset(center.x - squareSize/2, center.y - squareSize/2),
-                    size = androidx.compose.ui.geometry.Size(squareSize, squareSize),
-                    style = androidx.compose.ui.graphics.drawscope.Stroke(1.dp.toPx()),
-                    alpha = starAlpha
-                )
-                drawContext.canvas.restore()
-                drawContext.canvas.save()
-                drawContext.transform.rotate(45f, center)
-                drawRect(
-                    color = starColor,
-                    topLeft = androidx.compose.ui.geometry.Offset(center.x - squareSize/2, center.y - squareSize/2),
-                    size = androidx.compose.ui.geometry.Size(squareSize, squareSize),
-                    style = androidx.compose.ui.graphics.drawscope.Stroke(1.dp.toPx()),
-                    alpha = starAlpha
-                )
-                drawContext.canvas.restore()
-            }
-
-            // Text content — leaves 70dp on the right for the sidebar
-            Column(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(start = 20.dp, end = 78.dp, top = 18.dp, bottom = 18.dp),
-                verticalArrangement = Arrangement.Top,
-            ) {
-                if (!collection.title.isNullOrBlank()) {
-                    Text(
-                        text = collection.title,
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontFamily = if (collection.title.any { it in '\u0600'..'\u06FF' }) AmiriQuran else BeVietnamPro,
-                        color = contentColor,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Spacer(Modifier.height(4.dp))
-                }
-                Text(
-                    text = "${collection.items.size} dhikr",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = contentColor.copy(alpha = 0.6f),
-                )
-                if (collection.items.isNotEmpty()) {
-                    Spacer(Modifier.height(12.dp))
-                    collection.items.take(2).forEach { item ->
-                        Text(
-                            text = "· ${item.name}",
-                            style = MaterialTheme.typography.bodySmall,
-                            fontFamily = if (item.name.any { it in '\u0600'..'\u06FF' }) AmiriQuran else BeVietnamPro,
-                            color = contentColor.copy(alpha = 0.8f),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                }
-            }
-
-            // --- The Physical Sidebar (String + 3 Beads) ---
-            // Placed directly in the outer Box so the string spans the full card height
-            Box(
-                modifier = Modifier
-                    .width(100.dp)
-                    .fillMaxHeight()
-                    .align(Alignment.CenterEnd),
-                contentAlignment = Alignment.Center
-            ) {
-                // The String — full card height, no padding clipping
-                Canvas(modifier = Modifier.fillMaxHeight().width(8.dp)) {
-                    val centerX = size.width / 2f
-                    // Drop shadow
-                    drawLine(
-                        brush = androidx.compose.ui.graphics.Brush.verticalGradient(
-                            colors = listOf(
-                                Color.Transparent,
-                                Color.Black.copy(alpha = 0.25f),
-                                Color.Black.copy(alpha = 0.25f),
-                                Color.Transparent
-                            ),
-                            startY = 0f,
-                            endY = size.height
-                        ),
-                        start = androidx.compose.ui.geometry.Offset(centerX + 1.5.dp.toPx(), 0f),
-                        end = androidx.compose.ui.geometry.Offset(centerX + 1.5.dp.toPx(), size.height),
-                        strokeWidth = 2.dp.toPx()
-                    )
-                    // Main thread
-                    drawLine(
-                        brush = androidx.compose.ui.graphics.Brush.verticalGradient(
-                            colors = listOf(
-                                contentColor.copy(alpha = 0.4f),
-                                contentColor.copy(alpha = 0.7f),
-                                contentColor.copy(alpha = 0.7f),
-                                contentColor.copy(alpha = 0.4f)
-                            ),
-                            startY = 0f,
-                            endY = size.height
-                        ),
-                        start = androidx.compose.ui.geometry.Offset(centerX, 0f),
-                        end = androidx.compose.ui.geometry.Offset(centerX, size.height),
-                        strokeWidth = 2.dp.toPx()
-                    )
-                }
-
-                // 3 Beads
-                Column(
-                    modifier = Modifier.fillMaxHeight(),
-                    verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    repeat(3) {
-                        PreviewBead(
-                            baseColor = contentColor,
-                            legacyStyle = legacyBeadStyle,
-                            customStyle = customBeadStyle,
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
-                }
-            }
-        }
-    } else {
-        Box(
-            modifier = modifier
-                .aspectRatio(1f)
-                .clip(RoundedCornerShape(24.dp))
-                .background(containerColor)
-                .clickable(onClick = onTap)
-                .padding(12.dp),
-        ) {
-            // --- Islamic Pattern (Mini) ---
-            Canvas(modifier = Modifier.size(100.dp).align(Alignment.BottomEnd).offset(x = 20.dp, y = 20.dp)) {
-                val squareSize = size.minDimension * 0.707f
-                drawContext.canvas.save()
-                drawRect(
-                    color = contentColor,
-                    topLeft = androidx.compose.ui.geometry.Offset(center.x - squareSize/2, center.y - squareSize/2),
-                    size = androidx.compose.ui.geometry.Size(squareSize, squareSize),
-                    style = androidx.compose.ui.graphics.drawscope.Stroke(1.dp.toPx()),
-                    alpha = 0.08f
-                )
-                drawContext.transform.rotate(45f, center)
-                drawRect(
-                    color = contentColor,
-                    topLeft = androidx.compose.ui.geometry.Offset(center.x - squareSize/2, center.y - squareSize/2),
-                    size = androidx.compose.ui.geometry.Size(squareSize, squareSize),
-                    style = androidx.compose.ui.graphics.drawscope.Stroke(1.dp.toPx()),
-                    alpha = 0.08f
-                )
-                drawContext.canvas.restore()
-            }
-
-            Column {
-                if (!collection.title.isNullOrBlank()) {
-                    Text(
-                        text = collection.title,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontFamily = if (collection.title.any { it in '\u0600'..'\u06FF' }) AmiriQuran else BeVietnamPro,
-                        fontWeight = FontWeight.Bold,
-                        color = contentColor,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Spacer(Modifier.height(6.dp))
-                }
-                val displayItems = collection.items.take(3)
-                displayItems.forEach { item ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        Text(
-                            text = item.name,
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontFamily = if (item.name.any { it in '\u0600'..'\u06FF' }) AmiriQuran else BeVietnamPro,
-                            color = contentColor,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f).padding(end = 4.dp),
-                        )
-                        Text(
-                            text = item.targetCount.toString(),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = contentColor,
-                            fontWeight = FontWeight.Medium,
-                        )
-                    }
-                }
-                if (collection.items.size > 3) {
-                    Text(
-                        text = "...",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = contentColor.copy(alpha = 0.6f),
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun PreviewBead(
-    baseColor: Color,
-    legacyStyle: BeadStyle,
-    customStyle: com.kaizen.khushu.data.model.CustomBeadStyle?,
-    modifier: Modifier = Modifier
-) {
+    val resolvedStyle = customBeadStyle?.copy(engravingText = "")
+    val customShape = resolvedStyle?.let { beadShapeTypeToShape(it.shapeType) }
     val noiseShader = GlobalNoiseShader.value
     val noiseBrush = remember(noiseShader) { ShaderBrush(noiseShader) }
-    // Card preview should borrow the active shape/effects, but keep card-driven color
-    // and omit engraving so the card stays compact and legible.
-    val resolvedStyle = customStyle?.copy(
-        baseColor = baseColor.toArgb().toLong() and 0xFFFFFFFFL,
-        engravingText = ""
-    )
-    val customShape: androidx.compose.ui.graphics.Shape? = if (resolvedStyle != null) {
-        beadShapeTypeToShape(resolvedStyle.shapeType)
-    } else null
 
-    Canvas(modifier = modifier) {
-        val radius = size.minDimension / 2f
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 20.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Box(
+            modifier = Modifier.size(42.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Canvas(modifier = Modifier.size(22.dp)) {
+                val radius = size.minDimension / 2f
+                drawBeadWrapper(
+                    center = Offset(radius, radius),
+                    radius = radius,
+                    legacyStyle = beadStyle,
+                    customStyle = resolvedStyle,
+                    customShape = customShape,
+                    noiseBrush = noiseBrush,
+                )
+            }
+        }
 
-        drawBeadWrapper(
-            center = androidx.compose.ui.geometry.Offset(radius, radius),
-            radius = radius,
-            legacyStyle = legacyStyle,
-            customStyle = resolvedStyle,
-            customShape = customShape,
-            noiseBrush = noiseBrush
-        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = collection.title?.takeIf { it.isNotBlank() }
+                    ?: collection.items.firstOrNull()?.name
+                    ?: "Tasbih",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp,
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Spacer(Modifier.height(2.dp))
+            Text(
+                text = "${collection.items.size} dhikr",
+                style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+            )
+        }
     }
+
+    HorizontalDivider(
+        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
+        thickness = 0.5.dp,
+        modifier = Modifier.padding(horizontal = 20.dp),
+    )
 }

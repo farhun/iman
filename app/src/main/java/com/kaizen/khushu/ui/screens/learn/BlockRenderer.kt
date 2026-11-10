@@ -65,7 +65,7 @@ import com.kaizen.khushu.data.model.HeadingBlock
 import com.kaizen.khushu.data.model.ParagraphBlock
 import com.kaizen.khushu.data.repository.UserSettings
 import com.kaizen.khushu.ui.components.AyahEndMarker
-import com.kaizen.khushu.ui.theme.BeVietnamPro
+import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import com.kaizen.khushu.ui.theme.AmiriQuran
 
 /**
@@ -136,7 +136,7 @@ private fun HeadingBlockView(block: HeadingBlock, fg: Color, modifier: Modifier 
     Text(
         text = block.text,
         style = MaterialTheme.typography.titleLarge.copy(
-            fontFamily = BeVietnamPro,
+            fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.SemiBold,
             fontSize = 20.sp,
             lineHeight = 28.sp,
@@ -160,7 +160,7 @@ private fun ParagraphBlockView(
     Text(
         text = block.text,
         style = MaterialTheme.typography.bodyLarge.copy(
-            fontFamily = BeVietnamPro,
+            fontFamily = PlusJakartaSans,
             fontSize = settings.translationSizeSp.sp,
             lineHeight = (settings.translationSizeSp * 1.65f).sp,
         ),
@@ -267,7 +267,7 @@ private fun AyahBlockView(
                 Text(
                     text = block.ayah.toString(),
                     style = MaterialTheme.typography.labelSmall.copy(
-                        fontFamily = BeVietnamPro,
+                        fontFamily = PlusJakartaSans,
                         fontWeight = FontWeight.Bold,
                         fontSize = 10.sp
                     ),
@@ -329,7 +329,7 @@ private fun AyahBlockView(
                 Text(
                     text = translationText,
                     style = MaterialTheme.typography.bodyLarge.copy(
-                        fontFamily = BeVietnamPro,
+                        fontFamily = PlusJakartaSans,
                         fontSize = settings.translationSizeSp.sp,
                         lineHeight = (settings.translationSizeSp * 1.7f).sp,
                         textAlign = if (isTranslationRtl) TextAlign.Right else TextAlign.Left,
@@ -477,7 +477,7 @@ private fun VerseChip(
             )
             Text(
                 label,
-                style = MaterialTheme.typography.labelSmall.copy(fontFamily = BeVietnamPro),
+                style = MaterialTheme.typography.labelSmall.copy(fontFamily = PlusJakartaSans),
                 color = contentColor.copy(alpha = 0.6f)
             )
         }
@@ -528,7 +528,7 @@ private fun HadithBlockView(
                     Text(
                         text = block.display,
                         style = MaterialTheme.typography.labelSmall.copy(
-                            fontFamily = BeVietnamPro,
+                            fontFamily = PlusJakartaSans,
                             fontWeight = FontWeight.Medium,
                         ),
                         color = fg.copy(alpha = 0.45f),
@@ -562,7 +562,7 @@ private fun HadithBlockView(
                 Text(
                     text = "\u201C$bodyText\u201D",
                     style = MaterialTheme.typography.bodyLarge.copy(
-                        fontFamily = BeVietnamPro,
+                        fontFamily = PlusJakartaSans,
                         fontSize = settings.translationSizeSp.sp,
                         lineHeight = (settings.translationSizeSp * 1.65f).sp,
                         fontStyle = FontStyle.Italic,
@@ -577,7 +577,7 @@ private fun HadithBlockView(
                     Text(
                         text = "— ${block.narrator}",
                         style = MaterialTheme.typography.labelMedium.copy(
-                            fontFamily = BeVietnamPro,
+                            fontFamily = PlusJakartaSans,
                             fontWeight = FontWeight.SemiBold,
                         ),
                     )
@@ -603,7 +603,7 @@ private fun GradePill(grade: String, fg: Color) {
         Text(
             text = grade.uppercase(),
             style = MaterialTheme.typography.labelSmall.copy(
-                fontFamily = BeVietnamPro,
+                fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.ExtraBold,
                 letterSpacing = 1.sp
             ),
@@ -657,7 +657,7 @@ private fun CalloutBlockView(
             Text(
                 text = block.text,
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    fontFamily = BeVietnamPro,
+                    fontFamily = PlusJakartaSans,
                     lineHeight = 22.sp,
                 ),
                 color = fg.copy(alpha = 0.85f),
@@ -729,7 +729,7 @@ private fun ArabicBlockView(
                 Text(
                     text = block.translation,
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        fontFamily = BeVietnamPro,
+                        fontFamily = PlusJakartaSans,
                         fontSize = settings.translationSizeSp.sp,
                         lineHeight = (settings.translationSizeSp * 1.65f).sp,
                         fontStyle = FontStyle.Italic,

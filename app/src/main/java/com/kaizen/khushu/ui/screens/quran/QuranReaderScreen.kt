@@ -45,7 +45,7 @@ import com.kaizen.khushu.data.repository.TranslationRepository
 
 import com.kaizen.khushu.ui.screens.learn.BlockRenderer
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
-import com.kaizen.khushu.ui.theme.BeVietnamPro
+import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import com.kaizen.khushu.ui.theme.AmiriQuran
 import com.kaizen.khushu.ui.theme.rememberArabicScriptFontFamily
 import com.kaizen.khushu.ui.theme.colorSeeds
@@ -141,7 +141,7 @@ private fun JuzHeader(juzNumber: Int, contentColor: Color) {
             style = MaterialTheme.typography.labelSmall,
             color = contentColor.copy(alpha = 0.4f),
             modifier = Modifier.padding(horizontal = 12.dp),
-            fontFamily = BeVietnamPro,
+            fontFamily = PlusJakartaSans,
         )
         HorizontalDivider(
             modifier = Modifier.weight(1f),
@@ -172,7 +172,7 @@ private fun SajdaIndicator(type: String, contentColor: Color) {
             text = if (type == "obligatory") "Sajdah Wajibah" else "Sajdah Mustahabb",
             style = MaterialTheme.typography.labelSmall,
             color = contentColor.copy(alpha = 0.5f),
-            fontFamily = BeVietnamPro,
+            fontFamily = PlusJakartaSans,
         )
     }
 }
@@ -481,13 +481,13 @@ fun QuranReaderScreen(
                                                 Text(
                                                     text = it.revelationPlace.uppercase(),
                                                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                                                    style = MaterialTheme.typography.labelSmall.copy(fontFamily = BeVietnamPro),
+                                                    style = MaterialTheme.typography.labelSmall.copy(fontFamily = PlusJakartaSans),
                                                     color = MaterialTheme.colorScheme.primary
                                                 )
                                             }
                                             Text(
                                                 text = "${it.versesCount} VERSES",
-                                                style = MaterialTheme.typography.labelSmall.copy(fontFamily = BeVietnamPro),
+                                                style = MaterialTheme.typography.labelSmall.copy(fontFamily = PlusJakartaSans),
                                                 color = fg.copy(alpha = 0.6f)
                                             )
                                         }
@@ -892,7 +892,7 @@ private fun ReadingModeToggle(
         ) {
             Text(
                 text = "Verse by Verse",
-                style = MaterialTheme.typography.labelMedium.copy(fontFamily = BeVietnamPro),
+                style = MaterialTheme.typography.labelMedium.copy(fontFamily = PlusJakartaSans),
                 color = if (isVerseByVerse) activeColor else inactiveColor,
                 fontWeight = if (isVerseByVerse) FontWeight.SemiBold else FontWeight.Normal
             )
@@ -909,7 +909,7 @@ private fun ReadingModeToggle(
         ) {
             Text(
                 text = "Reading",
-                style = MaterialTheme.typography.labelMedium.copy(fontFamily = BeVietnamPro),
+                style = MaterialTheme.typography.labelMedium.copy(fontFamily = PlusJakartaSans),
                 color = if (!isVerseByVerse) activeColor else inactiveColor,
                 fontWeight = if (!isVerseByVerse) FontWeight.SemiBold else FontWeight.Normal
             )

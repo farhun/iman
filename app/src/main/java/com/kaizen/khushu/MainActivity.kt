@@ -408,6 +408,9 @@ private fun KhushuApp(
                             onBookmarkedAyahTap = { surah, ayah ->
                                 navController.navigate("quran/$surah?ayah=$ayah")
                             },
+                            onSettingsClick = {
+                                navController.navigate(SETTINGS_ROUTE) { launchSingleTop = true }
+                            },
                             viewModel = quranViewModel,
                             settingsViewModel = settingsViewModel
                         )

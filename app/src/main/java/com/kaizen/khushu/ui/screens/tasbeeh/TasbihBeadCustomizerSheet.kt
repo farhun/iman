@@ -35,9 +35,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kaizen.khushu.data.model.*
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
-import com.kaizen.khushu.ui.theme.Antonio
+import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
 import com.kaizen.khushu.ui.theme.AmiriQuran
-import com.kaizen.khushu.ui.theme.BeVietnamPro
+import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import com.kaizen.khushu.ui.theme.KhushuColors
 import java.util.UUID
 
@@ -146,7 +146,7 @@ fun TasbihBeadCustomizerSheet(
                 Text(
                     text = "Design Your Bead",
                     style = MaterialTheme.typography.titleMedium,
-                    fontFamily = BeVietnamPro,
+                    fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
@@ -327,19 +327,19 @@ fun TasbihBeadCustomizerSheet(
                     FilterChip(
                         selected = workingStyle.chromaticAberration,
                         onClick = { workingStyle = workingStyle.copy(chromaticAberration = !workingStyle.chromaticAberration, preset = com.kaizen.khushu.data.model.BeadPreset.NONE) },
-                        label = { Text("Chromatic", fontFamily = BeVietnamPro, style = MaterialTheme.typography.titleMedium) },
+                        label = { Text("Chromatic", fontFamily = PlusJakartaSans, style = MaterialTheme.typography.titleMedium) },
 //                        modifier = Modifier.weight(1f)
                     )
                     FilterChip(
                         selected = workingStyle.metallicSheen,
                         onClick = { workingStyle = workingStyle.copy(metallicSheen = !workingStyle.metallicSheen, preset = com.kaizen.khushu.data.model.BeadPreset.NONE) },
-                        label = { Text("Metallic", fontFamily = BeVietnamPro, style = MaterialTheme.typography.titleMedium) },
+                        label = { Text("Metallic", fontFamily = PlusJakartaSans, style = MaterialTheme.typography.titleMedium) },
 //                        modifier = Modifier.weight(1f)
                     )
                     FilterChip(
                         selected = workingStyle.is3dEnabled,
                         onClick = { workingStyle = workingStyle.copy(is3dEnabled = !workingStyle.is3dEnabled, preset = com.kaizen.khushu.data.model.BeadPreset.NONE) },
-                        label = { Text("3D Depth", fontFamily = BeVietnamPro, style = MaterialTheme.typography.titleMedium) },
+                        label = { Text("3D Depth", fontFamily = PlusJakartaSans, style = MaterialTheme.typography.titleMedium) },
 //                        modifier = Modifier.weight(1f)
                     )
                 }
@@ -391,7 +391,7 @@ fun TasbihBeadCustomizerSheet(
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text("Save & Apply Style", fontWeight = FontWeight.Bold, fontFamily = BeVietnamPro)
+                    Text("Save & Apply Style", fontWeight = FontWeight.Bold, fontFamily = PlusJakartaSans)
                 }
 
                 if (workingStyle.id != DEFAULT_CUSTOM_BEAD_STYLE_ID && settings.customBeadStyles.any { it.id == workingStyle.id }) {
@@ -587,7 +587,7 @@ private fun BeadPreview(
             color = if (isInsideShape) Color.White.copy(alpha = 0.85f) else Color.Red.copy(alpha = 0.6f),
             style = MaterialTheme.typography.headlineLarge.copy(
                 fontSize = 24.sp,
-                fontFamily = if (style.engravingText.any { it in '\u0600'..'\u06FF' }) AmiriQuran else Antonio,
+                fontFamily = if (style.engravingText.any { it in '\u0600'..'\u06FF' }) AmiriQuran else PlusJakartaSansBold,
                 textAlign = TextAlign.Center
             ),
             modifier = Modifier

@@ -36,8 +36,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
-import com.kaizen.khushu.ui.theme.Antonio
-import com.kaizen.khushu.ui.theme.BeVietnamPro
+import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
+import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import com.kaizen.khushu.ui.theme.colorSeeds
 import kotlinx.coroutines.launch
 import kotlin.math.hypot
@@ -147,7 +147,7 @@ fun OnboardingScreen(
                     }
             ) {
                 if (pagerState.currentPage == 3) {
-                    Text("Begin", modifier = Modifier.padding(horizontal = 24.dp), fontFamily = BeVietnamPro, fontWeight = FontWeight.Bold)
+                    Text("Begin", modifier = Modifier.padding(horizontal = 24.dp), fontFamily = PlusJakartaSans, fontWeight = FontWeight.Bold)
                 } else {
                     Icon(Icons.Default.ArrowForward, contentDescription = "Next")
                 }
@@ -189,7 +189,7 @@ private fun PageIdentity(offset: Float) {
         ) {
             Text(
                 text = "KHUSHU",
-                fontFamily = Antonio,
+                fontFamily = PlusJakartaSansBold,
                 fontSize = 84.sp,
                 lineHeight = 84.sp,
                 color = MaterialTheme.colorScheme.onBackground,
@@ -199,7 +199,7 @@ private fun PageIdentity(offset: Float) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "A minimalist sanctuary for your daily devotion. Engineered for total focus.",
-                fontFamily = BeVietnamPro,
+                fontFamily = PlusJakartaSans,
                 fontSize = 18.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -214,7 +214,7 @@ private fun PageEcosystem(offset: Float) {
     ) {
         Text(
             text = "The Ecosystem",
-            fontFamily = Antonio,
+            fontFamily = PlusJakartaSansBold,
             fontSize = 42.sp,
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.graphicsLayer { translationX = offset * 200f }
@@ -264,11 +264,11 @@ private fun PageLocation(viewModel: SettingsViewModel, offset: Float) {
     Column(
         modifier = Modifier.fillMaxSize().padding(32.dp).padding(top = 48.dp).graphicsLayer { translationX = offset * 250f }
     ) {
-        Text("Your Presence", fontFamily = Antonio, fontSize = 42.sp, color = MaterialTheme.colorScheme.onBackground)
+        Text("Your Presence", fontFamily = PlusJakartaSansBold, fontSize = 42.sp, color = MaterialTheme.colorScheme.onBackground)
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "Accurate prayer times require your coordinates. Iman can find them automatically or you can set them later.",
-            fontFamily = BeVietnamPro,
+            fontFamily = PlusJakartaSans,
             fontSize = 16.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -298,14 +298,14 @@ private fun PageLocation(viewModel: SettingsViewModel, offset: Float) {
                 Column {
                     Text(
                         "Locate Me", 
-                        fontFamily = BeVietnamPro, 
+                        fontFamily = PlusJakartaSans, 
                         fontWeight = FontWeight.Bold,
                         color = if (settings.useGpsLocation) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
                     )
                     if (settings.useGpsLocation) {
                         Text(
                             "Coordinates locked.",
-                            fontFamily = BeVietnamPro,
+                            fontFamily = PlusJakartaSans,
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                         )
@@ -318,7 +318,7 @@ private fun PageLocation(viewModel: SettingsViewModel, offset: Float) {
 
         Text(
             "Privacy Note: Your location never leaves this device. It is used strictly for offline astronomical calculations.",
-            fontFamily = BeVietnamPro,
+            fontFamily = PlusJakartaSans,
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
             textAlign = TextAlign.Center,
@@ -340,8 +340,8 @@ private fun BentoCard(title: String, subtitle: String, modifier: Modifier = Modi
             verticalArrangement = Arrangement.Bottom
         ) {
             Spacer(modifier = Modifier.weight(1f))
-            Text(title, fontFamily = BeVietnamPro, fontWeight = FontWeight.Bold, fontSize = 20.sp, color = MaterialTheme.colorScheme.onSurface)
-            Text(subtitle, fontFamily = BeVietnamPro, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(title, fontFamily = PlusJakartaSans, fontWeight = FontWeight.Bold, fontSize = 20.sp, color = MaterialTheme.colorScheme.onSurface)
+            Text(subtitle, fontFamily = PlusJakartaSans, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -354,10 +354,10 @@ private fun PageCommandCenter(viewModel: SettingsViewModel, offset: Float) {
     Column(
         modifier = Modifier.fillMaxSize().padding(32.dp).padding(top = 48.dp).graphicsLayer { translationX = offset * 250f }
     ) {
-        Text("Your Sanctuary", fontFamily = Antonio, fontSize = 42.sp, color = MaterialTheme.colorScheme.onBackground)
+        Text("Your Sanctuary", fontFamily = PlusJakartaSansBold, fontSize = 42.sp, color = MaterialTheme.colorScheme.onBackground)
         Spacer(modifier = Modifier.height(48.dp))
 
-        Text("Aesthetics", fontFamily = BeVietnamPro, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(bottom = 16.dp))
+        Text("Aesthetics", fontFamily = PlusJakartaSans, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(bottom = 16.dp))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.fillMaxWidth()) {
             items(colorSeeds.toList()) { (key, color) ->
                 Box(
@@ -391,7 +391,7 @@ private fun PageCommandCenter(viewModel: SettingsViewModel, offset: Float) {
                     contentColor = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                     tonalElevation = if (isSelected) 2.dp else 0.dp
                 ) {
-                    Text(mode, modifier = Modifier.padding(vertical = 12.dp), textAlign = TextAlign.Center, fontFamily = BeVietnamPro, fontWeight = FontWeight.Medium)
+                    Text(mode, modifier = Modifier.padding(vertical = 12.dp), textAlign = TextAlign.Center, fontFamily = PlusJakartaSans, fontWeight = FontWeight.Medium)
                 }
             }
         }
@@ -408,7 +408,7 @@ private fun PageCommandCenter(viewModel: SettingsViewModel, offset: Float) {
                 Row(modifier = Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Notifications, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer)
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text("Enable Reminders", fontFamily = BeVietnamPro, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    Text("Enable Reminders", fontFamily = PlusJakartaSans, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onPrimaryContainer)
                 }
             }
         }

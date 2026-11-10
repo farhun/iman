@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.kaizen.khushu.data.model.ContentSource
-import com.kaizen.khushu.ui.theme.BeVietnamPro
+import com.kaizen.khushu.ui.theme.PlusJakartaSans
 
 @Composable
 fun SourcePickerRow(
@@ -40,7 +40,7 @@ fun SourcePickerRow(
                 Text(
                     text = source.displayName,
                     style = MaterialTheme.typography.labelMedium,
-                    fontFamily = BeVietnamPro,
+                    fontFamily = PlusJakartaSans,
                     color = if (isSelected) MaterialTheme.colorScheme.primary
                             else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),

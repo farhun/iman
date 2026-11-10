@@ -43,8 +43,8 @@ import com.kaizen.khushu.data.model.ReciterMeta
 import com.kaizen.khushu.data.repository.TranslationRepository
 import com.kaizen.khushu.data.repository.QuranScriptFontRepository
 import com.kaizen.khushu.data.repository.UserSettings
-import com.kaizen.khushu.ui.theme.Antonio
-import com.kaizen.khushu.ui.theme.BeVietnamPro
+
+import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import com.kaizen.khushu.ui.theme.AmiriQuran
 import com.kaizen.khushu.ui.theme.QuranIndoPak
 
@@ -92,7 +92,7 @@ private fun SlidingSegmentedControl(
                         Text(
                             text = label,
                             style = MaterialTheme.typography.labelLarge,
-                            fontFamily = BeVietnamPro,
+                            fontFamily = PlusJakartaSans,
                             color = if (selectedIndex == index) {
                                 MaterialTheme.colorScheme.onSecondaryContainer
                             } else {
@@ -148,7 +148,7 @@ fun ReadingSettingsSheet(
                 Text(
                     text = "Reading Settings",
                     style = MaterialTheme.typography.titleMedium.copy(
-                        fontFamily = BeVietnamPro,
+                        fontFamily = PlusJakartaSans,
                         fontWeight = FontWeight.Normal
                     ),
                     modifier = Modifier.padding(horizontal = 28.dp)
@@ -181,7 +181,7 @@ fun ReadingSettingsSheet(
                                     Text(
                                         text = "1:1",
                                         style = MaterialTheme.typography.labelSmall,
-                                        fontFamily = BeVietnamPro,
+                                        fontFamily = PlusJakartaSans,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.55f)
                                     )
                                 }
@@ -191,7 +191,7 @@ fun ReadingSettingsSheet(
                             Spacer(Modifier.height(8.dp))
                             Text(
                                 text = "In the name of Allah, the Entirely Merciful, the Especially Merciful.",
-                                fontFamily = BeVietnamPro,
+                                fontFamily = PlusJakartaSans,
                                 fontSize = settings.translationSizeSp.sp,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                                 fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
@@ -282,7 +282,7 @@ fun ReadingSettingsSheet(
                                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                                     ) {
                                         Icon(Icons.Default.Language, null, modifier = Modifier.size(20.dp))
-                                        Text(langLabel, style = MaterialTheme.typography.bodyLarge, fontFamily = BeVietnamPro, fontWeight = FontWeight.SemiBold)
+                                        Text(langLabel, style = MaterialTheme.typography.bodyLarge, fontFamily = PlusJakartaSans, fontWeight = FontWeight.SemiBold)
                                     }
                                 }
                             }
@@ -374,13 +374,13 @@ fun ReadingSettingsSheet(
                                                     Text(
                                                         text = reciter.name,
                                                         style = MaterialTheme.typography.bodyLarge,
-                                                        fontFamily = BeVietnamPro,
+                                                        fontFamily = PlusJakartaSans,
                                                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                                                     )
                                                     Text(
                                                         text = reciter.style,
                                                         style = MaterialTheme.typography.labelSmall,
-                                                        fontFamily = BeVietnamPro,
+                                                        fontFamily = PlusJakartaSans,
                                                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                                                     )
                                                 }
@@ -402,7 +402,7 @@ fun SettingLabel(text: String) {
     Text(
         text = text,
         style = MaterialTheme.typography.labelLarge,
-        fontFamily = BeVietnamPro,
+        fontFamily = PlusJakartaSans,
         color = MaterialTheme.colorScheme.primary,
         fontWeight = FontWeight.SemiBold
     )
@@ -415,7 +415,7 @@ fun SettingToggle(label: String, checked: Boolean, onCheckedChange: (Boolean) ->
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = label, fontFamily = BeVietnamPro, color = MaterialTheme.colorScheme.onSurface)
+        Text(text = label, fontFamily = PlusJakartaSans, color = MaterialTheme.colorScheme.onSurface)
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange,
@@ -469,7 +469,7 @@ fun ThemePreviewCard(
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
-            fontFamily = BeVietnamPro,
+            fontFamily = PlusJakartaSans,
             color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
         )
@@ -509,7 +509,7 @@ fun ScriptPreviewCard(
                 Text(
                     text = label,
                     style = MaterialTheme.typography.labelMedium,
-                    fontFamily = BeVietnamPro,
+                    fontFamily = PlusJakartaSans,
                     color = contentColor,
                     fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
                 )
@@ -537,7 +537,7 @@ fun ThemeChip(label: String, selected: Boolean, onClick: () -> Unit) {
             text = label,
             style = MaterialTheme.typography.labelMedium,
             color = fg,
-            fontFamily = BeVietnamPro,
+            fontFamily = PlusJakartaSans,
             fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
         )
     }
@@ -578,7 +578,7 @@ fun TranslationPickerSheet(
             Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 32.dp)) {
                 Text(
                     "Translation",
-                    style = MaterialTheme.typography.headlineSmall.copy(fontFamily = BeVietnamPro),
+                    style = MaterialTheme.typography.headlineSmall.copy(fontFamily = PlusJakartaSans),
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
 
@@ -594,7 +594,7 @@ fun TranslationPickerSheet(
                 if (isDownloading) {
                     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
                         Text("Downloading...", style = MaterialTheme.typography.bodyMedium,
-                            fontFamily = BeVietnamPro, color = MaterialTheme.colorScheme.primary)
+                            fontFamily = PlusJakartaSans, color = MaterialTheme.colorScheme.primary)
                         Spacer(Modifier.height(6.dp))
                         LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
                         Spacer(Modifier.height(12.dp))
@@ -605,7 +605,7 @@ fun TranslationPickerSheet(
                     catalog.forEach { (lang, translations) ->
                         item {
                             Text(lang, style = MaterialTheme.typography.labelLarge,
-                                fontFamily = BeVietnamPro, color = MaterialTheme.colorScheme.primary,
+                                fontFamily = PlusJakartaSans, color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(top = 8.dp))
                         }
                         items(translations) { meta ->
@@ -628,7 +628,7 @@ fun TranslationPickerSheet(
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(meta.translatorName,
                                             style = MaterialTheme.typography.bodyLarge,
-                                            fontFamily = BeVietnamPro,
+                                            fontFamily = PlusJakartaSans,
                                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal)
                                         Text(
                                             buildString {
@@ -638,7 +638,7 @@ fun TranslationPickerSheet(
                                                 else append(" • Tap to download")
                                             },
                                             style = MaterialTheme.typography.bodySmall,
-                                            fontFamily = BeVietnamPro,
+                                            fontFamily = PlusJakartaSans,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }

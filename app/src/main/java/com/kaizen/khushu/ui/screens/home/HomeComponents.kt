@@ -66,8 +66,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kaizen.khushu.ui.theme.Antonio
-import com.kaizen.khushu.ui.theme.BeVietnamPro
+import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
+import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import com.kaizen.khushu.ui.theme.AmiriQuran
 import java.util.Calendar
 import kotlin.math.max
@@ -913,7 +913,7 @@ fun PrayerSunMergedCard(
                                             .displaySmall
                                             .copy(
                                                 fontFamily =
-                                                    Antonio,
+                                                    PlusJakartaSansBold,
                                                 fontSize =
                                                     17.sp
                                             ),
@@ -1014,7 +1014,7 @@ fun PrayerSunMergedCard(
                                             .displaySmall
                                             .copy(
                                                 fontFamily =
-                                                    Antonio,
+                                                    PlusJakartaSansBold,
                                                 fontSize =
                                                     13.sp
                                             ),
@@ -1616,7 +1616,7 @@ fun PrayerSunMergedCard(
                                             .labelSmall
                                             .copy(
                                                 fontFamily =
-                                                    BeVietnamPro,
+                                                    PlusJakartaSans,
                                                 fontSize =
                                                     9.sp,
                                                 fontWeight =
@@ -1679,7 +1679,7 @@ fun PrayerSunMergedCard(
                                             .labelSmall
                                             .copy(
                                                 fontFamily =
-                                                    BeVietnamPro,
+                                                    PlusJakartaSans,
                                                 fontSize =
                                                     9.sp,
                                                 fontWeight =
@@ -2231,7 +2231,6 @@ fun PrayerSlab(
     darkTheme: Boolean,
     locationLabel: String,
     source: CalculationSource,
-    bottomPadding: androidx.compose.ui.unit.Dp = 0.dp,
     modifier: Modifier = Modifier
 ) {
 
@@ -2242,20 +2241,15 @@ fun PrayerSlab(
 
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
-        shadowElevation = 4.dp,
-        tonalElevation = 2.dp
+        shape = RoundedCornerShape(0.dp),
+        color = Color.Transparent,
+        shadowElevation = 0.dp,
+        tonalElevation = 0.dp
     ) {
         Box(
             modifier =
-                Modifier.fillMaxSize()
-                    .padding(
-                        start = 22.dp,
-                        end = 22.dp,
-                        top = 22.dp,
-                        bottom = 32.dp + bottomPadding
-                    )
+                Modifier.fillMaxWidth()
+                    .padding(horizontal = 22.dp, vertical = 22.dp)
         ) {
             Column {
                 Row(
@@ -2436,91 +2430,46 @@ fun PrayerSlab(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    extraTimings.forEach { timing ->
-                        val dotColor =
-                            if (darkTheme) timing.dotColorDark
-                            else timing.dotColorLight
+                    extraTimings.forEachIndexed { index, timing ->
                         Row(
-                            modifier =
-                                Modifier.fillMaxWidth()
-                                    .padding(vertical = 7.dp),
-                            verticalAlignment =
-                                Alignment.CenterVertically
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.5.dp),
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Box(
-                                modifier =
-                                    Modifier.size(6.dp)
-                                        .clip(CircleShape)
-                                        .background(
-                                            dotColor.copy(
-                                                alpha =
-                                                    0.92f
-                                            )
-                                        )
-                            )
-
-                            Spacer(modifier = Modifier.width(10.dp))
-
                             Text(
                                 text = timing.name,
-                                style =
-                                    MaterialTheme.typography
-                                        .bodyLarge.copy(
-                                            fontSize = 13.sp,
-                                            fontWeight =
-                                                FontWeight
-                                                    .Light
-                                        ),
-                                color =
-                                    MaterialTheme.colorScheme
-                                        .onSurface.copy(
-                                            alpha = 0.88f
-                                        ),
-                                modifier = Modifier.weight(1f)
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Light,
+                                ),
+                                color = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.weight(1f),
                             )
-
-                            if (timing.ar.isNotBlank()) {
-                                Text(
-                                    text = timing.ar,
-                                    style =
-                                        MaterialTheme
-                                            .typography
-                                            .bodySmall
-                                            .copy(
-                                                fontSize =
-                                                    13.sp,
-                                                fontFamily = AmiriQuran
-                                            ),
-                                    color =
-                                        MaterialTheme
-                                            .colorScheme
-                                            .onSurface
-                                            .copy(
-                                                alpha =
-                                                    0.45f
-                                            )
-                                )
-                                Spacer(
-                                    modifier =
-                                        Modifier.width(8.dp)
-                                )
-                            }
-
+                            Text(
+                                text = timing.ar,
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontSize = 14.sp,
+                                    fontFamily = AmiriQuran,
+                                ),
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = timing.time,
-                                style =
-                                    MaterialTheme.typography
-                                        .bodySmall.copy(
-                                            fontSize = 12.sp,
-                                            fontWeight =
-                                                FontWeight
-                                                    .Medium
-                                        ),
-                                color =
-                                    MaterialTheme.colorScheme
-                                        .onSurface.copy(
-                                            alpha = 0.55f
-                                        )
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Medium,
+                                ),
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                                textAlign = TextAlign.End,
+                                modifier = Modifier.defaultMinSize(minWidth = 60.dp),
+                            )
+                        }
+                        if (index < extraTimings.lastIndex) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(1.dp)
+                                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)),
                             )
                         }
                     }
@@ -2626,7 +2575,8 @@ private fun QuickDirectoryRow(
             label = "Qibla",
             supportLabel = null,
             modifier = Modifier.weight(1f),
-            onClick = onQiblaClick
+            onClick = onQiblaClick,
+            circularButton = true,
         )
     }
 }
@@ -2638,7 +2588,50 @@ private fun ExploreMiniCard(
     supportLabel: String?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    circularButton: Boolean = false,
 ) {
+    if (circularButton) {
+        Column(
+            modifier = modifier
+                .height(84.dp)
+                .clickable(
+                    onClick = onClick,
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() },
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Surface(
+                modifier = Modifier.size(48.dp),
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 12.sp,
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        return
+    }
+
     Surface(
         modifier =
             modifier.height(84.dp)
@@ -2664,7 +2657,7 @@ private fun ExploreMiniCard(
                 text = label,
                 style =
                     MaterialTheme.typography.labelMedium.copy(
-                        fontFamily = BeVietnamPro,
+                        fontFamily = PlusJakartaSans,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 12.sp
                     ),
@@ -2677,7 +2670,7 @@ private fun ExploreMiniCard(
                     text = supportLabel,
                     style =
                         MaterialTheme.typography.labelSmall.copy(
-                            fontFamily = BeVietnamPro,
+                            fontFamily = PlusJakartaSans,
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Medium
                         ),

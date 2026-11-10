@@ -27,7 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
-import com.kaizen.khushu.ui.theme.BeVietnamPro
+import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import androidx.compose.runtime.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,7 +38,7 @@ fun SettingsTopBarTitle(text: String, scrollBehavior: TopAppBarScrollBehavior) {
     Text(
         text = text,
         style = TextStyle(
-            fontFamily = BeVietnamPro,
+            fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.SemiBold,
             fontSize = fontSize,
             lineHeight = 32.sp
@@ -58,7 +58,7 @@ fun SectionHeader(title: String) {
     Text(
         text = title.uppercase(),
         style = MaterialTheme.typography.labelSmall.copy(
-            fontFamily = BeVietnamPro,
+            fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.Bold,
             letterSpacing = 1.sp
         ),
@@ -92,14 +92,14 @@ fun SettingsSectionCard(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium.copy(
-                        fontFamily = BeVietnamPro,
+                        fontFamily = PlusJakartaSans,
                         fontWeight = FontWeight.SemiBold
                     )
                 )
                 if (!subtitle.isNullOrBlank()) {
                     Text(
                         text = subtitle,
-                        style = MaterialTheme.typography.bodyMedium.copy(fontFamily = BeVietnamPro),
+                        style = MaterialTheme.typography.bodyMedium.copy(fontFamily = PlusJakartaSans),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -141,13 +141,13 @@ fun ExpandableSettingsCard(
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleSmall.copy(
-                            fontFamily = BeVietnamPro,
+                            fontFamily = PlusJakartaSans,
                             fontWeight = FontWeight.SemiBold
                         )
                     )
                     Text(
                         text = summary,
-                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = BeVietnamPro),
+                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -234,11 +234,11 @@ fun SettingsToggle(
         Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
             Text(
                 title,
-                style = MaterialTheme.typography.bodyLarge.copy(fontFamily = BeVietnamPro)
+                style = MaterialTheme.typography.bodyLarge.copy(fontFamily = PlusJakartaSans)
             )
             Text(
                 subtitle,
-                style = MaterialTheme.typography.bodyMedium.copy(fontFamily = BeVietnamPro),
+                style = MaterialTheme.typography.bodyMedium.copy(fontFamily = PlusJakartaSans),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
         }
@@ -297,14 +297,14 @@ fun MenuSectionItem(
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    fontFamily = BeVietnamPro,
+                    fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.SemiBold
                 ),
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = detail,
-                style = MaterialTheme.typography.bodyMedium.copy(fontFamily = BeVietnamPro),
+                style = MaterialTheme.typography.bodyMedium.copy(fontFamily = PlusJakartaSans),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
         }
@@ -333,7 +333,7 @@ fun SettingsGroup(
             Text(
                 text = title.uppercase(),
                 style = MaterialTheme.typography.labelSmall.copy(
-                    fontFamily = BeVietnamPro,
+                    fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.2.sp
                 ),
@@ -354,7 +354,7 @@ fun SettingsGroup(
         if (description != null) {
             Text(
                 text = description,
-                style = MaterialTheme.typography.bodySmall.copy(fontFamily = BeVietnamPro),
+                style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(start = 24.dp, top = 10.dp, end = 24.dp)
             )
@@ -410,7 +410,7 @@ fun SettingsMenuItem(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.bodyLarge.copy(
-                        fontFamily = BeVietnamPro,
+                        fontFamily = PlusJakartaSans,
                         fontWeight = FontWeight.SemiBold
                     ),
                     color = MaterialTheme.colorScheme.onSurface
@@ -418,7 +418,7 @@ fun SettingsMenuItem(
                 if (subtitle != null) {
                     Text(
                         text = subtitle,
-                        style = MaterialTheme.typography.bodyMedium.copy(fontFamily = BeVietnamPro),
+                        style = MaterialTheme.typography.bodyMedium.copy(fontFamily = PlusJakartaSans),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -461,14 +461,14 @@ fun SettingsToggleItem(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.bodyLarge.copy(
-                        fontFamily = BeVietnamPro,
+                        fontFamily = PlusJakartaSans,
                         fontWeight = FontWeight.SemiBold
                     )
                 )
                 if (subtitle != null) {
                     Text(
                         text = subtitle,
-                        style = MaterialTheme.typography.bodyMedium.copy(fontFamily = BeVietnamPro),
+                        style = MaterialTheme.typography.bodyMedium.copy(fontFamily = PlusJakartaSans),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -509,11 +509,11 @@ fun SettingsDropdown(
         ) {
             Text(
                 title,
-                style = MaterialTheme.typography.bodyLarge.copy(fontFamily = BeVietnamPro)
+                style = MaterialTheme.typography.bodyLarge.copy(fontFamily = PlusJakartaSans)
             )
             Text(
                 subtitle,
-                style = MaterialTheme.typography.bodyMedium.copy(fontFamily = BeVietnamPro),
+                style = MaterialTheme.typography.bodyMedium.copy(fontFamily = PlusJakartaSans),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -529,7 +529,7 @@ fun SettingsDropdown(
                     ),
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                textStyle = MaterialTheme.typography.bodyLarge.copy(fontFamily = BeVietnamPro),
+                textStyle = MaterialTheme.typography.bodyLarge.copy(fontFamily = PlusJakartaSans),
                 shape = RoundedCornerShape(12.dp)
             )
         }
@@ -541,7 +541,7 @@ fun SettingsDropdown(
             options.forEach { option ->
                 DropdownMenuItem(
                     contentPadding = PaddingValues(14.dp),
-                    text = { Text(optionLabel(option), fontFamily = BeVietnamPro) },
+                    text = { Text(optionLabel(option), fontFamily = PlusJakartaSans) },
                     onClick = {
                         onOptionSelected(option)
                         expanded = false

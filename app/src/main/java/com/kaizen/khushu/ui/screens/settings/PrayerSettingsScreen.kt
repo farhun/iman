@@ -45,7 +45,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.KeyboardType
-import com.kaizen.khushu.ui.theme.BeVietnamPro
+import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationManagerCompat
@@ -330,7 +330,7 @@ fun PrayerSettingsScreen(
                                 Spacer(Modifier.width(8.dp))
                                 Text(
                                     "GPS Access",
-                                    fontFamily = BeVietnamPro,
+                                    fontFamily = PlusJakartaSans,
                                     style = MaterialTheme.typography.titleSmall
                                 )
                             }
@@ -341,7 +341,7 @@ fun PrayerSettingsScreen(
                             ) {
                                 Icon(Icons.Default.Refresh, contentDescription = null)
                                 Spacer(Modifier.width(8.dp))
-                                Text("Refresh", fontFamily = BeVietnamPro, style = MaterialTheme.typography.titleSmall)
+                                Text("Refresh", fontFamily = PlusJakartaSans, style = MaterialTheme.typography.titleSmall)
                             }
                         }
 
@@ -355,12 +355,12 @@ fun PrayerSettingsScreen(
                                         settings.locationLng
                                     )
                                 }",
-                                style = MaterialTheme.typography.bodySmall.copy(fontFamily = BeVietnamPro),
+                                style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
                                 text = "Last refreshed: $lastRefreshed",
-                                style = MaterialTheme.typography.bodySmall.copy(fontFamily = BeVietnamPro),
+                                style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -390,7 +390,7 @@ fun PrayerSettingsScreen(
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Allow Notifications", fontFamily = BeVietnamPro)
+                            Text("Allow Notifications", fontFamily = PlusJakartaSans)
                         }
                     }
                 }
@@ -443,13 +443,13 @@ fun PrayerSettingsScreen(
                                 },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text("Choose Alarm Sound", fontFamily = BeVietnamPro)
+                                Text("Choose Alarm Sound", fontFamily = PlusJakartaSans)
                             }
                             OutlinedButton(
                                 onClick = { viewModel.setPrayerNotificationCustomSoundUri("") },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text("Use System Default", fontFamily = BeVietnamPro)
+                                Text("Use System Default", fontFamily = PlusJakartaSans)
                             }
                         }
                     }
@@ -527,7 +527,7 @@ fun PrayerSettingsScreen(
                 Box(modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp)) {
                     Text(
                         text = "Localization groundwork is already in place through translation catalogs. Full app-string localization will build on this next.",
-                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = BeVietnamPro),
+                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -577,7 +577,7 @@ fun PrayerSettingsScreen(
                     Text(
                         "Debug Controls",
                         style = MaterialTheme.typography.labelLarge.copy(
-                            fontFamily = BeVietnamPro,
+                            fontFamily = PlusJakartaSans,
                             fontWeight = FontWeight.Bold
                         ),
                         color = MaterialTheme.colorScheme.primary
@@ -604,7 +604,7 @@ fun PrayerSettingsScreen(
                             Spacer(Modifier.width(8.dp))
                             Text(
                                 text = "Notify",
-                                fontFamily = BeVietnamPro,
+                                fontFamily = PlusJakartaSans,
                                 fontSize = 14.sp,
                                 style = MaterialTheme.typography.labelSmall
                             )
@@ -630,7 +630,7 @@ fun PrayerSettingsScreen(
                             Spacer(Modifier.width(8.dp))
                             Text(
                                 text = "Pre-notify",
-                                fontFamily = BeVietnamPro,
+                                fontFamily = PlusJakartaSans,
                                 fontSize = 14.sp,
                                 style = MaterialTheme.typography.labelSmall
                             )
@@ -660,13 +660,13 @@ private fun PrayerOffsetRow(
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    fontFamily = BeVietnamPro,
+                    fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.SemiBold
                 )
             )
             Text(
                 text = "Shift by minutes",
-                style = MaterialTheme.typography.bodySmall.copy(fontFamily = BeVietnamPro),
+                style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -678,7 +678,7 @@ private fun PrayerOffsetRow(
             Text(
                 text = if (value > 0) "+$value" else "$value",
                 modifier = Modifier.width(40.dp),
-                style = MaterialTheme.typography.bodyLarge.copy(fontFamily = BeVietnamPro),
+                style = MaterialTheme.typography.bodyLarge.copy(fontFamily = PlusJakartaSans),
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
             IconButton(onClick = { onValueChange(value + 1) }) {
@@ -795,10 +795,10 @@ private fun PrayerReminderCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Lead time", style = MaterialTheme.typography.bodyLarge.copy(fontFamily = BeVietnamPro))
+                    Text("Lead time", style = MaterialTheme.typography.bodyLarge.copy(fontFamily = PlusJakartaSans))
                     Text(
                         text = "${preference.prePrayerMinutes} minutes before",
-                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = BeVietnamPro),
+                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -812,7 +812,7 @@ private fun PrayerReminderCard(
                     Text(
                         text = "${preference.prePrayerMinutes}m",
                         modifier = Modifier.width(40.dp),
-                        style = MaterialTheme.typography.bodyLarge.copy(fontFamily = BeVietnamPro),
+                        style = MaterialTheme.typography.bodyLarge.copy(fontFamily = PlusJakartaSans),
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                     IconButton(onClick = { onPrePrayerMinutesChange(preference.prePrayerMinutes + 1) }) {
@@ -866,13 +866,13 @@ private fun DiagnosticRow(label: String, value: String) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Text(
             label,
-            style = MaterialTheme.typography.bodyMedium.copy(fontFamily = BeVietnamPro),
+            style = MaterialTheme.typography.bodyMedium.copy(fontFamily = PlusJakartaSans),
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
             value,
             style = MaterialTheme.typography.bodyMedium.copy(
-                fontFamily = BeVietnamPro,
+                fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.SemiBold
             )
         )
@@ -896,20 +896,20 @@ private fun ManualLocationInput(
             OutlinedTextField(
                 value = latText,
                 onValueChange = { latText = it },
-                label = { Text("Latitude", fontFamily = BeVietnamPro) },
+                label = { Text("Latitude", fontFamily = PlusJakartaSans) },
                 modifier = Modifier.weight(1f),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
-                textStyle = MaterialTheme.typography.bodyLarge.copy(fontFamily = BeVietnamPro)
+                textStyle = MaterialTheme.typography.bodyLarge.copy(fontFamily = PlusJakartaSans)
             )
             OutlinedTextField(
                 value = lngText,
                 onValueChange = { lngText = it },
-                label = { Text("Longitude", fontFamily = BeVietnamPro) },
+                label = { Text("Longitude", fontFamily = PlusJakartaSans) },
                 modifier = Modifier.weight(1f),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
-                textStyle = MaterialTheme.typography.bodyLarge.copy(fontFamily = BeVietnamPro)
+                textStyle = MaterialTheme.typography.bodyLarge.copy(fontFamily = PlusJakartaSans)
             )
         }
         FilledTonalButton(
@@ -922,7 +922,7 @@ private fun ManualLocationInput(
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Update Coordinates", fontFamily = BeVietnamPro)
+            Text("Update Coordinates", fontFamily = PlusJakartaSans)
         }
     }
 }
