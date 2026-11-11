@@ -35,7 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kaizen.khushu.data.model.ContentSource
+
 import com.kaizen.khushu.data.repository.CatalogRepository
 import com.kaizen.khushu.data.model.TranslationMeta
 import com.kaizen.khushu.data.model.ReciterMeta
@@ -256,13 +256,11 @@ fun ReadingSettingsSheet(
                             } else {
                             item {
                                 val context = LocalContext.current
-                                val currentMeta = remember(settings.selectedTranslationLang, settings.selectedTranslationSource) {
-                                    val source = try { com.kaizen.khushu.data.model.ContentSource.valueOf(settings.selectedTranslationSource) } catch (_: Exception) { com.kaizen.khushu.data.model.ContentSource.FAWAZ }
-                                    CatalogRepository.translations(context, source).find { it.id == settings.selectedTranslationLang }
-                                        ?: com.kaizen.khushu.data.model.TranslationMeta.bundledEnglish().takeIf { it.id == settings.selectedTranslationLang }
-                                        ?: com.kaizen.khushu.data.model.TranslationMeta.bundledUrdu().takeIf { it.id == settings.selectedTranslationLang }
+                                val currentMeta = remember(settings.selectedTranslationLang) {
+                                    CatalogRepository.translations(context).find { it.id == settings.selectedTranslationLang }
                                 }
-                                val langLabel = currentMeta?.let { "${it.langCode.uppercase()} • ${it.translatorName}" } ?: "Select Translation"
+                                val langLabel = currentMeta?.let { "${it.langCode.uppercase()} • ${it.translatorName}" }
+                                    ?: if (settings.selectedTranslationLang.isBlank()) "No Translation" else "Select Translation"
 
                                 SettingLabel("Active Translation")
                                 Spacer(Modifier.height(12.dp))
@@ -547,26 +545,33 @@ fun ThemeChip(label: String, selected: Boolean, onClick: () -> Unit) {
 @Composable
 fun TranslationPickerSheet(
     selectedId: String,
-    selectedSource: ContentSource,
     isDownloading: Boolean,
     progress: Float,
-    onSelectSource: (ContentSource) -> Unit,
+    onSelectNone: () -> Unit,
     onSelect: (TranslationMeta) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val context = LocalContext.current
-
-    val translationSources = remember {
-        ContentSource.entries.filter { it.supportsTranslations }
+    val catalog = remember {
+        CatalogRepository.translations(context)
+            .groupBy { it.langName.ifBlank { "Other" } }
+            .toSortedMap()
     }
-
-    val catalog = remember(selectedSource) {
-        val list = CatalogRepository.translations(context, selectedSource).toMutableList()
-        // Always show bundled at top
-        val bundled = listOf(TranslationMeta.bundledEnglish(), TranslationMeta.bundledUrdu())
-        bundled.forEach { b -> if (list.none { it.id == b.id }) list.add(0, b) }
-        list.groupBy { it.langName.ifBlank { "Other" } }.toSortedMap()
+    var searchText by remember { mutableStateOf("") }
+    val visibleCatalog = remember(catalog, searchText, context) {
+        val filtered = catalog.filterKeys { it.contains(searchText.trim(), ignoreCase = true) }
+        val downloaded = filtered.values.flatten()
+            .filter { TranslationRepository.isDownloaded(context, it.id) }
+        buildList<Pair<String, List<TranslationMeta>>> {
+            if (downloaded.isNotEmpty()) add("Downloaded" to downloaded)
+            filtered.forEach { (language, translations) ->
+                val notDownloaded = translations.filterNot {
+                    TranslationRepository.isDownloaded(context, it.id)
+                }
+                if (notDownloaded.isNotEmpty()) add(language to notDownloaded)
+            }
+        }
     }
 
     ModalBottomSheet(
@@ -581,15 +586,14 @@ fun TranslationPickerSheet(
                     style = MaterialTheme.typography.headlineSmall.copy(fontFamily = PlusJakartaSans),
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
-
-                SettingLabel("Source")
-                Spacer(Modifier.height(8.dp))
-                SourcePickerRow(
-                    sources = translationSources,
-                    selected = selectedSource,
-                    onSelect = onSelectSource,
+                OutlinedTextField(
+                    value = searchText,
+                    onValueChange = { searchText = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Search language") },
+                    singleLine = true,
                 )
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(12.dp))
 
                 if (isDownloading) {
                     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
@@ -602,15 +606,35 @@ fun TranslationPickerSheet(
                 }
 
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    catalog.forEach { (lang, translations) ->
+                    item {
+                        val isNoneSelected = selectedId.isBlank()
+                        Surface(
+                            onClick = { if (!isDownloading) onSelectNone() },
+                            shape = RoundedCornerShape(12.dp),
+                            color = if (isNoneSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
+                                    else Color.Transparent,
+                            border = if (isNoneSelected) BorderStroke(1.dp, MaterialTheme.colorScheme.primary) else null
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                Text("No translation", style = MaterialTheme.typography.bodyLarge,
+                                    fontFamily = PlusJakartaSans,
+                                    fontWeight = if (isNoneSelected) FontWeight.Bold else FontWeight.Normal)
+                                if (isNoneSelected) Icon(Icons.Default.Check, null, tint = MaterialTheme.colorScheme.primary)
+                            }
+                        }
+                    }
+                    visibleCatalog.forEach { (lang, translations) ->
                         item {
                             Text(lang, style = MaterialTheme.typography.labelLarge,
                                 fontFamily = PlusJakartaSans, color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(top = 8.dp))
                         }
                         items(translations) { meta ->
-                            val isBundled = meta.id in TranslationMeta.BUNDLED
-                            val isDownloaded = isBundled || TranslationRepository.isDownloaded(context, meta.id)
+                            val isDownloaded = TranslationRepository.isDownloaded(context, meta.id)
                             val isSelected = selectedId == meta.id
 
                             Surface(
@@ -633,8 +657,7 @@ fun TranslationPickerSheet(
                                         Text(
                                             buildString {
                                                 append(meta.langCode.uppercase())
-                                                if (isBundled) append(" • Bundled")
-                                                else if (isDownloaded) append(" • Downloaded")
+                                                if (isDownloaded) append(" • Downloaded")
                                                 else append(" • Tap to download")
                                             },
                                             style = MaterialTheme.typography.bodySmall,

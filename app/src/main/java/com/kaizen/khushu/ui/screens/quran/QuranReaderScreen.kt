@@ -769,15 +769,11 @@ fun QuranReaderScreen(
             if (showTranslationPicker) {
                 TranslationPickerSheet(
                     selectedId = settings.selectedTranslationLang,
-                    selectedSource = try {
-                        ContentSource.valueOf(settings.selectedTranslationSource)
-                    } catch (e: Exception) {
-                        ContentSource.FAWAZ
-                    },
                     isDownloading = isTranslationDownloading,
                     progress = translationDownloadProgress,
-                    onSelectSource = { source ->
-                        settingsViewModel.setSelectedTranslationSource(source.name)
+                    onSelectNone = {
+                        settingsViewModel.setSelectedTranslationLang("")
+                        showTranslationPicker = false
                     },
                     onSelect = { meta ->
                         if (TranslationRepository.isDownloaded(context, meta.id)) {
@@ -787,14 +783,16 @@ fun QuranReaderScreen(
                             translationDownloadScope.launch {
                                 isTranslationDownloading = true
                                 try {
-                                    withContext(Dispatchers.IO) {
-                                        TranslationRepository.download(context, meta.id, meta.downloadUrl) { progress ->
-                                            translationDownloadProgress = progress
-                                        }
-                                        TranslationRepository.load(context, meta.id)
+                                    val downloaded = TranslationRepository.download(context, meta.id, meta.downloadUrl) { progress ->
+                                        translationDownloadProgress = progress
                                     }
-                                    settingsViewModel.setSelectedTranslationLang(meta.id)
-                                    showTranslationPicker = false
+                                    if (downloaded) {
+                                        withContext(Dispatchers.IO) { TranslationRepository.load(context, meta.id) }
+                                        settingsViewModel.setSelectedTranslationLang(meta.id)
+                                        showTranslationPicker = false
+                                    } else {
+                                        Toast.makeText(context, "Download failed", Toast.LENGTH_SHORT).show()
+                                    }
                                 } finally {
                                     isTranslationDownloading = false
                                     translationDownloadProgress = 0f

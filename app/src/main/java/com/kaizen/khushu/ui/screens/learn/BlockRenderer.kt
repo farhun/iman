@@ -44,6 +44,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -63,6 +64,7 @@ import com.kaizen.khushu.data.model.DividerBlock
 import com.kaizen.khushu.data.model.HadithBlock
 import com.kaizen.khushu.data.model.HeadingBlock
 import com.kaizen.khushu.data.model.ParagraphBlock
+import com.kaizen.khushu.data.repository.CatalogRepository
 import com.kaizen.khushu.data.repository.UserSettings
 import com.kaizen.khushu.ui.components.AyahEndMarker
 import com.kaizen.khushu.ui.theme.PlusJakartaSans
@@ -325,10 +327,13 @@ private fun AyahBlockView(
 
             else -> block.translationEn
         }
-        val isTranslationRtl = com.kaizen.khushu.data.model.TranslationMeta.AVAILABLE_TRANSLATIONS
-            .find { it.id == settings.selectedTranslationLang }?.isRtl ?: false
+        val translationContext = LocalContext.current
+        val isTranslationRtl = remember(translationContext, settings.selectedTranslationLang) {
+            CatalogRepository.translations(translationContext)
+                .find { it.id == settings.selectedTranslationLang }?.isRtl ?: false
+        }
 
-        if (translationText != null) {
+        if (!translationText.isNullOrBlank()) {
             CompositionLocalProvider(
                 LocalLayoutDirection provides if (isTranslationRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
             ) {

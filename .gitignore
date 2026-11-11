@@ -51,8 +51,7 @@ docs/superpowers/
 docs/khushu-handoff.zip
 docs/khushu-handoff/
 # docs/images/screenshots/
-scripts/data/
-alquran_meta.json
+
 
 # Build output
 **/build/

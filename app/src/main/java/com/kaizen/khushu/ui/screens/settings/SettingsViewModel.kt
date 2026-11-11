@@ -303,9 +303,6 @@ class SettingsViewModel(
         viewModelScope.launch { repository.updateSelectedTranslationLang(lang) }
     }
 
-    fun setSelectedTranslationSource(source: String) {
-        viewModelScope.launch { repository.setSelectedTranslationSource(source) }
-    }
 
 
 

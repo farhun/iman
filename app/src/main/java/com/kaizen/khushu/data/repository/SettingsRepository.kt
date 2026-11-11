@@ -64,7 +64,6 @@ class SettingsRepository(private val context: Context) {
         val QURAN_EXIT_REMINDER_DISABLED = booleanPreferencesKey("quran_exit_reminder_disabled")
 
         val SELECTED_TRANSLATION_LANG = stringPreferencesKey("selected_translation_lang")
-        val SELECTED_TRANSLATION_SOURCE = stringPreferencesKey("selected_translation_source")
 
         val SELECTED_RECITER_ID = stringPreferencesKey("selected_reciter_id")
         val SELECTED_SCRIPT = stringPreferencesKey("selected_script")
@@ -202,8 +201,12 @@ class SettingsRepository(private val context: Context) {
                 showContinueReading = preferences[PreferencesKeys.SHOW_CONTINUE_READING] ?: true,
                 quranExitReminderDisabled = preferences[PreferencesKeys.QURAN_EXIT_REMINDER_DISABLED] ?: false,
 
-                selectedTranslationLang = preferences[PreferencesKeys.SELECTED_TRANSLATION_LANG] ?: "en_20",
-                selectedTranslationSource = preferences[PreferencesKeys.SELECTED_TRANSLATION_SOURCE] ?: "FAWAZ",
+                selectedTranslationLang = (preferences[PreferencesKeys.SELECTED_TRANSLATION_LANG] ?: "").let { id ->
+                    val parts = id.lowercase().split('_', limit = 2)
+                    if (id == "20" || id == "54" ||
+                        (parts.size == 2 && ((parts[0] == "en" && parts[1] == "20") ||
+                            (parts[0] == "ur" && parts[1] == "54")))) "" else id
+                },
                 selectedReciterId = preferences[PreferencesKeys.SELECTED_RECITER_ID] ?: "everyayah_mishari",
                 selectedScript = (preferences[PreferencesKeys.SELECTED_SCRIPT] ?: "uthmani")
                     .let {
@@ -642,9 +645,6 @@ class SettingsRepository(private val context: Context) {
         context.dataStore.edit { it[PreferencesKeys.SELECTED_TRANSLATION_LANG] = lang }
     }
 
-    suspend fun setSelectedTranslationSource(source: String) {
-        context.dataStore.edit { it[PreferencesKeys.SELECTED_TRANSLATION_SOURCE] = source }
-    }
 
 
 
@@ -687,8 +687,7 @@ data class UserSettings(
     val showContinueReading: Boolean = true,
     val quranExitReminderDisabled: Boolean = false,
 
-    val selectedTranslationLang: String = "en_20",
-    val selectedTranslationSource: String = "FAWAZ",
+    val selectedTranslationLang: String = "",
     val selectedReciterId: String = "everyayah_mishari",
     val selectedScript: String = "uthmani",
     val tasbeehDynamicColors: Boolean = true,

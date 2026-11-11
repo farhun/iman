@@ -47,7 +47,8 @@ class QuranViewModel(application: Application) : AndroidViewModel(application) {
         isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
             val ayahs = QuranRepository.getAyahs(getApplication(), surahNumber)
-            val translation = QuranRepository.getTranslation(getApplication(), surahNumber, translationId)
+            val translation = if (translationId.isBlank()) emptyMap()
+                else QuranRepository.getTranslation(getApplication(), surahNumber, translationId)
             withContext(Dispatchers.Main) {
                 currentAyahs.value = ayahs
                 currentTranslation.value = translation

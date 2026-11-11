@@ -22,7 +22,6 @@ android {
         versionName = "0.1"
 
 
-        buildConfigField("String", "AUDIO_BASE_URL", "\"https://example.com/audio/\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
