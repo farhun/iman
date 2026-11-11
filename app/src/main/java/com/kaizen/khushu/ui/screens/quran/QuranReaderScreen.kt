@@ -46,7 +46,7 @@ import com.kaizen.khushu.data.repository.TranslationRepository
 import com.kaizen.khushu.ui.screens.learn.BlockRenderer
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
 import com.kaizen.khushu.ui.theme.PlusJakartaSans
-import com.kaizen.khushu.ui.theme.AmiriQuran
+import com.kaizen.khushu.ui.theme.NotoSansArabic
 import com.kaizen.khushu.ui.theme.rememberArabicScriptFontFamily
 import com.kaizen.khushu.ui.theme.colorSeeds
 import com.kaizen.khushu.ui.theme.DefaultSeedColor
@@ -455,7 +455,7 @@ fun QuranReaderScreen(
                                         Text(
                                             text = it.nameArabic,
                                             style = MaterialTheme.typography.displaySmall.copy(
-                                                fontFamily = AmiriQuran,
+                                                fontFamily = NotoSansArabic,
                                                 color = fg
                                             ),
                                             textAlign = TextAlign.Center
@@ -512,7 +512,7 @@ fun QuranReaderScreen(
                                         Text(
                                             text = "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ",
                                             textAlign = TextAlign.Center,
-                                            fontFamily = AmiriQuran,
+                                            fontFamily = arabicScriptFontFamily,
                                             fontSize = 26.sp,
                                             color = fg.copy(alpha = 0.85f),
                                             modifier = Modifier.fillMaxWidth()

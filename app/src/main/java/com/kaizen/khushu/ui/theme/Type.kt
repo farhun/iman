@@ -9,6 +9,7 @@ import androidx.compose.ui.text.font.Font
 
 val QuranIndoPak = FontFamily(Font(R.font.quran_neo_arabic))
 val AmiriQuran = FontFamily(Font(R.font.amiri_quran))
+val NotoSansArabic = FontFamily(Font(R.font.notosansarabic_regular, FontWeight.Normal))
 val PlusJakartaSans = FontFamily(
     Font(R.font.plusjakartasans_regular, weight = FontWeight.Normal),
     Font(R.font.plusjakartasans_medium, weight = FontWeight.Medium),
@@ -18,5 +19,5 @@ val PlusJakartaSans = FontFamily(
 
 val Typography = createKhushuTypography(
     plusJakartaSans = PlusJakartaSans,
-    quranIndopak = AmiriQuran,
+    quranIndopak = QuranIndoPak,
 )

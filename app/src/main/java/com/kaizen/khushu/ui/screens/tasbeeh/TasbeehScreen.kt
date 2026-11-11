@@ -52,7 +52,8 @@ import com.kaizen.khushu.data.model.TasbeehCollection
 import com.kaizen.khushu.data.repository.UserSettings
 import com.kaizen.khushu.ui.navigation.AppDestinations
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
-import com.kaizen.khushu.ui.theme.AmiriQuran
+import com.kaizen.khushu.ui.theme.fontForText
+
 import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import com.kaizen.khushu.R
 
@@ -150,6 +151,9 @@ fun TasbeehScreen(
                             OutlinedTextField(
                                 value = query,
                                 onValueChange = { query = it },
+                                textStyle = MaterialTheme.typography.bodyLarge.copy(
+                                    fontFamily = fontForText(query, PlusJakartaSans)
+                                ),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(horizontal = 20.dp, vertical = 8.dp),
@@ -341,6 +345,7 @@ private fun CollectionDetailSheet(
                                val customShape = customBeadStyle?.let { beadShapeTypeToShape(it.shapeType) }
                                val noiseShader = GlobalNoiseShader.value
                                val noiseBrush = remember(noiseShader) { ShaderBrush(noiseShader) }
+                               val arabicEngravingTypeface = rememberArabicEngravingTypeface()
 
                                Canvas(modifier = Modifier.size(52.dp)) {
                                    val r = size.minDimension / 2f
@@ -350,7 +355,8 @@ private fun CollectionDetailSheet(
                                        legacyStyle = legacyBeadStyle,
                                        customStyle = customBeadStyle,
                                        customShape = customShape,
-                                       noiseBrush = noiseBrush
+                                       noiseBrush = noiseBrush,
+                                       arabicTypeface = arabicEngravingTypeface,
                                    )
                                }
                             }
@@ -368,7 +374,10 @@ private fun CollectionDetailSheet(
                             Text(
                                 text = collection.title?.takeIf { it.isNotBlank() } ?: "Collection",
                                 style = MaterialTheme.typography.headlineMedium,
-                                fontFamily = if (collection.title?.any { it in '\u0600'..'\u06FF' } == true) AmiriQuran else PlusJakartaSans,
+                                fontFamily = fontForText(
+                                    collection.title?.takeIf { it.isNotBlank() } ?: "Collection",
+                                    PlusJakartaSans,
+                                ),
                                 fontWeight = FontWeight.Medium,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.weight(1f),
@@ -409,7 +418,7 @@ private fun CollectionDetailSheet(
                             Text(
                                 text = item.name,
                                 style = MaterialTheme.typography.bodyLarge,
-                                fontFamily = if (item.name.any { it in '\u0600'..'\u06FF' }) AmiriQuran else PlusJakartaSans,
+                                fontFamily = fontForText(item.name, PlusJakartaSans),
                                 color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.weight(1f),
                             )
@@ -621,7 +630,13 @@ private fun PrepPresetsPickerSheet(
                         colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
                     ) {
                         Column(Modifier.padding(12.dp)) {
-                            Text(preset.name, style = MaterialTheme.typography.labelLarge, maxLines = 1)
+                            Text(
+                                preset.name,
+                                style = MaterialTheme.typography.labelLarge.copy(
+                                    fontFamily = fontForText(preset.name, PlusJakartaSans)
+                                ),
+                                maxLines = 1,
+                            )
                             Text(
                                 "${preset.widgets.size} widgets",
                                 style = MaterialTheme.typography.labelSmall,
@@ -656,6 +671,9 @@ private fun TasbihCollectionListItem(
     onClick: () -> Unit,
 ) {
 
+    val collectionTitle = collection.title?.takeIf { it.isNotBlank() }
+        ?: collection.items.firstOrNull()?.name
+        ?: "Tasbih"
     val resolvedStyle = customBeadStyle?.copy(engravingText = "")
     val customShape = resolvedStyle?.let { beadShapeTypeToShape(it.shapeType) }
     val noiseShader = GlobalNoiseShader.value
@@ -688,11 +706,9 @@ private fun TasbihCollectionListItem(
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = collection.title?.takeIf { it.isNotBlank() }
-                    ?: collection.items.firstOrNull()?.name
-                    ?: "Tasbih",
+                text = collectionTitle,
                 style = MaterialTheme.typography.titleMedium.copy(
-                    fontFamily = PlusJakartaSans,
+                    fontFamily = fontForText(collectionTitle, PlusJakartaSans),
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp,
                 ),

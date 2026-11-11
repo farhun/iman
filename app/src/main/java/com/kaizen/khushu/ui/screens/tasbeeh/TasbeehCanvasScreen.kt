@@ -47,7 +47,8 @@ import com.kaizen.khushu.data.model.TasbeehCanvasPresetDomain
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
 import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
 import com.kaizen.khushu.ui.theme.PlusJakartaSans
-import com.kaizen.khushu.ui.theme.AmiriQuran
+import com.kaizen.khushu.ui.theme.NotoSansArabic
+import com.kaizen.khushu.ui.theme.fontForText
 import com.kaizen.khushu.ui.theme.KhushuColors
 
 @Composable
@@ -409,7 +410,7 @@ private fun AddTasbihWidgetSheet(
                     modifier = Modifier.weight(1f),
                     onClick = { onAdd(TasbihWidget.DhikrNameWidget(id = "name_${System.currentTimeMillis()}")) }
                 ) {
-                    Text("سبحان الله", fontSize = 18.sp, color = Color.White, fontFamily = AmiriQuran)
+                    Text("سبحان الله", fontSize = 18.sp, color = Color.White, fontFamily = NotoSansArabic)
                 }
             }
             Spacer(Modifier.height(12.dp))
@@ -487,7 +488,13 @@ private fun TasbihPresetsSheet(
                             colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
                         ) {
                             Column(Modifier.padding(12.dp)) {
-                                Text(preset.name, style = MaterialTheme.typography.labelLarge, maxLines = 1)
+                                Text(
+                                    preset.name,
+                                    style = MaterialTheme.typography.labelLarge.copy(
+                                        fontFamily = fontForText(preset.name, PlusJakartaSans)
+                                    ),
+                                    maxLines = 1,
+                                )
                                 Spacer(Modifier.height(8.dp))
                                 Row {
                                     Text("${preset.widgets.size} widgets", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
@@ -515,6 +522,9 @@ private fun TasbihPresetsSheet(
                 OutlinedTextField(
                     value = presetName,
                     onValueChange = { presetName = it },
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+                        fontFamily = fontForText(presetName, PlusJakartaSans)
+                    ),
                     label = { Text("Preset Name") }
                 )
             },
@@ -630,6 +640,9 @@ private fun TasbihWidgetConfigSheet(
                 OutlinedTextField(
                     value = widget.text,
                     onValueChange = { onUpdate(widget.copy(text = it)) },
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+                        fontFamily = fontForText(widget.text, PlusJakartaSans)
+                    ),
                     label = { Text("Text Content") },
                     modifier = Modifier.fillMaxWidth()
                 )

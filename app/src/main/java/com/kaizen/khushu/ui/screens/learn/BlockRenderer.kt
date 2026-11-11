@@ -66,7 +66,7 @@ import com.kaizen.khushu.data.model.ParagraphBlock
 import com.kaizen.khushu.data.repository.UserSettings
 import com.kaizen.khushu.ui.components.AyahEndMarker
 import com.kaizen.khushu.ui.theme.PlusJakartaSans
-import com.kaizen.khushu.ui.theme.AmiriQuran
+import com.kaizen.khushu.ui.theme.NotoSansArabic
 
 /**
  * Renders a single [ContentBlock] into Compose UI.
@@ -82,7 +82,7 @@ fun BlockRenderer(
     bg: Color,
     translationMap: Map<String, String> = emptyMap(),
     scriptMap: Map<String, String> = emptyMap(),
-    arabicFontFamily: FontFamily = AmiriQuran,
+    arabicFontFamily: FontFamily = NotoSansArabic,
     isHighlighted: Boolean = false,
     isBookmarked: Boolean = false,
     isAyahPlaying: Boolean = false,
@@ -207,36 +207,40 @@ private fun AyahBlockView(
             contentColor,
             scriptMap,
             arabicFontFamily,
-            inlineContent = remember(block.ayah, contentColor) {
-                mapOf(
-                    "marker" to androidx.compose.foundation.text.InlineTextContent(
-                        androidx.compose.ui.text.Placeholder(
-                            width = 38.sp,
-                            height = 32.sp,
-                            placeholderVerticalAlign = androidx.compose.ui.text.PlaceholderVerticalAlign.Center
-                        )
-                    ) { AyahEndMarker(number = block.ayah, fg = contentColor) }
-                )
-            },
+            inlineContent = if (settings.selectedScript == "uthmani") {
+                remember(block.ayah, contentColor, settings.selectedScript) {
+                    mapOf(
+                        "marker" to androidx.compose.foundation.text.InlineTextContent(
+                            androidx.compose.ui.text.Placeholder(
+                                width = 38.sp,
+                                height = 32.sp,
+                                placeholderVerticalAlign = androidx.compose.ui.text.PlaceholderVerticalAlign.Center
+                            )
+                        ) { AyahEndMarker(number = block.ayah, fg = contentColor) }
+                    )
+                }
+            } else emptyMap(),
             modifier = modifier.background(highlightBg)
         )
         return
     }
 
     // Inline ayah-end marker
-    val inlineContent = remember(block.ayah, contentColor) {
-        mapOf(
-            "marker" to androidx.compose.foundation.text.InlineTextContent(
-                androidx.compose.ui.text.Placeholder(
-                    width = 38.sp,
-                    height = 32.sp,
-                    placeholderVerticalAlign = androidx.compose.ui.text.PlaceholderVerticalAlign.Center
-                )
-            ) {
-                AyahEndMarker(number = block.ayah, fg = contentColor)
-            }
-        )
-    }
+    val inlineContent = if (settings.selectedScript == "uthmani") {
+        remember(block.ayah, contentColor, settings.selectedScript) {
+            mapOf(
+                "marker" to androidx.compose.foundation.text.InlineTextContent(
+                    androidx.compose.ui.text.Placeholder(
+                        width = 38.sp,
+                        height = 32.sp,
+                        placeholderVerticalAlign = androidx.compose.ui.text.PlaceholderVerticalAlign.Center
+                    )
+                ) {
+                    AyahEndMarker(number = block.ayah, fg = contentColor)
+                }
+            )
+        }
+    } else emptyMap()
 
     Column(
         modifier = modifier
@@ -284,10 +288,12 @@ private fun AyahBlockView(
 
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             if (plainArabicText != null) {
-                val annotatedString = remember(plainArabicText, contentColor) {
+                val annotatedString = remember(plainArabicText, contentColor, settings.selectedScript) {
                     buildAnnotatedString {
                         append(plainArabicText)
-                        appendInlineContent("marker", "[marker]")
+                        if (settings.selectedScript == "uthmani") {
+                            appendInlineContent("marker", "[marker]")
+                        }
                     }
                 }
                 Text(
@@ -405,7 +411,7 @@ private fun AyahBlockView(
 /**
  * Reading mode: pure Arabic text flow, no action bar, no translation, no chips.
  * Uses a slightly larger line-height and justified/RTL rendering.
- * Font: AmiriQuran at the user's selected arabicSizeSp.
+ * Font: NotoSansArabic at the user's selected arabicSizeSp.
  */
 @Composable
 private fun ReadingModeAyah(
@@ -424,10 +430,12 @@ private fun ReadingModeAyah(
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         if (plainArabicText != null) {
-            val annotatedString = remember(plainArabicText) {
+            val annotatedString = remember(plainArabicText, settings.selectedScript) {
                 buildAnnotatedString {
                     append(plainArabicText)
-                    appendInlineContent("marker", "[marker]")
+                    if (settings.selectedScript == "uthmani") {
+                        appendInlineContent("marker", "[marker]")
+                    }
                 }
             }
             Text(
@@ -543,14 +551,14 @@ private fun HadithBlockView(
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Text(
                         text = block.textArabic,
-                        fontFamily = AmiriQuran,
+                        fontFamily = NotoSansArabic,
                         fontSize = settings.arabicSizeSp.sp,
                         lineHeight = (settings.arabicSizeSp * 1.75f).sp,
                         textAlign = TextAlign.Center,
                         color = fg,
                         style = MaterialTheme.typography.bodyLarge.copy(
                             textDirection = TextDirection.Rtl,
-                            fontFamily = AmiriQuran,
+                            fontFamily = NotoSansArabic,
                         ),
                         modifier = Modifier.fillMaxWidth(),
                     )

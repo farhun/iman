@@ -14,6 +14,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kaizen.khushu.ui.theme.AmiriQuran
+import com.kaizen.khushu.ui.theme.NotoSansArabic
 
 fun Int.toArabicIndic() = this.toString().map { c ->
     when (c) {
@@ -38,7 +39,7 @@ fun AyahEndMarker(number: Int, fg: Color) {
             lineHeight = 32.sp,
             softWrap = false,
             color = fg.copy(alpha = 0.6f),
-            fontFamily = AmiriQuran,
+            fontFamily = NotoSansArabic,
             textAlign = TextAlign.Center
         )
         // The number inside

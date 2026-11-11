@@ -36,9 +36,11 @@ import androidx.compose.ui.unit.sp
 import com.kaizen.khushu.data.model.*
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
 import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
-import com.kaizen.khushu.ui.theme.AmiriQuran
+import com.kaizen.khushu.ui.theme.NotoSansArabic
+import com.kaizen.khushu.ui.theme.fontForText
 import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import com.kaizen.khushu.ui.theme.KhushuColors
+
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -367,8 +369,11 @@ fun TasbihBeadCustomizerSheet(
                 OutlinedTextField(
                     value = workingStyle.engravingText,
                     onValueChange = { if (it.length <= 10) workingStyle = workingStyle.copy(engravingText = it) },
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+                        fontFamily = fontForText(workingStyle.engravingText, PlusJakartaSans)
+                    ),
                     label = { Text("Custom Text") },
-                    placeholder = { Text("e.g. الله", fontFamily = AmiriQuran) },
+                    placeholder = { Text("e.g. الله", fontFamily = NotoSansArabic) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
                     singleLine = true
@@ -587,7 +592,7 @@ private fun BeadPreview(
             color = if (isInsideShape) Color.White.copy(alpha = 0.85f) else Color.Red.copy(alpha = 0.6f),
             style = MaterialTheme.typography.headlineLarge.copy(
                 fontSize = 24.sp,
-                fontFamily = if (style.engravingText.any { it in '\u0600'..'\u06FF' }) AmiriQuran else PlusJakartaSansBold,
+                fontFamily = fontForText(style.engravingText, PlusJakartaSansBold),
                 textAlign = TextAlign.Center
             ),
             modifier = Modifier
@@ -618,8 +623,9 @@ private fun BeadRenderer(style: CustomBeadStyle, shape: Shape, size: Float) {
     }
     val noiseShader = GlobalNoiseShader.value
     val noiseBrush = remember(noiseShader) { ShaderBrush(noiseShader) }
+    val arabicEngravingTypeface = rememberArabicEngravingTypeface()
 
     Canvas(modifier = Modifier.size(size.dp)) {
-        drawPremiumBead(beadPath, style, noiseBrush)
+        drawPremiumBead(beadPath, style, noiseBrush, arabicTypeface = arabicEngravingTypeface)
     }
 }

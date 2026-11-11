@@ -31,7 +31,8 @@ import androidx.compose.ui.unit.sp
 import com.kaizen.khushu.data.model.SurahMeta
 import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
 import com.kaizen.khushu.ui.theme.PlusJakartaSans
-import com.kaizen.khushu.ui.theme.AmiriQuran
+import com.kaizen.khushu.ui.theme.NotoSansArabic
+import com.kaizen.khushu.ui.theme.fontForText
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -125,6 +126,9 @@ fun QuranSurahListScreen(
                             OutlinedTextField(
                                 value = searchQuery,
                                 onValueChange = { searchQuery = it },
+                                textStyle = MaterialTheme.typography.bodyLarge.copy(
+                                    fontFamily = fontForText(searchQuery, PlusJakartaSans)
+                                ),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(horizontal = 20.dp, vertical = 8.dp),
@@ -357,7 +361,7 @@ private fun SurahListItem(
         // Arabic name right-aligned
         Text(
             text = surah.nameArabic,
-            fontFamily = AmiriQuran,
+            fontFamily = NotoSansArabic,
             fontSize = 22.sp,
             color = MaterialTheme.colorScheme.primary,
             textAlign = TextAlign.End

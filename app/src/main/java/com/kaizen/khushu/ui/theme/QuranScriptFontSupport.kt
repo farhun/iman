@@ -6,4 +6,8 @@ import androidx.compose.ui.text.font.FontFamily
 @Composable
 @Suppress("UNUSED_PARAMETER")
 fun rememberArabicScriptFontFamily(script: String, availableScripts: Set<String>): FontFamily =
-    if (script == "indopak") QuranIndoPak else AmiriQuran
+    when (script) {
+        "indopak" -> QuranIndoPak
+        "uthmani" -> AmiriQuran
+        else -> AmiriQuran
+    }

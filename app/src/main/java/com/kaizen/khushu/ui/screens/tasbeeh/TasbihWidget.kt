@@ -1,5 +1,6 @@
 package com.kaizen.khushu.ui.screens.tasbeeh
 
+import android.graphics.Typeface
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -13,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
@@ -26,9 +28,13 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.core.content.res.ResourcesCompat
+import com.kaizen.khushu.R
 import com.kaizen.khushu.data.model.CustomBeadStyle
 import com.kaizen.khushu.data.model.DhikrItem
-import com.kaizen.khushu.ui.theme.AmiriQuran
+import com.kaizen.khushu.ui.theme.PlusJakartaSans
+import com.kaizen.khushu.ui.theme.containsArabic
+import com.kaizen.khushu.ui.theme.fontForText
 import kotlin.math.abs
 import kotlin.math.exp
 import kotlinx.serialization.Serializable
@@ -201,7 +207,13 @@ private val SharedEngravingPaint = android.graphics.Paint().apply {
     color = android.graphics.Color.argb(210, 255, 255, 255)
     textAlign = android.graphics.Paint.Align.CENTER
     isAntiAlias = true
-    typeface = android.graphics.Typeface.DEFAULT_BOLD
+    typeface = Typeface.DEFAULT_BOLD
+}
+
+@Composable
+internal fun rememberArabicEngravingTypeface(): Typeface? {
+    val context = LocalContext.current
+    return remember(context) { ResourcesCompat.getFont(context, R.font.notosansarabic_regular) }
 }
 
 @Composable
@@ -228,6 +240,7 @@ fun TasbihWidgetRenderer(
         scrollOffsetProvider: () -> Float = { 0f },
         modifier: Modifier = Modifier,
 ) {
+    val arabicEngravingTypeface = rememberArabicEngravingTypeface()
     val baseModifier = modifier.graphicsLayer {
         alpha = widget.alpha
         clip = false
@@ -380,7 +393,7 @@ fun TasbihWidgetRenderer(
                             center = Offset(cx, cy),
                         )
                     }
-                    drawBeadWrapper(Offset(cx, cy), r, beadStyle, customBeadStyle, customShape, noiseBrush)
+                    drawBeadWrapper(Offset(cx, cy), r, beadStyle, customBeadStyle, customShape, noiseBrush, arabicEngravingTypeface)
                 }
 
                 // ── Bottom stack ────────────────────────────────────────────────────
@@ -411,7 +424,7 @@ fun TasbihWidgetRenderer(
                             center = Offset(cx, cy),
                         )
                     }
-                    drawBeadWrapper(Offset(cx, cy), r, beadStyle, customBeadStyle, customShape, noiseBrush)
+                    drawBeadWrapper(Offset(cx, cy), r, beadStyle, customBeadStyle, customShape, noiseBrush, arabicEngravingTypeface)
                 }
 
                 // ── Transit bead: drawn on top, follows finger across the gap ───────
@@ -431,7 +444,7 @@ fun TasbihWidgetRenderer(
                         radius = tr * 2.5f,
                         center = Offset(cx, ty),
                     )
-                    drawBeadWrapper(Offset(cx, ty), tr, beadStyle, customBeadStyle, customShape, noiseBrush)
+                    drawBeadWrapper(Offset(cx, ty), tr, beadStyle, customBeadStyle, customShape, noiseBrush, arabicEngravingTypeface)
                 }
             }
         }
@@ -446,7 +459,7 @@ fun TasbihWidgetRenderer(
                         text = currentItem?.name ?: "سُبْحَانَ اللَّهِ",
                         style =
                                 TextStyle(
-                                        fontFamily = AmiriQuran,
+                                        fontFamily = fontForText(currentItem?.name ?: "سُبْحَانَ اللَّهِ", PlusJakartaSans),
                                         color = Color(widget.color),
                                         fontSize = MaterialTheme.typography.headlineLarge.fontSize,
                                         fontWeight =
@@ -537,7 +550,7 @@ fun TasbihWidgetRenderer(
                     text = widget.text,
                     style =
                             TextStyle(
-                                    fontFamily = if (widget.text.any { it in '\u0600'..'\u06FF' }) AmiriQuran else null,
+                                    fontFamily = fontForText(widget.text, PlusJakartaSans),
                                     color = Color(widget.color),
                                     fontSize = widget.fontSize.sp,
                                     fontWeight =
@@ -563,6 +576,7 @@ internal fun DrawScope.drawBeadWrapper(
         customStyle: CustomBeadStyle?,
         customShape: Shape?,
         noiseBrush: ShaderBrush?,
+        arabicTypeface: Typeface? = null,
 ) {
     if (customStyle != null && customShape != null) {
         val sizePx = radius * 2f
@@ -574,7 +588,7 @@ internal fun DrawScope.drawBeadWrapper(
                 SharedScratchPath
         )
         translate(left = center.x - radius, top = center.y - radius) {
-            drawPremiumBead(SharedScratchPath, customStyle, noiseBrush)
+            drawPremiumBead(SharedScratchPath, customStyle, noiseBrush, arabicTypeface = arabicTypeface)
         }
     } else {
         drawBead(center, radius, 1f, legacyStyle)
@@ -585,7 +599,8 @@ fun DrawScope.drawPremiumBead(
         path: Path,
         style: CustomBeadStyle,
         noiseBrush: ShaderBrush?,
-        drawEngraving: Boolean = true
+        drawEngraving: Boolean = true,
+        arabicTypeface: Typeface? = null,
 ) {
     val bounds = path.getBounds()
     val pathSize = androidx.compose.ui.geometry.Size(bounds.width, bounds.height)
@@ -615,6 +630,11 @@ fun DrawScope.drawPremiumBead(
     if (drawEngraving && style.engravingText.isNotBlank()) {
         val textSize = bounds.width * 0.38f
         SharedEngravingPaint.textSize = textSize
+        SharedEngravingPaint.typeface = if (containsArabic(style.engravingText)) {
+            arabicTypeface ?: Typeface.DEFAULT_BOLD
+        } else {
+            Typeface.DEFAULT_BOLD
+        }
         // Apply user scale and offset (stored as dp-equivalent values)
         val cx = bounds.left + bounds.width / 2f + (style.textOffsetX * density)
         val cy = bounds.top + bounds.height / 2f + (style.textOffsetY * density) + textSize * 0.35f

@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
 import com.kaizen.khushu.ui.theme.PlusJakartaSans
+import com.kaizen.khushu.ui.theme.fontForText
 import kotlinx.serialization.Serializable
 import java.time.LocalTime
 
@@ -78,7 +79,10 @@ fun WidgetRenderer(
                 ) { complete ->
                     Text(
                         text = if (complete) completionText else currentRakats.toString(),
-                        fontFamily = widgetFontFamily,
+                        fontFamily = fontForText(
+                            if (complete) completionText else currentRakats.toString(),
+                            widgetFontFamily,
+                        ),
                         fontSize = if (complete) (widget.fontSizeSp * 0.30f).sp else widget.fontSizeSp.sp,
                         fontWeight = FontWeight(widget.fontWeight),
                         textAlign = TextAlign.Center,
@@ -128,7 +132,7 @@ fun WidgetRenderer(
             ) {
                 Text(
                     text = widget.text ?: "",
-                    fontFamily = widgetFontFamily,
+                    fontFamily = fontForText(widget.text ?: "", widgetFontFamily),
                     fontSize = widget.fontSizeSp.sp,
                     fontWeight = FontWeight(widget.fontWeight),
                     fontStyle = if (widget.italic) FontStyle.Italic else FontStyle.Normal,

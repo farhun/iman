@@ -45,8 +45,8 @@ import com.kaizen.khushu.data.repository.QuranScriptFontRepository
 import com.kaizen.khushu.data.repository.UserSettings
 
 import com.kaizen.khushu.ui.theme.PlusJakartaSans
-import com.kaizen.khushu.ui.theme.AmiriQuran
-import com.kaizen.khushu.ui.theme.QuranIndoPak
+import com.kaizen.khushu.ui.theme.NotoSansArabic
+import com.kaizen.khushu.ui.theme.rememberArabicScriptFontFamily
 
 @Composable
 private fun SlidingSegmentedControl(
@@ -172,7 +172,7 @@ fun ReadingSettingsSheet(
                                     text = if (settings.selectedScript == "indopak")
                                         "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِیْمِ "
                                     else "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
-                                    fontFamily = if (settings.selectedScript == "indopak") QuranIndoPak else AmiriQuran,
+                                    fontFamily = rememberArabicScriptFontFamily(settings.selectedScript, availableQuranScripts),
                                     fontSize = settings.arabicSizeSp.sp,
                                     color = MaterialTheme.colorScheme.onSurface,
                                     textAlign = TextAlign.Center
@@ -460,7 +460,7 @@ fun ThemePreviewCard(
                 Text(
                     text = "بِسْمِ اللَّهِ",
                     color = fgColor,
-                    fontFamily = AmiriQuran,
+                    fontFamily = NotoSansArabic,
                     fontSize = 18.sp
                 )
             }

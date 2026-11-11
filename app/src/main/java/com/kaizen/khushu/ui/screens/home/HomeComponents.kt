@@ -68,7 +68,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
 import com.kaizen.khushu.ui.theme.PlusJakartaSans
-import com.kaizen.khushu.ui.theme.AmiriQuran
+import com.kaizen.khushu.ui.theme.NotoSansArabic
 import java.util.Calendar
 import kotlin.math.max
 import kotlin.math.min
@@ -2330,7 +2330,7 @@ fun PrayerSlab(
                             text = p.ar,
                             style =
                                 MaterialTheme.typography.bodySmall
-                                    .copy(fontSize = 14.sp, fontFamily = AmiriQuran),
+                                    .copy(fontSize = 14.sp, fontFamily = NotoSansArabic),
                             color =
                                 MaterialTheme.colorScheme.onSurface
                                     .copy(alpha = 0.5f)
@@ -2448,7 +2448,7 @@ fun PrayerSlab(
                                 text = timing.ar,
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     fontSize = 14.sp,
-                                    fontFamily = AmiriQuran,
+                                    fontFamily = NotoSansArabic,
                                 ),
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                             )

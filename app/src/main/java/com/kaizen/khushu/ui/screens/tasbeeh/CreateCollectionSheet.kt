@@ -67,6 +67,8 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.kaizen.khushu.ui.theme.KhushuColors
+import com.kaizen.khushu.ui.theme.PlusJakartaSans
+import com.kaizen.khushu.ui.theme.fontForText
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -89,7 +91,7 @@ fun CreateCollectionSheet(
     // skipPartiallyExpanded = true prevents the 'half-open' state from expanding weirdly on focus
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val settings by settingsViewModel.settings.collectAsState()
-    
+
     val dhikrRows = viewModel.createDhikrRows
     val selectedColor = KhushuColors.Palette[viewModel.createColorIndex]
     val lazyListState = rememberLazyListState()
@@ -159,6 +161,9 @@ fun CreateCollectionSheet(
                     OutlinedTextField(
                         value = viewModel.createTitle,
                         onValueChange = { viewModel.updateCreateTitle(it) },
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(
+                            fontFamily = fontForText(viewModel.createTitle, PlusJakartaSans)
+                        ),
                         label = { Text("Tasbih name") },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp),
@@ -191,7 +196,7 @@ fun CreateCollectionSheet(
 
                 item {
                     TextButton(
-                        onClick = { 
+                        onClick = {
                             viewModel.addDhikrRow()
                             scope.launch {
                                 // Delay slightly to allow the item to be added to the list
@@ -279,6 +284,9 @@ private fun DhikrRowItem(
             TextField(
                 value = row.name,
                 onValueChange = onNameChange,
+                textStyle = MaterialTheme.typography.bodyLarge.copy(
+                    fontFamily = fontForText(row.name, PlusJakartaSans)
+                ),
                 placeholder = { Text("Dhikr name") },
                 modifier = Modifier
                     .weight(1f)
