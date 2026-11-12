@@ -9,6 +9,7 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -43,6 +44,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
@@ -56,76 +59,33 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.kaizen.khushu.MainActivity
+import com.kaizen.khushu.R
+import com.kaizen.khushu.i18n.LocaleHelper
+import com.kaizen.khushu.i18n.alertStyleLabelRes
+import com.kaizen.khushu.i18n.madhabLabelRes
+import com.kaizen.khushu.i18n.methodLabelRes
+import com.kaizen.khushu.i18n.prayerLabel
+import com.kaizen.khushu.i18n.soundOptionLabelRes
+import com.kaizen.khushu.i18n.sourceTypeLabelRes
 import com.kaizen.khushu.data.repository.EXTRA_PRAYER_TIMINGS
 import com.kaizen.khushu.receiver.PrayerAlarmReceiver
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private val calculationMethodLabels = mapOf(
-    "ALGERIA" to "Algeria",
-    "PORTUGAL" to "Comunidade Islâmica de Lisboa (Portugal)",
-    "TURKEY" to "Diyanet İşleri Başkanlığı (Turkey)",
-    "DUBAI" to "Dubai (UAE)",
-    "EGYPTIAN" to "Egyptian General Authority of Survey",
-    "FRANCE_15" to "France (15°)",
-    "FRANCE_18" to "France (18°) / Grande Mosquée de Paris",
-    "GULF_REGION" to "Gulf Region",
-    "TEHRAN" to "Institute of Geophysics, University of Tehran",
-    "NORTH_AMERICA" to "Islamic Society of North America (ISNA)",
-    "MALAYSIA" to "Jabatan Kemajuan Islam Malaysia (JAKIM)",
-    "JORDAN" to "Jordan",
-    "INDONESIA" to "Kementerian Agama Republik Indonesia (KEMENAG)",
-    "KUWAIT" to "Kuwait",
-    "SINGAPORE" to "Majlis Ugama Islam Singapura, Singapore",
-    "MOON_SIGHTING_COMMITTEE" to "Moonsighting Committee",
-    "MOROCCO" to "Morocco",
-    "MUSLIM_WORLD_LEAGUE" to "Muslim World League",
-    "QATAR" to "Qatar",
-    "SHIA_ITHNA_ASHARI" to "Shia Ithna-Ashari, Leva Institute, Qum",
-    "RUSSIA" to "Spiritual Administration of Muslims of Russia",
-    "TUNISIA" to "Tunisia",
-    "UMM_AL_QURA" to "Umm Al-Qura University, Makkah",
-    "FRANCE_UOIF" to "Union Organization Islamique de France",
-    "KARACHI" to "University of Islamic Sciences, Karachi",
-    "LOCAL" to "Local Calculation (Offline)",
-    "API" to "AlAdhan API (Online)"
-)
-
-private val madhabLabels = mapOf(
-    "SHAFI" to "Standard (Shafi, Maliki, Hanbali)",
-    "HANAFI" to "Hanafi"
-)
-
-private val sourceLabels = mapOf(
-    "LOCAL" to "Local Formula (Offline)",
-    "API" to "AlAdhan API (Online)"
-)
-
-private val alertStyleLabels = mapOf(
-    "CUSTOM_SOUND" to "Custom sound",
-    "SYSTEM_SOUND" to "System sound",
-    "VIBRATION" to "Vibration only",
-    "SILENT" to "Silent"
-)
-
-private val prayerSoundLabels = mapOf(
-    "DEFAULT" to "Default",
-    "ADHAN" to "Adhan",
-    "TAKBIR" to "Takbir",
-    "SILENT" to "Silent"
-)
-
-
-private fun prayerSettingLabel(value: String, labels: Map<String, String>): String {
-    return labels[value] ?: value
+private fun prayerSettingLabel(context: Context, value: String, @StringRes labelRes: Int): String {
+    return if (labelRes == 0) value else LocaleHelper.wrap(context).getString(labelRes)
 }
 
 private fun customPrayerSoundLabel(context: Context, uriString: String): String {
-    if (uriString.isBlank()) return "System default alarm"
-    val uri = runCatching { Uri.parse(uriString) }.getOrNull() ?: return "Selected custom sound"
+    val localizedContext = LocaleHelper.wrap(context)
+    if (uriString.isBlank()) return localizedContext.getString(R.string.settings_system_default_alarm)
+    val uri = runCatching { Uri.parse(uriString) }.getOrNull()
+        ?: return localizedContext.getString(R.string.settings_selected_custom_sound)
     val ringtone = runCatching { RingtoneManager.getRingtone(context, uri) }.getOrNull()
-    return ringtone?.getTitle(context).orEmpty().ifBlank { "Selected custom sound" }
+    return ringtone?.getTitle(context).orEmpty().ifBlank {
+        localizedContext.getString(R.string.settings_selected_custom_sound)
+    }
 }
 
 private data class PrayerNotificationPreference(
@@ -174,7 +134,11 @@ private fun openAppLocationPermissionSettings(context: Context) {
         try {
             launch(appDetailsIntent)
         } catch (_: Exception) {
-            Toast.makeText(context.applicationContext, "Open app settings to allow location access.", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                context.applicationContext,
+                LocaleHelper.wrap(context.applicationContext).getString(R.string.settings_open_app_settings_for_location),
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 }
@@ -188,11 +152,12 @@ fun PrayerSettingsScreen(
     val settings by viewModel.settings.collectAsState()
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val noRingtonePickerMessage = stringResource(R.string.settings_no_ringtone_picker)
     val notificationsAllowed = NotificationManagerCompat.from(context).areNotificationsEnabled()
     val lastRefreshed = if (settings.lastPrayerRefreshEpochMs > 0L) {
         SimpleDateFormat("d MMM, HH:mm", Locale.getDefault()).format(Date(settings.lastPrayerRefreshEpochMs))
     } else {
-        "Not refreshed yet"
+        stringResource(R.string.settings_not_refreshed_yet)
     }
     var showLocationServicesDialog by remember { mutableStateOf(false) }
     var showUnsupportedSourceDialog by remember { mutableStateOf(false) }
@@ -279,16 +244,18 @@ fun PrayerSettingsScreen(
     if (showLocationServicesDialog) {
         AlertDialog(
             onDismissRequest = { showLocationServicesDialog = false },
-            title = { Text("Enable device location") },
-            text = { Text("Turn on device location services to find your current location for prayer times.") },
+            title = { Text(stringResource(R.string.settings_enable_device_location)) },
+            text = { Text(stringResource(R.string.settings_enable_device_location_message)) },
             confirmButton = {
                 TextButton(onClick = {
                     showLocationServicesDialog = false
                     context.startActivity(Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-                }) { Text("Open location settings") }
+                }) { Text(stringResource(R.string.settings_open_location_settings)) }
             },
             dismissButton = {
-                TextButton(onClick = { showLocationServicesDialog = false }) { Text("Not now") }
+                TextButton(onClick = { showLocationServicesDialog = false }) {
+                    Text(stringResource(R.string.settings_not_now))
+                }
             }
         )
     }
@@ -296,11 +263,13 @@ fun PrayerSettingsScreen(
     if (showUnsupportedSourceDialog) {
         AlertDialog(
             onDismissRequest = { showUnsupportedSourceDialog = false },
-            title = { Text("Not available offline") },
+            title = { Text(stringResource(R.string.settings_offline_title)) },
             text = {
                 Text(
-                    "${prayerSettingLabel(unsupportedSourceMethod, calculationMethodLabels)} isn't supported by the local formula. " +
-                        "Choose another convention to use the local formula, or keep AlAdhan (online)."
+                    stringResource(
+                        R.string.settings_offline_convention_message,
+                        prayerSettingLabel(context, unsupportedSourceMethod, methodLabelRes(unsupportedSourceMethod))
+                    )
                 )
             },
             confirmButton = {
@@ -308,10 +277,12 @@ fun PrayerSettingsScreen(
                     showUnsupportedSourceDialog = false
                     pendingLocalSwitch = true
                     openConventionPicker = true
-                }) { Text("Choose convention") }
+                }) { Text(stringResource(R.string.settings_choose_convention)) }
             },
             dismissButton = {
-                TextButton(onClick = { showUnsupportedSourceDialog = false }) { Text("Keep AlAdhan") }
+                TextButton(onClick = { showUnsupportedSourceDialog = false }) {
+                    Text(stringResource(R.string.settings_keep_aladhan))
+                }
             }
         )
     }
@@ -356,7 +327,7 @@ fun PrayerSettingsScreen(
     val extraTimingPreferences = EXTRA_PRAYER_TIMINGS.map {
         ExtraTimingPreference(
             id = it.id,
-            label = it.label,
+            label = prayerLabel(it.id),
             selected = settings.selectedExtraPrayerTimings.contains(it.id),
             notificationEnabled = settings.extraPrayerNotifications.contains(it.id)
         )
@@ -366,7 +337,7 @@ fun PrayerSettingsScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeTopAppBar(
-                title = { SettingsTopBarTitle("Prayer Times", scrollBehavior) },
+                title = { SettingsTopBarTitle(stringResource(R.string.settings_prayer_times), scrollBehavior) },
                 navigationIcon = { SettingsBackButton(onBack) },
                 scrollBehavior = scrollBehavior
             )
@@ -382,16 +353,16 @@ fun PrayerSettingsScreen(
             Spacer(Modifier.height(12.dp))
 
             SettingsGroup(
-                title = "Calculation",
+                title = stringResource(R.string.settings_calculation),
 //                description = "How Khushu computes the daily prayer times."
             ) {
                 Box(modifier = Modifier.padding(horizontal = 20.dp)) {
                     SettingsDropdown(
-                        title = "Convention",
-                        subtitle = "The calculation convention used for Fajr and Isha.",
+                        title = stringResource(R.string.settings_convention),
+                        subtitle = stringResource(R.string.settings_convention_summary),
                         options = calculationMethods,
                         selectedOption = settings.prayerCalculationMethod,
-                        optionLabel = { prayerSettingLabel(it, calculationMethodLabels) },
+                        optionLabel = { prayerSettingLabel(context, it, methodLabelRes(it)) },
                         onOptionSelected = { method ->
                             val switchToLocal = pendingLocalSwitch
                             pendingLocalSwitch = false
@@ -408,34 +379,34 @@ fun PrayerSettingsScreen(
 
                 Box(modifier = Modifier.padding(horizontal = 20.dp)) {
                     SettingsDropdown(
-                        title = "Madhab",
-                        subtitle = "The Asr shadow rule used in the calculation.",
+                        title = stringResource(R.string.settings_madhab),
+                        subtitle = stringResource(R.string.settings_madhab_summary),
                         options = madhabs,
                         selectedOption = settings.prayerMadhab,
-                        optionLabel = { prayerSettingLabel(it, madhabLabels) },
+                        optionLabel = { prayerSettingLabel(context, it, madhabLabelRes(it)) },
                         onOptionSelected = viewModel::setPrayerMadhab
                     )
                 }
 
                 Box(modifier = Modifier.padding(horizontal = 20.dp)) {
                     SettingsDropdown(
-                        title = "Source",
-                        subtitle = "Choose the local formula or the online source.",
+                        title = stringResource(R.string.settings_source),
+                        subtitle = stringResource(R.string.settings_source_summary),
                         options = sources,
                         selectedOption = settings.prayerSourceType,
-                        optionLabel = { prayerSettingLabel(it, sourceLabels) },
+                        optionLabel = { prayerSettingLabel(context, it, sourceTypeLabelRes(it)) },
                         onOptionSelected = viewModel::setPrayerSourceType
                     )
                 }
             }
 
             SettingsGroup(
-                title = "Location",
+                title = stringResource(R.string.settings_location),
 //                description = "Use GPS or your saved coordinates for local prayer times."
             ) {
                 SettingsToggleItem(
-                    title = "Use Device GPS",
-                    subtitle = "Automatically refresh your location for accurate timings.",
+                    title = stringResource(R.string.settings_use_device_gps),
+                    subtitle = stringResource(R.string.settings_gps_summary),
                     checked = settings.useGpsLocation,
                     onCheckedChange = { enabled ->
                         if (enabled) requestGpsAccess() else viewModel.toggleUseGpsLocation(false)
@@ -449,7 +420,7 @@ fun PrayerSettingsScreen(
                     ) {
                         Icon(Icons.Default.MyLocation, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
-                        Text("GPS Access", fontFamily = PlusJakartaSans, style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(R.string.settings_gps_access), fontFamily = PlusJakartaSans, style = MaterialTheme.typography.titleSmall)
                     }
                 }
 
@@ -466,7 +437,7 @@ fun PrayerSettingsScreen(
                                 Icon(Icons.Default.MyLocation, contentDescription = null)
                                 Spacer(Modifier.width(8.dp))
                                 Text(
-                                    "GPS Access",
+                                    stringResource(R.string.settings_gps_access),
                                     fontFamily = PlusJakartaSans,
                                     style = MaterialTheme.typography.titleSmall
                                 )
@@ -478,7 +449,7 @@ fun PrayerSettingsScreen(
                             ) {
                                 Icon(Icons.Default.Refresh, contentDescription = null)
                                 Spacer(Modifier.width(8.dp))
-                                Text("Refresh", fontFamily = PlusJakartaSans, style = MaterialTheme.typography.titleSmall)
+                                Text(stringResource(R.string.settings_refresh), fontFamily = PlusJakartaSans, style = MaterialTheme.typography.titleSmall)
                             }
                         }
 
@@ -486,17 +457,16 @@ fun PrayerSettingsScreen(
 
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(
-                                text = "Current: ${"%.4f".format(Locale.US, settings.locationLat)}, ${
-                                    "%.4f".format(
-                                        Locale.US,
-                                        settings.locationLng
-                                    )
-                                }",
+                                text = stringResource(
+                                    R.string.settings_current_coordinates,
+                                    "%.4f".format(Locale.US, settings.locationLat),
+                                    "%.4f".format(Locale.US, settings.locationLng)
+                                ),
                                 style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = "Last refreshed: $lastRefreshed",
+                                text = stringResource(R.string.settings_last_refreshed, lastRefreshed),
                                 style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -516,7 +486,7 @@ fun PrayerSettingsScreen(
             Spacer(Modifier.height(16.dp))
 
             SettingsGroup(
-                title = "Reminders",
+                title = stringResource(R.string.settings_reminders),
 //                description = "Global alert style and per-prayer reminder controls."
             ) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !notificationsAllowed) {
@@ -527,18 +497,18 @@ fun PrayerSettingsScreen(
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Allow Notifications", fontFamily = PlusJakartaSans)
+                            Text(stringResource(R.string.settings_allow_notifications), fontFamily = PlusJakartaSans)
                         }
                     }
                 }
 
                 Box(modifier = Modifier.padding(horizontal = 20.dp)) {
                     SettingsDropdown(
-                        title = "Extra timing alert style",
-                        subtitle = "Choose how extra timing notifications sound or behave.",
+                        title = stringResource(R.string.settings_extra_timing_alert_style),
+                        subtitle = stringResource(R.string.settings_extra_timing_alert_style_summary),
                         options = alertStyleOptions,
                         selectedOption = settings.prayerNotificationAlertStyle,
-                        optionLabel = { alertStyleLabels[it] ?: it },
+                        optionLabel = { prayerSettingLabel(context, it, alertStyleLabelRes(it)) },
                         onOptionSelected = viewModel::setPrayerNotificationAlertStyle
                     )
                 }
@@ -546,7 +516,7 @@ fun PrayerSettingsScreen(
                 if (settings.prayerNotificationAlertStyle == "CUSTOM_SOUND") {
                     Box(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
                         SettingsSectionCard(
-                            title = "Custom Sound",
+                            title = stringResource(R.string.settings_custom_sound),
                             subtitle = customPrayerSoundLabel(context, settings.prayerNotificationCustomSoundUri),
                             contentPadding = PaddingValues(16.dp)
                         ) {
@@ -573,20 +543,20 @@ fun PrayerSettingsScreen(
                                     } else {
                                         Toast.makeText(
                                             context,
-                                            "No ringtone picker is available on this device.",
+                                            noRingtonePickerMessage,
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }
                                 },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text("Choose Alarm Sound", fontFamily = PlusJakartaSans)
+                                Text(stringResource(R.string.settings_choose_alarm_sound), fontFamily = PlusJakartaSans)
                             }
                             OutlinedButton(
                                 onClick = { viewModel.setPrayerNotificationCustomSoundUri("") },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text("Use System Default", fontFamily = PlusJakartaSans)
+                                Text(stringResource(R.string.settings_use_system_default), fontFamily = PlusJakartaSans)
                             }
                         }
                     }
@@ -594,11 +564,11 @@ fun PrayerSettingsScreen(
 
                 Box(modifier = Modifier.padding(horizontal = 20.dp)) {
                     SettingsDropdown(
-                        title = "Pre-prayer reminder sound",
-                        subtitle = "Shared by all pre-prayer reminders.",
+                        title = stringResource(R.string.settings_pre_prayer_reminder_sound),
+                        subtitle = stringResource(R.string.settings_pre_prayer_reminder_sound_summary),
                         options = prayerSoundOptions,
                         selectedOption = settings.prePrayerNotificationSound,
-                        optionLabel = { prayerSoundLabels[it] ?: it },
+                        optionLabel = { prayerSettingLabel(context, it, soundOptionLabelRes(it)) },
                         onOptionSelected = viewModel::setPrePrayerNotificationSound
                     )
                 }
@@ -631,7 +601,7 @@ fun PrayerSettingsScreen(
             }
 
             SettingsGroup(
-                title = "Extra Timings",
+                title = stringResource(R.string.settings_extra_timings),
 //                description = "Optional non-fard timings and whether they appear on Home."
             ) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -655,15 +625,15 @@ fun PrayerSettingsScreen(
                 )
 
                 SettingsToggleItem(
-                    title = "Show extra timings on Home",
-                    subtitle = "Include selected extra timings on Home surfaces.",
+                    title = stringResource(R.string.settings_show_extra_timings_home),
+                    subtitle = stringResource(R.string.settings_show_extra_timings_home_summary),
                     checked = settings.showExtraPrayerTimingsOnHome,
                     onCheckedChange = viewModel::toggleShowExtraPrayerTimingsOnHome
                 )
 
                 Box(modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp)) {
                     Text(
-                        text = "Localization groundwork is already in place through translation catalogs. Full app-string localization will build on this next.",
+                        text = stringResource(R.string.settings_localization_groundwork),
                         style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -671,12 +641,12 @@ fun PrayerSettingsScreen(
             }
 
             SettingsGroup(
-                title = "Advanced",
+                title = stringResource(R.string.settings_advanced),
 //                description = "Offsets, diagnostics, and debugging tools."
             ) {
                 ExpandableSettingsCard(
-                    title = "Prayer Offsets",
-                    summary = "Manually shift calculated timings.",
+                    title = stringResource(R.string.settings_prayer_offsets),
+                    summary = stringResource(R.string.settings_prayer_offsets_summary),
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -694,14 +664,14 @@ fun PrayerSettingsScreen(
                 }
 
                 ExpandableSettingsCard(
-                    title = "Diagnostics",
-                    summary = "Setup, coordinates, and notification status.",
+                    title = stringResource(R.string.settings_diagnostics),
+                    summary = stringResource(R.string.settings_diagnostics_summary),
                     modifier = Modifier.padding(horizontal = 16.dp)
                 ) {
                     PrayerDiagnosticsCard(
-                        source = prayerSettingLabel(settings.prayerSourceType, sourceLabels),
-                        method = prayerSettingLabel(settings.prayerCalculationMethod, calculationMethodLabels),
-                        madhab = prayerSettingLabel(settings.prayerMadhab, madhabLabels),
+                        source = prayerSettingLabel(context, settings.prayerSourceType, sourceTypeLabelRes(settings.prayerSourceType)),
+                        method = prayerSettingLabel(context, settings.prayerCalculationMethod, methodLabelRes(settings.prayerCalculationMethod)),
+                        madhab = prayerSettingLabel(context, settings.prayerMadhab, madhabLabelRes(settings.prayerMadhab)),
                         latitude = settings.locationLat,
                         longitude = settings.locationLng,
                         lastRefreshed = lastRefreshed,
@@ -712,7 +682,7 @@ fun PrayerSettingsScreen(
 
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text(
-                        "Debug Controls",
+                        stringResource(R.string.settings_debug_controls),
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontFamily = PlusJakartaSans,
                             fontWeight = FontWeight.Bold
@@ -740,7 +710,7 @@ fun PrayerSettingsScreen(
                             Icon(Icons.Default.Notifications, contentDescription = null)
                             Spacer(Modifier.width(8.dp))
                             Text(
-                                text = "Notify",
+                                text = stringResource(R.string.settings_notify),
                                 fontFamily = PlusJakartaSans,
                                 fontSize = 14.sp,
                                 style = MaterialTheme.typography.labelSmall
@@ -766,7 +736,7 @@ fun PrayerSettingsScreen(
                             Icon(Icons.Default.BugReport, contentDescription = null)
                             Spacer(Modifier.width(8.dp))
                             Text(
-                                text = "Pre-notify",
+                                text = stringResource(R.string.settings_pre_notify),
                                 fontFamily = PlusJakartaSans,
                                 fontSize = 14.sp,
                                 style = MaterialTheme.typography.labelSmall
@@ -795,14 +765,14 @@ private fun PrayerOffsetRow(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = title,
+                text = prayerLabel(title),
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.SemiBold
                 )
             )
             Text(
-                text = "Shift by minutes",
+                text = stringResource(R.string.settings_shift_by_minutes),
                 style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -813,7 +783,11 @@ private fun PrayerOffsetRow(
                 Text("-", style = MaterialTheme.typography.titleLarge)
             }
             Text(
-                text = if (value > 0) "+$value" else "$value",
+                text = if (value > 0) {
+                    stringResource(R.string.settings_offset_positive, value)
+                } else {
+                    stringResource(R.string.settings_offset_value, value)
+                },
                 modifier = Modifier.width(40.dp),
                 style = MaterialTheme.typography.bodyLarge.copy(fontFamily = PlusJakartaSans),
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -831,11 +805,9 @@ private fun ExtraTimingCard(
     onSelectedToggle: (Boolean) -> Unit,
     onNotificationToggle: (Boolean) -> Unit,
 ) {
-    val summary = buildString {
-        append(if (preference.selected) "Shown" else "Hidden")
-        append(" · ")
-        append(if (preference.notificationEnabled) "Alert on" else "Alert off")
-    }
+    val visibilityLabel = stringResource(if (preference.selected) R.string.settings_shown else R.string.settings_hidden)
+    val alertLabel = stringResource(if (preference.notificationEnabled) R.string.settings_alert_on else R.string.settings_alert_off)
+    val summary = stringResource(R.string.settings_extra_timing_summary, visibilityLabel, alertLabel)
     ExpandableSettingsCard(
         title = preference.label,
         summary = summary,
@@ -844,26 +816,26 @@ private fun ExtraTimingCard(
             SettingsInlineAction(
                 selected = preference.selected,
                 icon = Icons.Default.Schedule,
-                contentDescription = "Show ${preference.label}",
+                contentDescription = stringResource(R.string.settings_show_timing, preference.label),
                 onClick = { onSelectedToggle(!preference.selected) }
             )
             SettingsInlineAction(
                 selected = preference.notificationEnabled,
                 icon = Icons.Default.Notifications,
-                contentDescription = "Notify for ${preference.label}",
+                contentDescription = stringResource(R.string.settings_notify_for_timing, preference.label),
                 onClick = { onNotificationToggle(!preference.notificationEnabled) }
             )
         }
     ) {
         SettingsToggleItem(
-            title = "Show on surfaces",
-            subtitle = "Keep ${preference.label} visible in Iman.",
+            title = stringResource(R.string.settings_show_on_surfaces),
+            subtitle = stringResource(R.string.settings_keep_timing_visible, preference.label),
             checked = preference.selected,
             onCheckedChange = onSelectedToggle
         )
         SettingsToggleItem(
-            title = "Notification alert",
-            subtitle = "Send a reminder when ${preference.label} starts.",
+            title = stringResource(R.string.settings_notification_alert),
+            subtitle = stringResource(R.string.settings_send_timing_reminder, preference.label),
             checked = preference.notificationEnabled,
             onCheckedChange = onNotificationToggle,
             showDivider = false
@@ -879,47 +851,51 @@ private fun PrayerReminderCard(
     onPrePrayerMinutesChange: (Int) -> Unit,
     onPrayerSoundChange: (String) -> Unit,
 ) {
-    val summary = buildString {
-        append(if (preference.prayerEnabled) "Prayer on" else "Prayer off")
-        append(" · ")
-        if (preference.prePrayerEnabled) append("Pre ${preference.prePrayerMinutes}m") else append("Pre off")
+    val context = LocalContext.current
+    val prayerName = prayerLabel(preference.prayerName)
+    val prayerStatus = stringResource(if (preference.prayerEnabled) R.string.settings_prayer_on else R.string.settings_prayer_off)
+    val prePrayerStatus = if (preference.prePrayerEnabled) {
+        stringResource(R.string.settings_pre_prayer_summary, preference.prePrayerMinutes)
+    } else {
+        stringResource(R.string.settings_pre_off)
     }
+    val summary = stringResource(R.string.settings_prayer_reminder_summary, prayerStatus, prePrayerStatus)
     ExpandableSettingsCard(
-        title = preference.prayerName,
+        title = prayerName,
         summary = summary,
         shape = RoundedCornerShape(20.dp),
         actions = {
             SettingsInlineAction(
                 selected = preference.prayerEnabled,
                 icon = Icons.Default.Notifications,
-                contentDescription = "${preference.prayerName} prayer reminder",
+                contentDescription = stringResource(R.string.settings_prayer_reminder_action_description, prayerName),
                 onClick = { onPrayerToggle(!preference.prayerEnabled) }
             )
             SettingsInlineAction(
                 selected = preference.prePrayerEnabled,
                 icon = Icons.Default.Schedule,
-                contentDescription = "${preference.prayerName} pre-prayer reminder",
+                contentDescription = stringResource(R.string.settings_pre_prayer_reminder_action_description, prayerName),
                 onClick = { onPrePrayerToggle(!preference.prePrayerEnabled) }
             )
         }
     ) {
         SettingsToggleItem(
-            title = "Prayer notification",
-            subtitle = "Alert when ${preference.prayerName} starts.",
+            title = stringResource(R.string.settings_prayer_notification),
+            subtitle = stringResource(R.string.settings_prayer_notification_summary, prayerName),
             checked = preference.prayerEnabled,
             onCheckedChange = onPrayerToggle
         )
         SettingsDropdown(
-            title = "Prayer reminder sound",
-            subtitle = "Sound used for the ${preference.prayerName} reminder.",
+            title = stringResource(R.string.settings_prayer_reminder_sound),
+            subtitle = stringResource(R.string.settings_prayer_reminder_sound_summary, prayerName),
             options = listOf("DEFAULT", "ADHAN", "TAKBIR", "SILENT"),
             selectedOption = preference.prayerSound,
-            optionLabel = { prayerSoundLabels[it] ?: it },
+            optionLabel = { prayerSettingLabel(context, it, soundOptionLabelRes(it)) },
             onOptionSelected = onPrayerSoundChange
         )
         SettingsToggleItem(
-            title = "Pre-prayer notification",
-            subtitle = "Remind me before ${preference.prayerName}.",
+            title = stringResource(R.string.settings_pre_prayer_notification),
+            subtitle = stringResource(R.string.settings_remind_before_prayer, prayerName),
             checked = preference.prePrayerEnabled,
             onCheckedChange = onPrePrayerToggle,
             showDivider = preference.prePrayerEnabled
@@ -932,9 +908,13 @@ private fun PrayerReminderCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Lead time", style = MaterialTheme.typography.bodyLarge.copy(fontFamily = PlusJakartaSans))
+                    Text(stringResource(R.string.settings_lead_time), style = MaterialTheme.typography.bodyLarge.copy(fontFamily = PlusJakartaSans))
                     Text(
-                        text = "${preference.prePrayerMinutes} minutes before",
+                        text = pluralStringResource(
+                            R.plurals.settings_minutes_before,
+                            preference.prePrayerMinutes,
+                            preference.prePrayerMinutes
+                        ),
                         style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -947,7 +927,7 @@ private fun PrayerReminderCard(
                         Text("-", style = MaterialTheme.typography.titleLarge)
                     }
                     Text(
-                        text = "${preference.prePrayerMinutes}m",
+                        text = stringResource(R.string.settings_minutes_short, preference.prePrayerMinutes),
                         modifier = Modifier.width(40.dp),
                         style = MaterialTheme.typography.bodyLarge.copy(fontFamily = PlusJakartaSans),
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -973,28 +953,41 @@ private fun PrayerDiagnosticsCard(
     notificationsAllowed: Boolean
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("Setup", style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.primary))
-        DiagnosticRow("Source", source)
-        DiagnosticRow("Method", method)
-        DiagnosticRow("Madhab", madhab)
+        Text(stringResource(R.string.settings_diagnostic_setup), style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.primary))
+        DiagnosticRow(stringResource(R.string.settings_source), source)
+        DiagnosticRow(stringResource(R.string.settings_diagnostic_method), method)
+        DiagnosticRow(stringResource(R.string.settings_madhab), madhab)
 
         HorizontalDivider(
             color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
             modifier = Modifier.padding(vertical = 4.dp)
         )
 
-        Text("Location", style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.primary))
-        DiagnosticRow("Coordinates", "${"%.4f".format(Locale.US, latitude)}, ${"%.4f".format(Locale.US, longitude)}")
-        DiagnosticRow("GPS Status", if (gpsEnabled) "Enabled" else "Disabled")
-        DiagnosticRow("Last Refresh", lastRefreshed)
+        Text(stringResource(R.string.settings_location), style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.primary))
+        DiagnosticRow(
+            stringResource(R.string.settings_diagnostic_coordinates),
+            stringResource(
+                R.string.settings_diagnostic_coordinates_value,
+                "%.4f".format(Locale.US, latitude),
+                "%.4f".format(Locale.US, longitude)
+            )
+        )
+        DiagnosticRow(
+            stringResource(R.string.settings_diagnostic_gps_status),
+            stringResource(if (gpsEnabled) R.string.settings_status_enabled else R.string.settings_status_disabled)
+        )
+        DiagnosticRow(stringResource(R.string.settings_diagnostic_last_refresh), lastRefreshed)
 
         HorizontalDivider(
             color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
             modifier = Modifier.padding(vertical = 4.dp)
         )
 
-        Text("Status", style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.primary))
-        DiagnosticRow("Notifications", if (notificationsAllowed) "Allowed" else "Not allowed")
+        Text(stringResource(R.string.settings_diagnostic_status), style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.primary))
+        DiagnosticRow(
+            stringResource(R.string.settings_diagnostic_notifications),
+            stringResource(if (notificationsAllowed) R.string.settings_status_allowed else R.string.settings_status_not_allowed)
+        )
     }
 }
 
@@ -1033,7 +1026,7 @@ private fun ManualLocationInput(
             OutlinedTextField(
                 value = latText,
                 onValueChange = { latText = it },
-                label = { Text("Latitude", fontFamily = PlusJakartaSans) },
+                label = { Text(stringResource(R.string.settings_latitude), fontFamily = PlusJakartaSans) },
                 modifier = Modifier.weight(1f),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
@@ -1042,7 +1035,7 @@ private fun ManualLocationInput(
             OutlinedTextField(
                 value = lngText,
                 onValueChange = { lngText = it },
-                label = { Text("Longitude", fontFamily = PlusJakartaSans) },
+                label = { Text(stringResource(R.string.settings_longitude), fontFamily = PlusJakartaSans) },
                 modifier = Modifier.weight(1f),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
@@ -1059,7 +1052,7 @@ private fun ManualLocationInput(
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Update Coordinates", fontFamily = PlusJakartaSans)
+            Text(stringResource(R.string.settings_update_coordinates), fontFamily = PlusJakartaSans)
         }
     }
 }

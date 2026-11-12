@@ -22,11 +22,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
+import com.kaizen.khushu.R
 import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import androidx.compose.runtime.*
 
@@ -49,7 +51,7 @@ fun SettingsTopBarTitle(text: String, scrollBehavior: TopAppBarScrollBehavior) {
 @Composable
 fun SettingsBackButton(onClick: () -> Unit) {
     IconButton(onClick = onClick, modifier = Modifier.padding(top = 8.dp)) {
-        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.common_back))
     }
 }
 

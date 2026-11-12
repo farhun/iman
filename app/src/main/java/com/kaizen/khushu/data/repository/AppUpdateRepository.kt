@@ -5,6 +5,8 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.content.FileProvider
 import com.kaizen.khushu.BuildConfig
+import com.kaizen.khushu.R
+import com.kaizen.khushu.i18n.LocaleHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
@@ -77,10 +79,11 @@ object AppUpdateRepository {
      * Checks for an update on GitHub. Returns [UpdateCheckResult.Error] immediately
      * if called on a non-updateable build.
      */
-    suspend fun checkForUpdate(): UpdateCheckResult = withContext(Dispatchers.IO) {
+    suspend fun checkForUpdate(context: Context): UpdateCheckResult = withContext(Dispatchers.IO) {
+        val localizedContext = LocaleHelper.wrap(context)
         if (!isUpdateableBuild) {
             return@withContext UpdateCheckResult.Error(
-                "In-app updates are not available on this build.",
+                localizedContext.getString(R.string.settings_update_unavailable_build),
                 isRetryable = false
             )
         }
@@ -95,16 +98,16 @@ object AppUpdateRepository {
 
             if (!response.isSuccessful) {
                 val msg = when (response.code) {
-                    403 -> "Rate-limited by GitHub. Try again later."
-                    404 -> "Release endpoint not found."
-                    in 500..599 -> "GitHub server error (${response.code}). Try again later."
-                    else -> "GitHub API returned ${response.code}"
+                    403 -> localizedContext.getString(R.string.settings_update_rate_limited)
+                    404 -> localizedContext.getString(R.string.settings_update_endpoint_not_found)
+                    in 500..599 -> localizedContext.getString(R.string.settings_update_server_error, response.code)
+                    else -> localizedContext.getString(R.string.settings_update_api_error, response.code)
                 }
                 return@withContext UpdateCheckResult.Error(msg, isRetryable = true)
             }
 
             val body = response.body?.string() ?: return@withContext UpdateCheckResult.Error(
-                "Empty response from GitHub",
+                localizedContext.getString(R.string.settings_update_empty_response),
                 isRetryable = true
             )
             val release = json.decodeFromString<GitHubRelease>(body)
@@ -112,7 +115,7 @@ object AppUpdateRepository {
             // Prerelease policy: skip prerelease releases on stable channel.
             if (release.prerelease) {
                 return@withContext UpdateCheckResult.Error(
-                    "Latest release is a pre-release. Download it manually from GitHub.",
+                    localizedContext.getString(R.string.settings_update_prerelease),
                     isRetryable = false
                 )
             }
@@ -123,7 +126,11 @@ object AppUpdateRepository {
 
             if (compareVersions(tagVersion, currentVersionName) < 0) {
                 return@withContext UpdateCheckResult.Error(
-                    "Installed version ($currentVersionName) is newer than the latest release ($tagVersion). You may be on a development build.",
+                    localizedContext.getString(
+                        R.string.settings_update_installed_newer,
+                        currentVersionName,
+                        tagVersion
+                    ),
                     isRetryable = false
                 )
             }
@@ -142,7 +149,7 @@ object AppUpdateRepository {
             if (apkAsset == null) {
                 val assetNames = release.assets.joinToString(", ") { it.name }
                 return@withContext UpdateCheckResult.Error(
-                    "No APK asset found in latest release (found: $assetNames)",
+                    localizedContext.getString(R.string.settings_update_no_apk, assetNames),
                     isRetryable = false
                 )
             }
@@ -155,11 +162,20 @@ object AppUpdateRepository {
                 )
             )
         } catch (e: java.net.SocketTimeoutException) {
-            UpdateCheckResult.Error("Connection timed out. Check your internet connection.", isRetryable = true)
+            UpdateCheckResult.Error(
+                localizedContext.getString(R.string.settings_update_timeout),
+                isRetryable = true
+            )
         } catch (e: java.net.UnknownHostException) {
-            UpdateCheckResult.Error("No internet connection.", isRetryable = true)
+            UpdateCheckResult.Error(
+                localizedContext.getString(R.string.settings_update_no_internet),
+                isRetryable = true
+            )
         } catch (e: Exception) {
-            UpdateCheckResult.Error(e.message ?: "Unknown error checking for updates.", isRetryable = true)
+            UpdateCheckResult.Error(
+                e.message ?: localizedContext.getString(R.string.settings_update_unknown_error),
+                isRetryable = true
+            )
         }
     }
 
@@ -168,15 +184,20 @@ object AppUpdateRepository {
         downloadUrl: String,
         onProgress: (Float) -> Unit,
     ): DownloadState = withContext(Dispatchers.IO) {
+        val localizedContext = LocaleHelper.wrap(context)
         try {
             val request = Request.Builder().url(downloadUrl).build()
             val response = client.newCall(request).execute()
 
             if (!response.isSuccessful) {
-                return@withContext DownloadState.Failed("Download failed: ${response.code}")
+                return@withContext DownloadState.Failed(
+                                    localizedContext.getString(R.string.settings_update_download_failed_code, response.code)
+                                )
             }
 
-            val body = response.body ?: return@withContext DownloadState.Failed("Empty response body")
+            val body = response.body ?: return@withContext DownloadState.Failed(
+                localizedContext.getString(R.string.settings_update_empty_body)
+            )
             val contentLength = body.contentLength()
             val fileName = "iman-update-${BuildConfig.VERSION_NAME}.apk"
             val file = File(context.cacheDir, fileName)
@@ -197,7 +218,7 @@ object AppUpdateRepository {
 
             DownloadState.Ready(file)
         } catch (e: Exception) {
-            DownloadState.Failed(e.message ?: "Download failed")
+            DownloadState.Failed(e.message ?: localizedContext.getString(R.string.settings_update_download_failed))
         }
     }
 

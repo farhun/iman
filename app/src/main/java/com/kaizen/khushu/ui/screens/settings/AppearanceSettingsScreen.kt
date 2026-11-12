@@ -50,15 +50,24 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
+import com.kaizen.khushu.R
 import com.kaizen.khushu.ui.navigation.AppDestinations
 import androidx.compose.ui.text.font.FontWeight
 import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import com.kaizen.khushu.ui.theme.LocalThemeTransitionController
 import com.kaizen.khushu.ui.theme.colorSeeds
+
+private fun themeLabelRes(mode: String): Int = when (mode) {
+    "System" -> R.string.settings_theme_system
+    "Light" -> R.string.settings_theme_light
+    "Dark" -> R.string.settings_theme_dark
+    else -> 0
+}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -86,7 +95,7 @@ fun AppearanceSettingsScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeTopAppBar(
-                title = { SettingsTopBarTitle("Appearance", scrollBehavior) },
+                title = { SettingsTopBarTitle(stringResource(R.string.settings_appearance), scrollBehavior) },
                 navigationIcon = { SettingsBackButton(onBack) },
                 scrollBehavior = scrollBehavior
             )
@@ -102,7 +111,7 @@ fun AppearanceSettingsScreen(
             Spacer(Modifier.height(12.dp))
 
             SettingsGroup(
-                title = "Theme",
+                title = stringResource(R.string.settings_theme),
 //                description = "Control the overall look and startup behavior of Khushu."
             ) {
                 Box(modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)) {
@@ -129,7 +138,7 @@ fun AppearanceSettingsScreen(
                                 },
                                 label = {
                                     Text(
-                                        text = label,
+                                        text = stringResource(themeLabelRes(label)),
                                         fontFamily = PlusJakartaSans,
                                         style = MaterialTheme.typography.titleMedium
                                     )
@@ -140,21 +149,21 @@ fun AppearanceSettingsScreen(
                 }
 
                 SettingsToggleItem(
-                    title = "Show Continue Reading",
-                    subtitle = "Keep the last opened study topic visible in Study.",
+                    title = stringResource(R.string.settings_show_continue_reading),
+                    subtitle = stringResource(R.string.settings_show_continue_reading_summary),
                     checked = settings.showContinueReading,
                     onCheckedChange = viewModel::toggleShowContinueReading
                 )
 
                 SettingsToggleItem(
-                    title = "Keep Screen Awake",
-                    subtitle = "Prevent the screen from sleeping while Iman is open.",
+                    title = stringResource(R.string.settings_keep_screen_awake),
+                    subtitle = stringResource(R.string.settings_keep_screen_awake_summary),
                     checked = settings.keepScreenAwake,
                     onCheckedChange = viewModel::toggleKeepScreenAwake
                 )
 
                 SettingsToggleItem(
-                    title = "Show exit reminder for unbookmarked Quran",
+                    title = stringResource(R.string.settings_show_quran_exit_reminder),
                     checked = !settings.quranExitReminderDisabled,
                     onCheckedChange = { enabled ->
                         viewModel.setQuranExitReminderDisabled(!enabled)
@@ -163,7 +172,7 @@ fun AppearanceSettingsScreen(
 
                 Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
                     Text(
-                        text = "Startup screen",
+                        text = stringResource(R.string.settings_startup_screen),
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontFamily = PlusJakartaSans,
                             fontWeight = FontWeight.SemiBold
@@ -171,7 +180,7 @@ fun AppearanceSettingsScreen(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "Choose which area opens first when Iman launches.",
+                        text = stringResource(R.string.settings_startup_screen_summary),
                         style = MaterialTheme.typography.bodyMedium.copy(fontFamily = PlusJakartaSans),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -182,14 +191,14 @@ fun AppearanceSettingsScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         listOf(
-                            "Home" to AppDestinations.HOME.route,
-                            "Tasbih" to AppDestinations.TASBEEH.route,
-                            "Quran" to AppDestinations.QURAN.route
-                        ).forEach { (label, route) ->
+                            R.string.nav_home to AppDestinations.HOME.route,
+                            R.string.nav_tasbih to AppDestinations.TASBEEH.route,
+                            R.string.nav_quran to AppDestinations.QURAN.route
+                        ).forEach { (labelRes, route) ->
                             FilterChip(
                                 selected = settings.startupTab == route,
                                 onClick = { viewModel.setStartupTab(route) },
-                                label = { Text(label, fontFamily = PlusJakartaSans) }
+                                label = { Text(stringResource(labelRes), fontFamily = PlusJakartaSans) }
                             )
                         }
                     }
@@ -197,13 +206,13 @@ fun AppearanceSettingsScreen(
             }
 
             SettingsGroup(
-                title = "Color",
+                title = stringResource(R.string.settings_color),
 //                description = "Use wallpaper-aware colors or choose a manual accent."
             ) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     SettingsToggleItem(
-                        title = "Dynamic Color",
-                        subtitle = "Sync the accent palette with your wallpaper.",
+                        title = stringResource(R.string.settings_dynamic_color),
+                        subtitle = stringResource(R.string.settings_dynamic_color_summary),
                         checked = settings.dynamicColor,
                         onCheckedChange = viewModel::toggleDynamicColor
                     )
@@ -211,8 +220,8 @@ fun AppearanceSettingsScreen(
 
                 if (isDarkTheme) {
                     SettingsToggleItem(
-                        title = "Pure AMOLED Black",
-                        subtitle = "Use an absolute black background in dark mode.",
+                        title = stringResource(R.string.settings_pure_amoled_black),
+                        subtitle = stringResource(R.string.settings_pure_amoled_black_summary),
                         checked = settings.pureBlack,
                         onCheckedChange = viewModel::togglePureBlack,
                         showDivider = !settings.dynamicColor || Build.VERSION.SDK_INT < Build.VERSION_CODES.S

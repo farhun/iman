@@ -9,6 +9,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
+import com.kaizen.khushu.R
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -24,7 +26,7 @@ fun CounterSettingsScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeTopAppBar(
-                title = { SettingsTopBarTitle("Counter", scrollBehavior) },
+                title = { SettingsTopBarTitle(stringResource(R.string.settings_counter), scrollBehavior) },
                 navigationIcon = { SettingsBackButton(onBack) },
                 scrollBehavior = scrollBehavior
             )
@@ -40,12 +42,12 @@ fun CounterSettingsScreen(
             Spacer(Modifier.height(12.dp))
 
             SettingsGroup(
-                title = "Haptics",
+                title = stringResource(R.string.settings_haptics),
 //                description = "Physical feedback that applies across Khushu counters."
             ) {
                 SettingsToggleItem(
-                    title = "Haptic Feedback",
-                    subtitle = "Vibrate slightly when a count increments.",
+                    title = stringResource(R.string.settings_haptic_feedback),
+                    subtitle = stringResource(R.string.settings_haptic_feedback_summary),
                     checked = settings.hapticsEnabled,
                     onCheckedChange = { viewModel.toggleHaptics(it) },
                     showDivider = false
@@ -53,12 +55,12 @@ fun CounterSettingsScreen(
             }
 
             SettingsGroup(
-                title = "Hardware",
+                title = stringResource(R.string.settings_hardware),
 //                description = "Optional device-level controls for counting."
             ) {
                 SettingsToggleItem(
-                    title = "Volume Key Counting",
-                    subtitle = "Use the hardware volume buttons to count.",
+                    title = stringResource(R.string.settings_volume_key_counting),
+                    subtitle = stringResource(R.string.settings_volume_key_counting_summary),
                     checked = settings.volumeCounting,
                     onCheckedChange = { viewModel.toggleVolumeCounting(it) },
                     showDivider = false

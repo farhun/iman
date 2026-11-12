@@ -80,7 +80,7 @@ fun SettingsScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeTopAppBar(
-                title = { SettingsTopBarTitle("Settings", scrollBehavior) },
+                title = { SettingsTopBarTitle(stringResource(R.string.common_settings), scrollBehavior) },
                 navigationIcon = { SettingsBackButton(onBack) },
                 scrollBehavior = scrollBehavior
             )
@@ -96,40 +96,40 @@ fun SettingsScreen(
             Spacer(Modifier.height(12.dp))
 
             SettingsGroup(
-                title = "Preferences",
+                title = stringResource(R.string.settings_preferences),
 //                description = "Prayer, appearance, interaction, and app information."
             ) {
                 SettingsMenuItem(
-                    title = "Prayer Times",
-                    subtitle = "Calculation, reminders, and diagnostics",
+                    title = stringResource(R.string.settings_prayer_times),
+                    subtitle = stringResource(R.string.settings_prayer_times_summary),
                     imageVector = Icons.Default.AccessTime,
                     onClick = onNavigatePrayer
                 )
 
                 SettingsMenuItem(
-                    title = "Appearance",
-                    subtitle = "Theme, colors, and startup screen",
+                    title = stringResource(R.string.settings_appearance),
+                    subtitle = stringResource(R.string.settings_appearance_summary),
                     imageVector = Icons.Default.ColorLens,
                     onClick = onNavigateAppearance
                 )
 
                 SettingsMenuItem(
-                    title = "Widget",
-                    subtitle = "Custom backgrounds and transparency",
+                    title = stringResource(R.string.widget_title),
+                    subtitle = stringResource(R.string.widget_settings_summary),
                     imageVector = Icons.Default.Layers,
                     onClick = onNavigateWidget
                 )
 
                 SettingsMenuItem(
-                    title = "Counter",
-                    subtitle = "Haptics and hardware behavior",
+                    title = stringResource(R.string.settings_counter),
+                    subtitle = stringResource(R.string.settings_counter_summary),
                     imageVector = Icons.Default.TouchApp,
                     onClick = onNavigateCounter
                 )
 
                 SettingsMenuItem(
-                    title = "Tasbih Screen",
-                    subtitle = "Customize the tasbih screen and canvas",
+                    title = stringResource(R.string.settings_tasbih_screen),
+                    subtitle = stringResource(R.string.settings_tasbih_screen_summary),
                     imageVector = Icons.Default.Tune,
                     onClick = onNavigateTasbeeh
                 )
@@ -142,8 +142,8 @@ fun SettingsScreen(
                 )
 
                 SettingsMenuItem(
-                    title = "About Iman",
-                    subtitle = "Story, project links, and reporting",
+                    title = stringResource(R.string.about_title),
+                    subtitle = stringResource(R.string.settings_about_summary),
                     imageVector = Icons.Default.Info,
                     onClick = onNavigateAbout,
                     showDivider = false
@@ -181,7 +181,7 @@ fun SettingsScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showLanguageDialog.value = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.common_cancel))
                 }
             }
         )

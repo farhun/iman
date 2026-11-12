@@ -32,8 +32,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.kaizen.khushu.R
 import com.kaizen.khushu.data.repository.AppUpdateRepository
 import com.kaizen.khushu.data.repository.DownloadState
 import com.kaizen.khushu.data.repository.UpdateCheckResult
@@ -45,6 +47,7 @@ fun UpdateCheckDialog(
     onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
+    val installerError = stringResource(R.string.settings_update_installer_error)
     val scope = rememberCoroutineScope()
     var checkResult by remember { mutableStateOf<UpdateCheckResult>(UpdateCheckResult.Checking) }
     // Cache the APK path as a simple string so it survives config changes across dialog show/hides.
@@ -69,13 +72,13 @@ fun UpdateCheckDialog(
     )
 
     LaunchedEffect(Unit) {
-        checkResult = AppUpdateRepository.checkForUpdate()
+        checkResult = AppUpdateRepository.checkForUpdate(context)
     }
 
     val onRetry: () -> Unit = {
         checkResult = UpdateCheckResult.Checking
         scope.launch {
-            checkResult = AppUpdateRepository.checkForUpdate()
+            checkResult = AppUpdateRepository.checkForUpdate(context)
         }
     }
 
@@ -86,10 +89,10 @@ fun UpdateCheckDialog(
         title = {
             Text(
                 text = when (checkResult) {
-                    is UpdateCheckResult.Checking -> "Checking for Updates"
-                    is UpdateCheckResult.UpToDate -> "Up to Date"
-                    is UpdateCheckResult.UpdateAvailable -> "Update Available"
-                    is UpdateCheckResult.Error -> "Check Failed"
+                    is UpdateCheckResult.Checking -> stringResource(R.string.settings_update_checking)
+                    is UpdateCheckResult.UpToDate -> stringResource(R.string.settings_update_up_to_date)
+                    is UpdateCheckResult.UpdateAvailable -> stringResource(R.string.settings_update_available)
+                    is UpdateCheckResult.Error -> stringResource(R.string.settings_update_failed)
                 },
                 style = MaterialTheme.typography.titleLarge,
             )
@@ -117,7 +120,7 @@ fun UpdateCheckDialog(
                             )
                         }
                         Text(
-                            text = "Querying GitHub releases...",
+                            text = stringResource(R.string.settings_update_querying),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -125,21 +128,24 @@ fun UpdateCheckDialog(
 
                     is UpdateCheckResult.UpToDate -> {
                         Text(
-                            text = "Iman ${com.kaizen.khushu.BuildConfig.VERSION_NAME} is the latest version.",
+                            text = stringResource(
+                                R.string.settings_update_latest_version,
+                                com.kaizen.khushu.BuildConfig.VERSION_NAME
+                            ),
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     }
 
                     is UpdateCheckResult.UpdateAvailable -> {
                         Text(
-                            text = "Version ${result.info.latestVersionName} is available.",
+                            text = stringResource(R.string.settings_update_version_available, result.info.latestVersionName),
                             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
                         )
                         Spacer(Modifier.height(4.dp))
 
                         if (result.info.releaseNotes.isNotBlank()) {
                             Text(
-                                text = "Release Notes",
+                                text = stringResource(R.string.settings_update_release_notes),
                                 style = MaterialTheme.typography.titleSmall,
                             )
                             Text(
@@ -172,14 +178,14 @@ fun UpdateCheckDialog(
                                     },
                                     modifier = Modifier.fillMaxWidth(),
                                 ) {
-                                    Text("Download & Install")
+                                    Text(stringResource(R.string.settings_update_download_install))
                                 }
                             }
 
                             is DownloadState.Downloading -> {
                                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                     Text(
-                                        text = "Downloading...",
+                                        text = stringResource(R.string.settings_update_downloading),
                                         style = MaterialTheme.typography.bodySmall,
                                     )
                                     LinearProgressIndicator(
@@ -187,7 +193,7 @@ fun UpdateCheckDialog(
                                         modifier = Modifier.fillMaxWidth(),
                                     )
                                     Text(
-                                        text = "${(animatedProgress * 100).toInt()}%",
+                                        text = stringResource(R.string.settings_update_progress, (animatedProgress * 100).toInt()),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
@@ -201,12 +207,12 @@ fun UpdateCheckDialog(
                                         try {
                                             context.startActivity(intent)
                                         } catch (e: Exception) {
-                                            Toast.makeText(context, "Could not open installer", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(context, installerError, Toast.LENGTH_SHORT).show()
                                         }
                                     },
                                     modifier = Modifier.fillMaxWidth(),
                                 ) {
-                                    Text("Install Update")
+                                    Text(stringResource(R.string.settings_update_install))
                                 }
                             }
 
@@ -218,7 +224,7 @@ fun UpdateCheckDialog(
                                 )
                                 Spacer(Modifier.height(4.dp))
                                 Text(
-                                    text = "Check your internet connection and storage space, then try again.",
+                                    text = stringResource(R.string.settings_update_download_help),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -241,7 +247,7 @@ fun UpdateCheckDialog(
                                     },
                                     modifier = Modifier.fillMaxWidth(),
                                 ) {
-                                    Text("Retry")
+                                    Text(stringResource(R.string.common_retry))
                                 }
                             }
                         }
@@ -261,22 +267,22 @@ fun UpdateCheckDialog(
             when (checkResult) {
                 is UpdateCheckResult.Checking -> {}
                 is UpdateCheckResult.UpToDate -> {
-                    TextButton(onClick = onDismiss) { Text("Close") }
+                    TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_close)) }
                 }
                 is UpdateCheckResult.UpdateAvailable -> {
                     if (downloadState is DownloadState.Ready) {
-                        TextButton(onClick = onDismiss) { Text("Later") }
+                        TextButton(onClick = onDismiss) { Text(stringResource(R.string.settings_update_later)) }
                     } else if (downloadState !is DownloadState.Downloading) {
-                        TextButton(onClick = onDismiss) { Text("Later") }
+                        TextButton(onClick = onDismiss) { Text(stringResource(R.string.settings_update_later)) }
                     }
                 }
                 is UpdateCheckResult.Error -> {
                     val err = checkResult as UpdateCheckResult.Error
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         if (err.isRetryable) {
-                            TextButton(onClick = onRetry) { Text("Retry") }
+                            TextButton(onClick = onRetry) { Text(stringResource(R.string.common_retry)) }
                         }
-                        TextButton(onClick = onDismiss) { Text("Close") }
+                        TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_close)) }
                     }
                 }
             }

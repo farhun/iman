@@ -19,9 +19,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.kaizen.khushu.R
 import com.kaizen.khushu.data.model.ReleaseNote
 import com.kaizen.khushu.ui.theme.PlusJakartaSans
 
@@ -49,7 +51,7 @@ fun ReleaseNotesDialog(
                     verticalArrangement = Arrangement.spacedBy(14.dp),
                 ) {
                     Text(
-                        text = "What's New",
+                        text = stringResource(R.string.settings_update_whats_new),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.SemiBold,
@@ -69,7 +71,7 @@ fun ReleaseNotesDialog(
 
                     if (note.highlights.isNotEmpty()) {
                         ReleaseNoteSectionBlock(
-                            title = "Highlights",
+                            title = stringResource(R.string.settings_update_highlights),
                             items = note.highlights,
                         )
                     }
@@ -91,7 +93,7 @@ fun ReleaseNotesDialog(
                 ) {
                     OutlinedButton(onClick = onDismiss) {
                         Text(
-                            text = "Continue",
+                            text = stringResource(R.string.settings_update_continue),
                             style = MaterialTheme.typography.titleSmall,
                         )
                     }

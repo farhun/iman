@@ -12,6 +12,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.kaizen.khushu.R
+import com.kaizen.khushu.i18n.LocaleHelper
 import com.kaizen.khushu.data.model.CustomBeadStyle
 import com.kaizen.khushu.data.model.DEFAULT_CUSTOM_BEAD_STYLE_ID
 import com.kaizen.khushu.data.model.defaultCustomBeadStyle
@@ -129,7 +131,7 @@ class SettingsViewModel(
                     best?.subAdminArea?.takeIf { it.isNotBlank() },
                     best?.adminArea?.takeIf { it.isNotBlank() }
                 ).firstOrNull()
-            }.getOrNull() ?: "Your area"
+            }.getOrNull() ?: LocaleHelper.wrap(appContext).getString(R.string.home_your_area)
 
             repository.updateLocationLabel(label)
         }
@@ -495,7 +497,7 @@ class SettingsViewModel(
             if (showProviderError) {
                 Toast.makeText(
                     appContext,
-                    "No location providers enabled. Please check your system settings.",
+                    LocaleHelper.wrap(appContext).getString(R.string.settings_location_providers_disabled),
                     Toast.LENGTH_SHORT
                 ).show()
             }

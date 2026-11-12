@@ -35,10 +35,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kaizen.khushu.BuildConfig
+import com.kaizen.khushu.R
 
 private const val KHUSHU_REPO_URL = "https://github.com/farhun/iman"
 private const val KHUSHU_ISSUES_URL = "https://github.com/farhun/iman/issues"
@@ -64,7 +66,7 @@ fun AboutSettingsScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeTopAppBar(
-                title = { SettingsTopBarTitle("About Iman", scrollBehavior) },
+                title = { SettingsTopBarTitle(stringResource(R.string.about_title), scrollBehavior) },
                 navigationIcon = { SettingsBackButton(onBack) },
                 scrollBehavior = scrollBehavior
             )
@@ -80,9 +82,9 @@ fun AboutSettingsScreen(
         ) {
             Spacer(Modifier.height(8.dp))
 
-            SectionHeader("Story")
+            SectionHeader(stringResource(R.string.about_story))
             Text(
-                text = "Iman is a prayer companion for salah times, Quran reading, and dhikr.",
+                text = stringResource(R.string.about_description),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -92,30 +94,30 @@ fun AboutSettingsScreen(
 //                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.78f)
 //            )
 
-            SectionHeader("Links")
+            SectionHeader(stringResource(R.string.about_links))
             MenuSectionItem(
-                title = "GitHub Repository",
-                detail = "View source, releases and project progress",
+                title = stringResource(R.string.about_github_repository),
+                detail = stringResource(R.string.about_github_repository_detail),
                 imageVector = Icons.Default.Code,
                 onClick = { openUrl(KHUSHU_REPO_URL) }
             )
             MenuSectionItem(
-                title = "Project Page",
-                detail = "Open the public GitHub project page",
+                title = stringResource(R.string.about_project_page),
+                detail = stringResource(R.string.about_project_page_detail),
                 imageVector = Icons.Default.Language,
                 onClick = { openUrl(KHUSHU_REPO_URL) }
             )
 
-            SectionHeader("Support")
+            SectionHeader(stringResource(R.string.about_support))
             MenuSectionItem(
-                title = "Report a Bug / Issue",
-                detail = "Open GitHub issues and report what broke",
+                title = stringResource(R.string.about_report_bug),
+                detail = stringResource(R.string.about_report_bug_detail),
                 imageVector = Icons.Default.BugReport,
                 onClick = { openUrl(KHUSHU_ISSUES_URL) }
             )
             MenuSectionItem(
-                title = "Contribute to Development",
-                detail = "Follow project progress and contribute on GitHub",
+                title = stringResource(R.string.about_contribute),
+                detail = stringResource(R.string.about_contribute_detail),
                 imageVector = Icons.AutoMirrored.Filled.MenuBook,
                 onClick = { openUrl(KHUSHU_REPO_URL) }
             )
@@ -126,13 +128,13 @@ fun AboutSettingsScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "Report an Issue",
+                    text = stringResource(R.string.about_report_issue),
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold)
                 )
             }
 
             Text(
-                text = "Version ${BuildConfig.VERSION_NAME}",
+                text = stringResource(R.string.about_version, BuildConfig.VERSION_NAME),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.52f),
                 modifier = Modifier.padding(bottom = 32.dp)
