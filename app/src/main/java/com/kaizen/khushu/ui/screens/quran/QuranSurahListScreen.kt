@@ -22,7 +22,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -62,6 +64,8 @@ fun QuranSurahListScreen(
         }
     }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val headerBackgroundColor = MaterialTheme.colorScheme.background
+    val headerSurfaceColor = MaterialTheme.colorScheme.surface
 
     LaunchedEffect(Unit) {
         viewModel.loadChapters()
@@ -77,41 +81,50 @@ fun QuranSurahListScreen(
             containerColor = Color.Transparent,
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                LargeTopAppBar(
-                    title = {
-                        Column {
-                            Text(
-                                text = stringResource(R.string.nav_quran),
-                                fontFamily = PlusJakartaSansBold,
-                                fontSize = 32.sp,
-                                fontWeight = FontWeight.Normal,
-                                color = MaterialTheme.colorScheme.onBackground
-                            )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .drawBehind {
+                            val collapseFraction = scrollBehavior.state.collapsedFraction.coerceIn(0f, 1f)
+                            drawRect(lerp(headerBackgroundColor, headerSurfaceColor, collapseFraction))
                         }
-                    },
-                    actions = {
-                        IconButton(
-                            onClick = {
-                                searchActive = !searchActive
-                                if (!searchActive) searchQuery = ""
+                ) {
+                    LargeTopAppBar(
+                        title = {
+                            Column {
+                                Text(
+                                    text = stringResource(R.string.nav_quran),
+                                    fontFamily = PlusJakartaSansBold,
+                                    fontSize = 32.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    color = MaterialTheme.colorScheme.onBackground
+                                )
                             }
-                        ) {
-                            Icon(Icons.Default.Search, contentDescription = stringResource(R.string.quran_search_content_description))
-                        }
-                        IconButton(onClick = { showBookmarks = true }) {
-                            Icon(Icons.Default.Bookmark, contentDescription = stringResource(R.string.nav_bookmarks))
-                        }
-                        IconButton(onClick = onSettingsClick) {
-                            Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.common_settings))
-                        }
-                    },
-                    scrollBehavior = scrollBehavior,
-                    colors = TopAppBarDefaults.largeTopAppBarColors(
-                        containerColor = Color.Transparent,
-                        scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
-                        titleContentColor = MaterialTheme.colorScheme.onBackground
+                        },
+                        actions = {
+                            IconButton(
+                                onClick = {
+                                    searchActive = !searchActive
+                                    if (!searchActive) searchQuery = ""
+                                }
+                            ) {
+                                Icon(Icons.Default.Search, contentDescription = stringResource(R.string.quran_search_content_description))
+                            }
+                            IconButton(onClick = { showBookmarks = true }) {
+                                Icon(Icons.Default.Bookmark, contentDescription = stringResource(R.string.nav_bookmarks))
+                            }
+                            IconButton(onClick = onSettingsClick) {
+                                Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.common_settings))
+                            }
+                        },
+                        scrollBehavior = scrollBehavior,
+                        colors = TopAppBarDefaults.largeTopAppBarColors(
+                            containerColor = Color.Transparent,
+                            scrolledContainerColor = Color.Transparent,
+                            titleContentColor = MaterialTheme.colorScheme.onBackground
+                        )
                     )
-                )
+                }
             }
         ) { paddingValues ->
             Surface(
@@ -122,7 +135,7 @@ fun QuranSurahListScreen(
                 shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
             ) {
                 LazyColumn(
-                    contentPadding = PaddingValues(bottom = 120.dp),
+                    contentPadding = PaddingValues(bottom = 150.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
                     if (searchActive) {

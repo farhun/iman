@@ -27,7 +27,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialShapes
@@ -101,41 +103,54 @@ fun TasbeehScreen(
         end = MaterialShapes.Cookie9Sided,
         progress = listProgress,
     )
-
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val headerBackgroundColor = MaterialTheme.colorScheme.background
+    val headerSurfaceColor = MaterialTheme.colorScheme.surface
 
     Box(modifier = modifier.fillMaxSize()) {
         Scaffold(
             containerColor = Color.Transparent,
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                LargeTopAppBar(
-                    title = {
-                        Text(
-                            text = stringResource(AppDestinations.TASBEEH.labelRes),
-                            fontFamily = PlusJakartaSansBold,
-                            fontSize = 32.sp,
-                            fontWeight = FontWeight.Normal,
-                            color = MaterialTheme.colorScheme.onBackground,
-                        )
-                    },
-                    actions = {
-                        IconButton(
-                            onClick = {
-                                searchActive = !searchActive
-                                if (!searchActive) query = ""
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .drawBehind {
+                            val collapseFraction = scrollBehavior.state.collapsedFraction.coerceIn(0f, 1f)
+                            drawRect(lerp(headerBackgroundColor, headerSurfaceColor, collapseFraction))
+                        }
+                ) {
+                    LargeTopAppBar(
+                        title = {
+                            Text(
+                                text = stringResource(AppDestinations.TASBEEH.labelRes),
+                                fontFamily = PlusJakartaSansBold,
+                                fontSize = 32.sp,
+                                fontWeight = FontWeight.Normal,
+                                color = MaterialTheme.colorScheme.onBackground,
+                            )
+                        },
+                        actions = {
+                            IconButton(
+                                onClick = {
+                                    searchActive = !searchActive
+                                    if (!searchActive) query = ""
+                                }
+                            ) {
+                                Icon(Icons.Default.Search, contentDescription = stringResource(R.string.tasbih_search_description))
                             }
-                        ) {
-                            Icon(Icons.Default.Search, contentDescription = stringResource(R.string.tasbih_search_description))
-                        }
-                        IconButton(onClick = onSettingsClick) {
-                            Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.common_settings))
-                        }
-                    },
-                    colors = TopAppBarDefaults.largeTopAppBarColors(
-                        containerColor = Color.Transparent,
-                        scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
-                        titleContentColor = MaterialTheme.colorScheme.onBackground,
-                    ),
-                )
+                            IconButton(onClick = onSettingsClick) {
+                                Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.common_settings))
+                            }
+                        },
+                        scrollBehavior = scrollBehavior,
+                        colors = TopAppBarDefaults.largeTopAppBarColors(
+                            containerColor = Color.Transparent,
+                            scrolledContainerColor = Color.Transparent,
+                            titleContentColor = MaterialTheme.colorScheme.onBackground,
+                        ),
+                    )
+                }
             },
         ) { paddingValues ->
             Surface(
@@ -146,7 +161,7 @@ fun TasbeehScreen(
                 shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
             ) {
                 LazyColumn(
-                    contentPadding = PaddingValues(bottom = 120.dp),
+                    contentPadding = PaddingValues(bottom = 150.dp),
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     if (searchActive) {
