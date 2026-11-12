@@ -341,7 +341,7 @@ fun SettingsGroup(
                 modifier = Modifier.padding(start = 24.dp, bottom = 8.dp, top = 8.dp)
             )
         }
-        
+
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(28.dp),
@@ -495,9 +495,14 @@ fun SettingsDropdown(
     options: List<String>,
     selectedOption: String,
     optionLabel: (String) -> String = { it },
+    openDropdown: Boolean = false,
+    onDismiss: () -> Unit = {},
     onOptionSelected: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    LaunchedEffect(openDropdown) {
+        if (openDropdown) expanded = true
+    }
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -533,10 +538,13 @@ fun SettingsDropdown(
                 shape = RoundedCornerShape(12.dp)
             )
         }
-        
+
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = {
+                expanded = false
+                onDismiss()
+            }
         ) {
             options.forEach { option ->
                 DropdownMenuItem(

@@ -23,8 +23,10 @@ import com.kaizen.khushu.widget.PrayerWidgetProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -40,6 +42,8 @@ class SettingsViewModel(
     private val appContext: Context,
 ) : ViewModel() {
     private var hasAttemptedGpsRefresh = false
+    private val _unsupportedLocalSourceEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val unsupportedLocalSourceEvents = _unsupportedLocalSourceEvents.asSharedFlow()
     val availableQuranScripts = MutableStateFlow(QuranScriptFontRepository.availableScripts(appContext))
 
     val settings: StateFlow<UserSettings> = repository.settingsFlow.stateIn(
@@ -79,6 +83,7 @@ class SettingsViewModel(
         )
 
     init {
+        viewModelScope.launch { repository.repairUnsupportedLocalPrayerSource() }
         viewModelScope.launch {
             settings.collect { current ->
                 if (current.useGpsLocation && !hasAttemptedGpsRefresh) {
@@ -343,8 +348,10 @@ class SettingsViewModel(
         }
     }
 
-    fun setPrayerCalculationMethod(method: String) {
-        viewModelScope.launch { repository.updatePrayerCalculationMethod(method) }
+    fun setPrayerCalculationMethod(method: String, switchToLocalIfSupported: Boolean = false) {
+        viewModelScope.launch {
+            repository.updatePrayerCalculationMethod(method, switchToLocalIfSupported)
+        }
     }
 
     fun setPrayerMadhab(madhab: String) {
@@ -360,7 +367,9 @@ class SettingsViewModel(
     }
 
     fun setPrayerSourceType(source: String) {
-        viewModelScope.launch { repository.updatePrayerSourceType(source) }
+        viewModelScope.launch {
+            repository.updatePrayerSourceType(source)?.let { _unsupportedLocalSourceEvents.emit(it) }
+        }
     }
 
     fun setPrayerOffset(prayerName: String, minutes: Int) {

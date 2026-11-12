@@ -30,6 +30,25 @@ object WidgetVisibilityItems {
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 private val PRAYER_SOUND_OPTIONS = setOf("DEFAULT", "ADHAN", "TAKBIR", "SILENT")
 
+internal fun supportsLocalCalculationMethod(methodStr: String): Boolean = when (methodStr) {
+    "MUSLIM_WORLD_LEAGUE",
+    "EGYPTIAN",
+    "KARACHI",
+    "UMM_AL_QURA",
+    "DUBAI",
+    "MOON_SIGHTING_COMMITTEE",
+    "NORTH_AMERICA",
+    "KUWAIT",
+    "QATAR",
+    "SINGAPORE",
+    "ALGERIA",
+    "TUNISIA",
+    "FRANCE_UOIF",
+    "FRANCE_15",
+    "FRANCE_18" -> true
+    else -> false
+}
+
 class SettingsRepository(private val context: Context) {
     internal val applicationContext: Context
         get() = context.applicationContext
@@ -97,6 +116,7 @@ class SettingsRepository(private val context: Context) {
         val LOCATION_LNG = floatPreferencesKey("location_lng")
         val USE_GPS_LOCATION = booleanPreferencesKey("use_gps_location")
         val PRAYER_SOURCE_TYPE = stringPreferencesKey("prayer_source_type")
+        val SOURCE_AUTO_SWITCHED = booleanPreferencesKey("source_auto_switched")
         val PRAYER_OFFSET_FAJR = intPreferencesKey("prayer_offset_fajr")
         val PRAYER_OFFSET_DHUHR = intPreferencesKey("prayer_offset_dhuhr")
         val PRAYER_OFFSET_ASR = intPreferencesKey("prayer_offset_asr")
@@ -323,8 +343,27 @@ class SettingsRepository(private val context: Context) {
         context.dataStore.edit { it[PreferencesKeys.TASBEEH_STEALTH_MODE_ALLOWED] = enabled }
     }
 
-    suspend fun updatePrayerCalculationMethod(method: String) {
-        context.dataStore.edit { it[PreferencesKeys.PRAYER_CALCULATION_METHOD] = method }
+    suspend fun updatePrayerCalculationMethod(
+        method: String,
+        switchToLocalIfSupported: Boolean = false
+    ) {
+        context.dataStore.edit { preferences ->
+            val source = preferences[PreferencesKeys.PRAYER_SOURCE_TYPE] ?: "LOCAL"
+            val autoSwitched = preferences[PreferencesKeys.SOURCE_AUTO_SWITCHED] ?: false
+            val supportedLocally = supportsLocalCalculationMethod(method)
+            preferences[PreferencesKeys.PRAYER_CALCULATION_METHOD] = method
+
+            when {
+                !supportedLocally && source == "LOCAL" -> {
+                    preferences[PreferencesKeys.PRAYER_SOURCE_TYPE] = "API"
+                    preferences[PreferencesKeys.SOURCE_AUTO_SWITCHED] = true
+                }
+                supportedLocally && source == "API" && (autoSwitched || switchToLocalIfSupported) -> {
+                    preferences[PreferencesKeys.PRAYER_SOURCE_TYPE] = "LOCAL"
+                    preferences[PreferencesKeys.SOURCE_AUTO_SWITCHED] = false
+                }
+            }
+        }
     }
 
     suspend fun updatePrayerMadhab(madhab: String) {
@@ -342,8 +381,31 @@ class SettingsRepository(private val context: Context) {
         context.dataStore.edit { it[PreferencesKeys.USE_GPS_LOCATION] = enabled }
     }
 
-    suspend fun updatePrayerSourceType(source: String) {
-        context.dataStore.edit { it[PreferencesKeys.PRAYER_SOURCE_TYPE] = source }
+    suspend fun updatePrayerSourceType(source: String): String? {
+        var unsupportedMethod: String? = null
+        context.dataStore.edit { preferences ->
+            if (source == "LOCAL") {
+                val method = preferences[PreferencesKeys.PRAYER_CALCULATION_METHOD] ?: "MUSLIM_WORLD_LEAGUE"
+                if (!supportsLocalCalculationMethod(method)) {
+                    unsupportedMethod = method
+                    return@edit
+                }
+            }
+            preferences[PreferencesKeys.PRAYER_SOURCE_TYPE] = source
+            preferences[PreferencesKeys.SOURCE_AUTO_SWITCHED] = false
+        }
+        return unsupportedMethod
+    }
+
+    suspend fun repairUnsupportedLocalPrayerSource() {
+        context.dataStore.edit { preferences ->
+            val source = preferences[PreferencesKeys.PRAYER_SOURCE_TYPE] ?: "LOCAL"
+            val method = preferences[PreferencesKeys.PRAYER_CALCULATION_METHOD] ?: "MUSLIM_WORLD_LEAGUE"
+            if (source == "LOCAL" && !supportsLocalCalculationMethod(method)) {
+                preferences[PreferencesKeys.PRAYER_SOURCE_TYPE] = "API"
+                preferences[PreferencesKeys.SOURCE_AUTO_SWITCHED] = true
+            }
+        }
     }
 
     suspend fun updatePrayerOffset(prayerKey: String, minutes: Int) {

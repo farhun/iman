@@ -36,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -194,6 +195,16 @@ fun PrayerSettingsScreen(
         "Not refreshed yet"
     }
     var showLocationServicesDialog by remember { mutableStateOf(false) }
+    var showUnsupportedSourceDialog by remember { mutableStateOf(false) }
+    var unsupportedSourceMethod by remember { mutableStateOf(settings.prayerCalculationMethod) }
+    var pendingLocalSwitch by remember { mutableStateOf(false) }
+    var openConventionPicker by remember { mutableStateOf(false) }
+    LaunchedEffect(viewModel) {
+        viewModel.unsupportedLocalSourceEvents.collect { method ->
+            unsupportedSourceMethod = method
+            showUnsupportedSourceDialog = true
+        }
+    }
     val locationPrefs = remember(context) {
         context.getSharedPreferences(MainActivity.LOCATION_PREFS, Context.MODE_PRIVATE)
     }
@@ -282,6 +293,29 @@ fun PrayerSettingsScreen(
         )
     }
 
+    if (showUnsupportedSourceDialog) {
+        AlertDialog(
+            onDismissRequest = { showUnsupportedSourceDialog = false },
+            title = { Text("Not available offline") },
+            text = {
+                Text(
+                    "${prayerSettingLabel(unsupportedSourceMethod, calculationMethodLabels)} isn't supported by the local formula. " +
+                        "Choose another convention to use the local formula, or keep AlAdhan (online)."
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showUnsupportedSourceDialog = false
+                    pendingLocalSwitch = true
+                    openConventionPicker = true
+                }) { Text("Choose convention") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showUnsupportedSourceDialog = false }) { Text("Keep AlAdhan") }
+            }
+        )
+    }
+
     val prayerNotificationPreferences = listOf(
         PrayerNotificationPreference(
             "Fajr",
@@ -358,7 +392,17 @@ fun PrayerSettingsScreen(
                         options = calculationMethods,
                         selectedOption = settings.prayerCalculationMethod,
                         optionLabel = { prayerSettingLabel(it, calculationMethodLabels) },
-                        onOptionSelected = viewModel::setPrayerCalculationMethod
+                        onOptionSelected = { method ->
+                            val switchToLocal = pendingLocalSwitch
+                            pendingLocalSwitch = false
+                            openConventionPicker = false
+                            viewModel.setPrayerCalculationMethod(method, switchToLocalIfSupported = switchToLocal)
+                        },
+                        openDropdown = openConventionPicker,
+                        onDismiss = {
+                            pendingLocalSwitch = false
+                            openConventionPicker = false
+                        }
                     )
                 }
 
