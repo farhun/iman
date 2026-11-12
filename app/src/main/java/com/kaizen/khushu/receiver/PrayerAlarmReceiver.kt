@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.kaizen.khushu.data.repository.SettingsRepository
+import com.kaizen.khushu.i18n.LocaleHelper
 import com.kaizen.khushu.notifications.PrayerAlarmType
 import com.kaizen.khushu.notifications.PrayerNotificationPublisher
 import com.kaizen.khushu.notifications.PrayerNotificationScheduler
@@ -22,20 +23,21 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         val type = runCatching {
             PrayerAlarmType.valueOf(intent.getStringExtra(EXTRA_NOTIFICATION_TYPE).orEmpty())
         }.getOrDefault(PrayerAlarmType.PRAYER)
+        val localizedContext = LocaleHelper.wrap(context)
         val prePrayerMinutes = intent.getIntExtra(EXTRA_PRE_PRAYER_MINUTES, 10)
         val triggerAtMillis = intent.getLongExtra(EXTRA_TRIGGER_AT_MILLIS, System.currentTimeMillis())
 
         val pendingResult = goAsync()
         CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             try {
-                val settings = SettingsRepository(context.applicationContext).settingsFlow.first()
-                PrayerNotificationScheduler(context).syncNotifications(settings)
+                val settings = SettingsRepository(localizedContext.applicationContext).settingsFlow.first()
+                PrayerNotificationScheduler(localizedContext).syncNotifications(settings)
                 PrayerNotificationScheduler.createNotificationChannels(
-                    context,
+                    localizedContext,
                     settings.prayerNotificationCustomSoundUri
                 )
                 PrayerNotificationPublisher.publish(
-                    context = context,
+                    context = localizedContext,
                     settings = settings,
                     prayerName = prayerName,
                     type = type,
@@ -43,7 +45,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                     prePrayerMinutes = prePrayerMinutes,
                     alertStyle = settings.prayerNotificationAlertStyle
                 )
-                SettingsRepository(context.applicationContext).updateLastDeliveredPrayerNotificationEventId(
+                SettingsRepository(localizedContext.applicationContext).updateLastDeliveredPrayerNotificationEventId(
                     PrayerNotificationScheduler.eventIdFor(
                         prayerName = prayerName,
                         type = type,

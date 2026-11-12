@@ -1,5 +1,16 @@
 <resources>
-    <string name="app_name">Iman</string>
+    <!--
+        Future localization rules:
+        - Use snake_case names prefixed by area: home_, settings_, quran_, tasbih_, widget_, notif_.
+        - Format arguments use %1$s; counts use <plurals>.
+        - Identifiers (prayer names compared by code, sound option names, DataStore keys, notification channel ids) stay in code.
+        - Quran text and Arabic name data are never translated.
+        - app_name is translatable="false".
+    -->
+    <string name="app_name" translatable="false">Iman</string>
+    <string name="language_title">Language</string>
+    <string name="language_system_default">System default</string>
+    <string name="language_dialog_title">Choose language</string>
     <string name="widget_moon_phase_icon_desc">Moon Phase Icon</string>
     <string name="widget_map_pin_icon_desc">Map Pin Icon</string>
 </resources>

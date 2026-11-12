@@ -16,6 +16,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.kaizen.khushu.MainActivity
+import com.kaizen.khushu.i18n.LocaleHelper
 import com.kaizen.khushu.data.repository.PrayerTimeRepository
 import com.kaizen.khushu.data.repository.SettingsRepository
 import com.kaizen.khushu.data.repository.UserSettings
@@ -105,7 +106,7 @@ fun UserSettings.toPrayerNotificationScheduleConfig(): PrayerNotificationSchedul
 class PrayerNotificationScheduler(
     private val context: Context
 ) {
-    private val appContext = context.applicationContext
+    private val appContext = LocaleHelper.wrap(context.applicationContext)
     private val settingsRepository = SettingsRepository(appContext)
     private val prayerTimeRepository = PrayerTimeRepository(settingsRepository)
     private val alarmManager = appContext.getSystemService(AlarmManager::class.java)

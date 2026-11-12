@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import com.kaizen.khushu.MainActivity
 import com.kaizen.khushu.R
 import com.kaizen.khushu.data.repository.UserSettings
+import com.kaizen.khushu.i18n.LocaleHelper
 
 object PrayerNotificationPublisher {
 
@@ -22,14 +23,15 @@ object PrayerNotificationPublisher {
         prePrayerMinutes: Int,
         alertStyle: String,
     ) {
-        val notificationManager = NotificationManagerCompat.from(context)
+        val localizedContext = LocaleHelper.wrap(context)
+        val notificationManager = NotificationManagerCompat.from(localizedContext)
         if (!notificationManager.areNotificationsEnabled()) return
 
-        val launchIntent = Intent(context, MainActivity::class.java).apply {
+        val launchIntent = Intent(localizedContext, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
         val contentIntent = PendingIntent.getActivity(
-            context,
+            localizedContext,
             "$prayerName-${type.name}".hashCode(),
             launchIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -48,7 +50,7 @@ object PrayerNotificationPublisher {
         }
 
         val content = PrayerNotificationCopy.build(
-            context = context,
+            context = localizedContext,
             settings = settings,
             prayerName = prayerName,
             type = type,
@@ -57,7 +59,7 @@ object PrayerNotificationPublisher {
         )
 
         val builder = NotificationCompat.Builder(
-            context,
+            localizedContext,
             selectedSound?.let(PrayerNotificationScheduler::channelIdForSound)
                 ?: PrayerNotificationScheduler.channelIdForStyle(
                     style = alertStyle,
@@ -65,7 +67,7 @@ object PrayerNotificationPublisher {
                 )
         )
             .setSmallIcon(R.drawable.ic_notification_glyph)
-            .setColor(ContextCompat.getColor(context, R.color.notification_icon_background))
+            .setColor(ContextCompat.getColor(localizedContext, R.color.notification_icon_background))
             .setContentTitle(content.title)
             .setContentText(content.utilityLine)
             .setStyle(NotificationCompat.BigTextStyle().bigText(content.expandedText))
@@ -85,7 +87,7 @@ object PrayerNotificationPublisher {
             if (selectedSound == "SILENT") {
                 builder.setSilent(true)
             } else {
-                PrayerNotificationScheduler.soundUriForSelection(context, selectedSound)?.let(builder::setSound)
+                PrayerNotificationScheduler.soundUriForSelection(localizedContext, selectedSound)?.let(builder::setSound)
                 builder.setDefaults(NotificationCompat.DEFAULT_LIGHTS)
                 builder.setVibrate(longArrayOf(0L, 180L, 120L, 180L))
             }

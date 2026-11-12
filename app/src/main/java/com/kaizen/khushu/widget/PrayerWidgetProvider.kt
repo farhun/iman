@@ -20,6 +20,7 @@ import com.kaizen.khushu.data.repository.PrayerTimeRepository
 import com.kaizen.khushu.data.repository.SettingsRepository
 import com.kaizen.khushu.data.repository.UserSettings
 import com.kaizen.khushu.data.repository.WidgetVisibilityItems
+import com.kaizen.khushu.i18n.LocaleHelper
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -107,10 +108,11 @@ class PrayerWidgetProvider : AppWidgetProvider() {
         )
 
         suspend fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
-            val views = RemoteViews(context.packageName, R.layout.widget_prayer_times)
-            val launchIntent = Intent(context, MainActivity::class.java)
+            val localizedContext = LocaleHelper.wrap(context)
+            val views = RemoteViews(localizedContext.packageName, R.layout.widget_prayer_times)
+            val launchIntent = Intent(localizedContext, MainActivity::class.java)
             val contentIntent = PendingIntent.getActivity(
-                context,
+                localizedContext,
                 0,
                 launchIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -118,8 +120,8 @@ class PrayerWidgetProvider : AppWidgetProvider() {
             views.setOnClickPendingIntent(R.id.widget_root, contentIntent)
 
             try {
-                val settings = SettingsRepository(context).settingsFlow.first()
-                val prayerTimeRepository = PrayerTimeRepository(SettingsRepository(context))
+                val settings = SettingsRepository(localizedContext).settingsFlow.first()
+                val prayerTimeRepository = PrayerTimeRepository(SettingsRepository(localizedContext))
                 val nowMs = System.currentTimeMillis()
                 val nowDate = Date(nowMs)
                 val validLocation = settings.locationLat.isFinite() &&
@@ -138,7 +140,7 @@ class PrayerWidgetProvider : AppWidgetProvider() {
                 views.setTextViewText(R.id.text_hijri_date, hijriDate)
 
                 val locationName = if (validLocation) {
-                    settings.locationLabel.ifBlank { resolveLocationLabel(context, settings) }
+                    settings.locationLabel.ifBlank { resolveLocationLabel(localizedContext, settings) }
                 } else {
                     "Location unavailable"
                 }
@@ -200,7 +202,7 @@ class PrayerWidgetProvider : AppWidgetProvider() {
                 setUnavailableContent(views)
                 appWidgetManager.updateAppWidget(appWidgetId, views)
             } finally {
-                scheduleNextCountdownRefresh(context)
+                scheduleNextCountdownRefresh(localizedContext)
             }
         }
 

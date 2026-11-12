@@ -7,6 +7,9 @@ plugins {
 
 android {
     namespace = "com.kaizen.khushu"
+    androidResources {
+        generateLocaleConfig = true
+    }
     compileSdk = 36
 
     dependenciesInfo {

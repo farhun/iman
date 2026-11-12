@@ -10,6 +10,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import android.Manifest
 import android.content.ComponentName
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.result.contract.ActivityResultContracts
@@ -56,6 +57,7 @@ import com.kaizen.khushu.data.repository.SettingsRepository
 import com.kaizen.khushu.data.model.TasbeehCollection
 import com.kaizen.khushu.data.model.DhikrItem
 import com.kaizen.khushu.data.local.TasbeehDatabase
+import com.kaizen.khushu.i18n.LocaleHelper
 import com.kaizen.khushu.notifications.PrayerNotificationScheduler
 import com.kaizen.khushu.notifications.toPrayerNotificationScheduleConfig
 import com.kaizen.khushu.ui.components.PillNavBar
@@ -111,6 +113,10 @@ class MainActivity : ComponentActivity() {
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { _ -> }
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.wrap(newBase))
+    }
 
     override fun onStart() {
         super.onStart()

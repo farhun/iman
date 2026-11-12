@@ -3,6 +3,7 @@ package com.kaizen.khushu.notifications
 import android.content.Context
 import android.location.Geocoder
 import android.os.Build
+import com.kaizen.khushu.i18n.LocaleHelper
 import com.kaizen.khushu.data.repository.extraPrayerTimingLabel
 import com.kaizen.khushu.data.repository.UserSettings
 import java.text.SimpleDateFormat
@@ -129,7 +130,8 @@ object PrayerNotificationCopy {
         triggerAtMillis: Long,
         prePrayerMinutes: Int,
     ): PrayerNotificationContent {
-        val locationLabel = resolveLocationLabel(context, settings)
+        val localizedContext = LocaleHelper.wrap(context)
+        val locationLabel = resolveLocationLabel(localizedContext, settings)
         val prayerUtilityLine = "$prayerName at ${formatTime(triggerAtMillis)} in $locationLabel"
         val seed = "$prayerName|${type.name}|${dayStamp(triggerAtMillis)}".hashCode()
         val isExtraTiming = prayerTitles[prayerName] == null && prePrayerTitles[prayerName] == null
