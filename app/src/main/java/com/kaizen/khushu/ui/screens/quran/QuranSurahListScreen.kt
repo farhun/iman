@@ -26,9 +26,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kaizen.khushu.R
 import com.kaizen.khushu.data.model.SurahMeta
+import com.kaizen.khushu.i18n.revelationPlaceLabel
 import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
 import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import com.kaizen.khushu.ui.theme.NotoSansArabic
@@ -77,7 +81,7 @@ fun QuranSurahListScreen(
                     title = {
                         Column {
                             Text(
-                                text = "Quran",
+                                text = stringResource(R.string.nav_quran),
                                 fontFamily = PlusJakartaSansBold,
                                 fontSize = 32.sp,
                                 fontWeight = FontWeight.Normal,
@@ -92,13 +96,13 @@ fun QuranSurahListScreen(
                                 if (!searchActive) searchQuery = ""
                             }
                         ) {
-                            Icon(Icons.Default.Search, contentDescription = "Search Quran")
+                            Icon(Icons.Default.Search, contentDescription = stringResource(R.string.quran_search_content_description))
                         }
                         IconButton(onClick = { showBookmarks = true }) {
-                            Icon(Icons.Default.Bookmark, contentDescription = "Bookmarks")
+                            Icon(Icons.Default.Bookmark, contentDescription = stringResource(R.string.nav_bookmarks))
                         }
                         IconButton(onClick = onSettingsClick) {
-                            Icon(Icons.Default.Settings, contentDescription = "Settings")
+                            Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.common_settings))
                         }
                     },
                     scrollBehavior = scrollBehavior,
@@ -132,7 +136,7 @@ fun QuranSurahListScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(horizontal = 20.dp, vertical = 8.dp),
-                                placeholder = { Text("Search surahs") },
+                                placeholder = { Text(stringResource(R.string.quran_search_placeholder)) },
                                 singleLine = true
                             )
                         }
@@ -211,7 +215,7 @@ private fun QuranBookmarksSheet(
                 .padding(bottom = 32.dp)
         ) {
             Text(
-                "Bookmarks",
+                stringResource(R.string.nav_bookmarks),
                 style = MaterialTheme.typography.headlineSmall,
                 fontFamily = PlusJakartaSans,
                 modifier = Modifier.padding(bottom = 10.dp)
@@ -223,12 +227,12 @@ private fun QuranBookmarksSheet(
                 FilterChip(
                     selected = latestFirst,
                     onClick = { latestFirst = true },
-                    label = { Text("Latest first") }
+                    label = { Text(stringResource(R.string.quran_bookmarks_sort_latest)) }
                 )
                 FilterChip(
                     selected = !latestFirst,
                     onClick = { latestFirst = false },
-                    label = { Text("Oldest first") }
+                    label = { Text(stringResource(R.string.quran_bookmarks_sort_oldest)) }
                 )
             }
             if (bookmarks.isEmpty()) {
@@ -237,7 +241,7 @@ private fun QuranBookmarksSheet(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        "No bookmarks yet",
+                        stringResource(R.string.quran_bookmarks_empty),
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
                 }
@@ -260,7 +264,7 @@ private fun QuranBookmarksSheet(
                             ) {
                                 Icon(
                                     Icons.Default.DeleteOutline,
-                                    contentDescription = "Delete bookmark",
+                                    contentDescription = stringResource(R.string.quran_bookmark_delete_content_description),
                                     tint = MaterialTheme.colorScheme.error
                                 )
                             }
@@ -271,7 +275,7 @@ private fun QuranBookmarksSheet(
                                 modifier = Modifier.size(20.dp)
                             )
                             Text(
-                                "${bookmark.surah.nameSimple} · Ayah ${bookmark.ayahIndex + 1}",
+                                stringResource(R.string.quran_bookmark_ayah, bookmark.surah.nameSimple, bookmark.ayahIndex + 1),
                                 modifier = Modifier.padding(start = 12.dp),
                                 style = MaterialTheme.typography.bodyMedium
                             )
@@ -285,18 +289,18 @@ private fun QuranBookmarksSheet(
     bookmarkPendingDelete?.let { bookmark ->
         AlertDialog(
             onDismissRequest = { bookmarkPendingDelete = null },
-            title = { Text("Delete this bookmark?") },
+            title = { Text(stringResource(R.string.quran_bookmark_delete_title)) },
             confirmButton = {
                 TextButton(onClick = {
                     onBookmarkDelete(bookmark.topicId, bookmark.ayahIndex)
                     bookmarkPendingDelete = null
                 }) {
-                    Text("Yes")
+                    Text(stringResource(R.string.common_yes))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { bookmarkPendingDelete = null }) {
-                    Text("No")
+                    Text(stringResource(R.string.common_no))
                 }
             }
         )
@@ -352,7 +356,7 @@ private fun SurahListItem(
             )
             Spacer(Modifier.height(2.dp))
             Text(
-                text = "${surah.revelationPlace.replaceFirstChar { it.uppercase() }} · ${surah.versesCount} verses",
+                text = "${revelationPlaceLabel(surah.revelationPlace)} · ${pluralStringResource(R.plurals.quran_verse_count, surah.versesCount, surah.versesCount)}",
                 style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
             )

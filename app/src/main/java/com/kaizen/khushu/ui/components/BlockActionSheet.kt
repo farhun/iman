@@ -14,8 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.kaizen.khushu.R
 import com.kaizen.khushu.data.model.*
 import com.kaizen.khushu.data.repository.UserSettings
 
@@ -33,14 +35,18 @@ fun BlockActionSheet(
 ) {
     val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState()
-    
-    val (title, contentToCopy, referenceToCopy) = when (block) {
-        is AyahBlock -> Triple("Ayah Actions", block.textUthmani ?: "", block.display)
-        is HadithBlock -> Triple("Hadith Actions", block.textEn ?: "", block.display)
-        is HeadingBlock -> Triple("Section Actions", block.text, null)
-        is ArabicBlock -> Triple("Arabic Text Actions", block.text, null)
-        else -> Triple("Actions", "", null)
+
+    val (titleRes, contentToCopy, referenceToCopy) = when (block) {
+        is AyahBlock -> Triple(R.string.quran_action_ayah_title, block.textUthmani ?: "", block.display)
+        is HadithBlock -> Triple(R.string.quran_action_hadith_title, block.textEn ?: "", block.display)
+        is HeadingBlock -> Triple(R.string.quran_action_section_title, block.text, null)
+        is ArabicBlock -> Triple(R.string.quran_action_arabic_title, block.text, null)
+        else -> Triple(R.string.quran_action_title, "", null)
     }
+    val title = stringResource(titleRes)
+    val shareViaLabel = stringResource(R.string.quran_share_via)
+    val textCopiedMessage = stringResource(R.string.quran_text_copied)
+    val referenceCopiedMessage = stringResource(R.string.quran_reference_copied, referenceToCopy.orEmpty())
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -66,14 +72,14 @@ fun BlockActionSheet(
                 onPlayAyah?.let {
                     ActionRow(
                         icon = Icons.Default.PlayArrow,
-                        label = "Play Ayah",
+                        label = stringResource(R.string.quran_play_ayah),
                         onClick = it
                     )
                 }
                 onPlayFromHere?.let {
                     ActionRow(
                         icon = Icons.AutoMirrored.Filled.PlaylistPlay,
-                        label = "Play from here",
+                        label = stringResource(R.string.quran_play_from_here),
                         onClick = it
                     )
                 }
@@ -83,21 +89,21 @@ fun BlockActionSheet(
             // 2. Personal Actions
             ActionRow(
                 icon = if (isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                label = if (isBookmarked) "Remove Bookmark" else "Add Bookmark",
+                label = stringResource(if (isBookmarked) R.string.quran_remove_bookmark else R.string.quran_add_bookmark),
                 onClick = onBookmark
             )
 
             // 3. Sharing & Utility Actions
             ActionRow(
                 icon = Icons.Default.Share,
-                label = "Share",
+                label = stringResource(R.string.quran_share),
                 onClick = {
                     val shareIntent = android.content.Intent().apply {
                         action = android.content.Intent.ACTION_SEND
                         type = "text/plain"
                         putExtra(android.content.Intent.EXTRA_TEXT, "$contentToCopy\n\n— $referenceToCopy")
                     }
-                    context.startActivity(android.content.Intent.createChooser(shareIntent, "Share via"))
+                    context.startActivity(android.content.Intent.createChooser(shareIntent, shareViaLabel))
                     onDismiss()
                 }
             )
@@ -110,7 +116,7 @@ fun BlockActionSheet(
                         val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
                         val clip = android.content.ClipData.newPlainText("Iman Text", contentToCopy)
                         clipboard.setPrimaryClip(clip)
-                        Toast.makeText(context, "Text copied to clipboard", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, textCopiedMessage, Toast.LENGTH_SHORT).show()
                         onDismiss()
                     }
                 )
@@ -124,7 +130,7 @@ fun BlockActionSheet(
                         val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
                         val clip = android.content.ClipData.newPlainText("Iman Reference", referenceToCopy)
                         clipboard.setPrimaryClip(clip)
-                        Toast.makeText(context, "Reference copied: $referenceToCopy", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, referenceCopiedMessage, Toast.LENGTH_SHORT).show()
                         onDismiss()
                     }
                 )

@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -55,6 +56,7 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kaizen.khushu.R
 import com.kaizen.khushu.data.model.ArabicBlock
 import com.kaizen.khushu.data.model.AyahBlock
 import com.kaizen.khushu.data.model.CalloutBlock
@@ -371,7 +373,7 @@ private fun AyahBlockView(
                     IconButton(onClick = onPlayClick, modifier = Modifier.size(32.dp)) {
                         Icon(
                             if (isAyahPlaying) Icons.Default.Stop else Icons.Default.PlayArrow,
-                            contentDescription = if (isAyahPlaying) "Stop" else "Play",
+                            contentDescription = stringResource(if (isAyahPlaying) R.string.common_stop else R.string.common_play),
                             tint = contentColor.copy(alpha = 0.45f),
                             modifier = Modifier.size(17.dp)
                         )
@@ -380,7 +382,7 @@ private fun AyahBlockView(
                 IconButton(onClick = onBookmarkClick, modifier = Modifier.size(32.dp)) {
                     Icon(
                         if (isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                        contentDescription = if (isBookmarked) "Remove bookmark" else "Bookmark",
+                        contentDescription = stringResource(if (isBookmarked) R.string.quran_bookmark_remove_content_description else R.string.quran_bookmark_content_description),
                         tint = contentColor.copy(alpha = 0.45f),
                         modifier = Modifier.size(17.dp)
                     )
@@ -388,7 +390,7 @@ private fun AyahBlockView(
                 IconButton(onClick = {}, modifier = Modifier.size(32.dp)) {
                     Icon(
                         Icons.Default.Share,
-                        contentDescription = "Share",
+                        contentDescription = stringResource(R.string.quran_share),
                         tint = contentColor.copy(alpha = 0.45f),
                         modifier = Modifier.size(17.dp)
                     )
@@ -396,7 +398,7 @@ private fun AyahBlockView(
                 IconButton(onClick = {}, modifier = Modifier.size(32.dp)) {
                     Icon(
                         Icons.Default.MoreVert,
-                        contentDescription = "More",
+                        contentDescription = stringResource(R.string.quran_more_content_description),
                         tint = contentColor.copy(alpha = 0.45f),
                         modifier = Modifier.size(17.dp)
                     )

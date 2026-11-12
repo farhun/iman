@@ -13,7 +13,9 @@ import androidx.lifecycle.viewModelScope
 
 import com.kaizen.khushu.data.model.AyahBlock
 import com.kaizen.khushu.data.model.ContentBlock
+import com.kaizen.khushu.R
 import com.kaizen.khushu.data.model.ReciterMeta
+import com.kaizen.khushu.i18n.LocaleHelper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
@@ -36,6 +38,10 @@ class QuranAudioViewModel(application: Application) : AndroidViewModel(applicati
     val currentSurah = mutableStateOf<Int?>(null)
     val playingAyahIndex = mutableStateOf<Int?>(null)
     val currentAyahKey = mutableStateOf<String?>(null)
+
+    private fun audioError() = AudioState.Error(
+        LocaleHelper.wrap(getApplication<Application>()).getString(R.string.quran_audio_error)
+    )
 
     private var mediaController: MediaController? = null
     private var ayahLoadingTimeoutJob: Job? = null
@@ -73,7 +79,7 @@ class QuranAudioViewModel(application: Application) : AndroidViewModel(applicati
 
             override fun onPlayerError(error: PlaybackException) {
                 cancelAyahLoadingTimeout()
-                audioState.value = AudioState.Error("Could not load this verse.")
+                audioState.value = audioError()
             }
         })
     }
@@ -122,7 +128,7 @@ class QuranAudioViewModel(application: Application) : AndroidViewModel(applicati
         audioState.value = AudioState.Loading
 
         val controller = mediaController ?: run {
-            audioState.value = AudioState.Error("Could not load this verse.")
+            audioState.value = audioError()
             return
         }
         try {
@@ -132,7 +138,7 @@ class QuranAudioViewModel(application: Application) : AndroidViewModel(applicati
             controller.play()
         } catch (_: Exception) {
             cancelAyahLoadingTimeout()
-            audioState.value = AudioState.Error("Could not load this verse.")
+            audioState.value = audioError()
         }
     }
 
@@ -142,7 +148,7 @@ class QuranAudioViewModel(application: Application) : AndroidViewModel(applicati
         ayahLoadingTimeoutJob = viewModelScope.launch {
             delay(AYAH_LOADING_TIMEOUT_MS)
             if (attempt == ayahLoadAttempt && audioState.value == AudioState.Loading) {
-                audioState.value = AudioState.Error("Could not load this verse.")
+                audioState.value = audioError()
                 controller.stop()
             }
         }

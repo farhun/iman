@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -37,8 +38,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 import com.kaizen.khushu.data.repository.CatalogRepository
+import com.kaizen.khushu.R
 import com.kaizen.khushu.data.model.TranslationMeta
 import com.kaizen.khushu.data.model.ReciterMeta
+import com.kaizen.khushu.i18n.quranReadingThemeLabel
+import com.kaizen.khushu.i18n.quranScriptLabel
 
 import com.kaizen.khushu.data.repository.TranslationRepository
 import com.kaizen.khushu.data.repository.QuranScriptFontRepository
@@ -128,9 +132,13 @@ fun ReadingSettingsSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = if (isQuranContext) {
-        listOf("Display", "Text", "Audio")
+        listOf(
+            stringResource(R.string.quran_settings_tab_display),
+            stringResource(R.string.quran_settings_tab_text),
+            stringResource(R.string.quran_settings_tab_audio)
+        )
     } else {
-        listOf("Display")
+        listOf(stringResource(R.string.quran_settings_tab_display))
     }
 
     LaunchedEffect(isQuranContext) {
@@ -146,7 +154,7 @@ fun ReadingSettingsSheet(
         Box(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.9f)) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = "Reading Settings",
+                    text = stringResource(R.string.quran_reading_settings_title),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontFamily = PlusJakartaSans,
                         fontWeight = FontWeight.Normal
@@ -221,7 +229,7 @@ fun ReadingSettingsSheet(
                     when (selectedTab) {
                         0 -> { // Display
                             item {
-                                SettingLabel("Background Theme")
+                                SettingLabel(stringResource(R.string.quran_background_theme))
                                 Spacer(Modifier.height(12.dp))
                                 Row(
                                     horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -229,13 +237,13 @@ fun ReadingSettingsSheet(
                                 ) {
                                     val systemIsDark = isSystemInDarkTheme()
                                     listOf(
-                                        Triple("SYSTEM", "Auto", (if (systemIsDark) Color.Black else Color.White) to (if (systemIsDark) Color.White else Color.Black)),
-                                        Triple("DARK", "Dark", Color.Black to Color.White),
-                                        Triple("PAPER", "Paper", Color(0xFFF5E6C8) to Color.Black),
-                                        Triple("LIGHT", "Light", Color.White to Color.Black)
-                                    ).forEach { (value, label, colors) ->
+                                        "SYSTEM" to ((if (systemIsDark) Color.Black else Color.White) to (if (systemIsDark) Color.White else Color.Black)),
+                                        "DARK" to (Color.Black to Color.White),
+                                        "PAPER" to (Color(0xFFF5E6C8) to Color.Black),
+                                        "LIGHT" to (Color.White to Color.Black)
+                                    ).forEach { (value, colors) ->
                                         ThemePreviewCard(
-                                            label = label,
+                                            label = quranReadingThemeLabel(value),
                                             selected = settings.readingTheme == value,
                                             bgColor = colors.first,
                                             fgColor = colors.second,
@@ -247,7 +255,7 @@ fun ReadingSettingsSheet(
                             }
 
                             item {
-                                SettingToggle(label = "Keep Screen On", checked = settings.readingKeepScreenOn, onCheckedChange = onKeepScreenOnChange)
+                                SettingToggle(label = stringResource(R.string.quran_keep_screen_on), checked = settings.readingKeepScreenOn, onCheckedChange = onKeepScreenOnChange)
                             }
                         }
                         1 -> { // Text & Translation
@@ -260,9 +268,10 @@ fun ReadingSettingsSheet(
                                     CatalogRepository.translations(context).find { it.id == settings.selectedTranslationLang }
                                 }
                                 val langLabel = currentMeta?.let { "${it.langCode.uppercase()} • ${it.translatorName}" }
-                                    ?: if (settings.selectedTranslationLang.isBlank()) "No Translation" else "Select Translation"
+                                    ?: if (settings.selectedTranslationLang.isBlank()) stringResource(R.string.quran_translation_none)
+                                    else stringResource(R.string.quran_translation_select)
 
-                                SettingLabel("Active Translation")
+                                SettingLabel(stringResource(R.string.quran_active_translation))
                                 Spacer(Modifier.height(12.dp))
                                 Button(
                                     onClick = onOpenTranslationPicker,
@@ -286,18 +295,15 @@ fun ReadingSettingsSheet(
                             }
 
                             item {
-                                SettingLabel("Script Style")
+                                SettingLabel(stringResource(R.string.quran_script_style))
                                 Spacer(Modifier.height(12.dp))
                                 Row(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    listOf(
-                                        "uthmani" to "Uthmani",
-                                        "indopak" to "IndoPak"
-                                    ).forEach { (value, label) ->
+                                    listOf("uthmani", "indopak").forEach { value ->
                                         ScriptPreviewCard(
-                                            label = label,
+                                            label = quranScriptLabel(value),
                                             selected = settings.selectedScript == value,
                                             onClick = { onScriptChange(value) },
                                             modifier = Modifier.weight(1f)
@@ -307,7 +313,7 @@ fun ReadingSettingsSheet(
                             }
 
                             item {
-                                SettingLabel("Arabic Text Size: ${settings.arabicSizeSp.toInt()}sp")
+                                SettingLabel(stringResource(R.string.quran_arabic_text_size, settings.arabicSizeSp.toInt()))
                                 Slider(
                                     value = settings.arabicSizeSp,
                                     onValueChange = onArabicSizeChange,
@@ -318,7 +324,7 @@ fun ReadingSettingsSheet(
 
                             if (settings.showTranslation) {
                                 item {
-                                    SettingLabel("Translation Size: ${settings.translationSizeSp.toInt()}sp")
+                                    SettingLabel(stringResource(R.string.quran_translation_size, settings.translationSizeSp.toInt()))
                                     Slider(
                                         value = settings.translationSizeSp,
                                         onValueChange = onTranslationSizeChange,
@@ -333,7 +339,7 @@ fun ReadingSettingsSheet(
                                 Spacer(Modifier.height(12.dp))
                                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
-                                    SettingToggle(label = "Show Translation", checked = settings.showTranslation, onCheckedChange = onShowTranslationChange)
+                                    SettingToggle(label = stringResource(R.string.quran_show_translation), checked = settings.showTranslation, onCheckedChange = onShowTranslationChange)
                                 }
                             }
                             }
@@ -343,7 +349,7 @@ fun ReadingSettingsSheet(
                                 val reciters = remember { ReciterMeta.everyayahDefaults() }
 
                                 Column {
-                                    SettingLabel("Select Reciter")
+                                    SettingLabel(stringResource(R.string.quran_select_reciter))
                                     Spacer(Modifier.height(8.dp))
                                 }
 
@@ -553,18 +559,20 @@ fun TranslationPickerSheet(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val context = LocalContext.current
-    val catalog = remember {
+    val otherLanguageLabel = stringResource(R.string.quran_translation_other)
+    val downloadedLabel = stringResource(R.string.quran_translation_downloaded_section)
+    val catalog = remember(context, otherLanguageLabel) {
         CatalogRepository.translations(context)
-            .groupBy { it.langName.ifBlank { "Other" } }
+            .groupBy { it.langName.ifBlank { otherLanguageLabel } }
             .toSortedMap()
     }
     var searchText by remember { mutableStateOf("") }
-    val visibleCatalog = remember(catalog, searchText, context) {
+    val visibleCatalog = remember(catalog, searchText, context, downloadedLabel) {
         val filtered = catalog.filterKeys { it.contains(searchText.trim(), ignoreCase = true) }
         val downloaded = filtered.values.flatten()
             .filter { TranslationRepository.isDownloaded(context, it.id) }
         buildList<Pair<String, List<TranslationMeta>>> {
-            if (downloaded.isNotEmpty()) add("Downloaded" to downloaded)
+            if (downloaded.isNotEmpty()) add(downloadedLabel to downloaded)
             filtered.forEach { (language, translations) ->
                 val notDownloaded = translations.filterNot {
                     TranslationRepository.isDownloaded(context, it.id)
@@ -582,7 +590,7 @@ fun TranslationPickerSheet(
         Box(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.9f)) {
             Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 32.dp)) {
                 Text(
-                    "Translation",
+                    stringResource(R.string.quran_translation_title),
                     style = MaterialTheme.typography.headlineSmall.copy(fontFamily = PlusJakartaSans),
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
@@ -590,14 +598,14 @@ fun TranslationPickerSheet(
                     value = searchText,
                     onValueChange = { searchText = it },
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Search language") },
+                    label = { Text(stringResource(R.string.quran_translation_search_language)) },
                     singleLine = true,
                 )
                 Spacer(Modifier.height(12.dp))
 
                 if (isDownloading) {
                     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-                        Text("Downloading...", style = MaterialTheme.typography.bodyMedium,
+                        Text(stringResource(R.string.settings_update_downloading), style = MaterialTheme.typography.bodyMedium,
                             fontFamily = PlusJakartaSans, color = MaterialTheme.colorScheme.primary)
                         Spacer(Modifier.height(6.dp))
                         LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
@@ -620,7 +628,7 @@ fun TranslationPickerSheet(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
-                                Text("No translation", style = MaterialTheme.typography.bodyLarge,
+                                Text(stringResource(R.string.quran_translation_none), style = MaterialTheme.typography.bodyLarge,
                                     fontFamily = PlusJakartaSans,
                                     fontWeight = if (isNoneSelected) FontWeight.Bold else FontWeight.Normal)
                                 if (isNoneSelected) Icon(Icons.Default.Check, null, tint = MaterialTheme.colorScheme.primary)
@@ -655,11 +663,11 @@ fun TranslationPickerSheet(
                                             fontFamily = PlusJakartaSans,
                                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal)
                                         Text(
-                                            buildString {
-                                                append(meta.langCode.uppercase())
-                                                if (isDownloaded) append(" • Downloaded")
-                                                else append(" • Tap to download")
-                                            },
+                                            stringResource(
+                                                if (isDownloaded) R.string.quran_translation_downloaded_status
+                                                else R.string.quran_translation_tap_to_download,
+                                                meta.langCode.uppercase()
+                                            ),
                                             style = MaterialTheme.typography.bodySmall,
                                             fontFamily = PlusJakartaSans,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant

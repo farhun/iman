@@ -27,15 +27,21 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.media3.session.MediaController
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.kaizen.khushu.R
 import com.kaizen.khushu.data.model.AyahBlock
 import com.kaizen.khushu.data.model.ContentBlock
 import com.kaizen.khushu.data.model.ContentSource
+import com.kaizen.khushu.i18n.LocaleHelper
+import com.kaizen.khushu.i18n.quranReadingModeLabel
+import com.kaizen.khushu.i18n.revelationPlaceLabel
 
 import com.kaizen.khushu.ui.components.BlockActionSheet
 import com.kaizen.khushu.ui.components.ReadingSettingsSheet
@@ -137,7 +143,7 @@ private fun JuzHeader(juzNumber: Int, contentColor: Color) {
             color = contentColor.copy(alpha = 0.15f),
         )
         Text(
-            text = "Juz $juzNumber",
+            text = stringResource(R.string.quran_juz_number, juzNumber),
             style = MaterialTheme.typography.labelSmall,
             color = contentColor.copy(alpha = 0.4f),
             modifier = Modifier.padding(horizontal = 12.dp),
@@ -169,7 +175,7 @@ private fun SajdaIndicator(type: String, contentColor: Color) {
         )
         Spacer(Modifier.width(6.dp))
         Text(
-            text = if (type == "obligatory") "Sajdah Wajibah" else "Sajdah Mustahabb",
+            text = stringResource(if (type == "obligatory") R.string.quran_sajdah_obligatory else R.string.quran_sajdah_mustahabb),
             style = MaterialTheme.typography.labelSmall,
             color = contentColor.copy(alpha = 0.5f),
             fontFamily = PlusJakartaSans,
@@ -317,7 +323,8 @@ fun QuranReaderScreen(
     var translationDownloadProgress by remember { mutableFloatStateOf(0f) }
     // "verse_by_verse" or "reading"
     var readingMode by remember { mutableStateOf("verse_by_verse") }
-
+    val bookmarkAddedMessage = stringResource(R.string.quran_bookmark_added)
+    val bookmarkRemovedMessage = stringResource(R.string.quran_bookmark_removed)
 
     LaunchedEffect(surahNumber, settings.selectedTranslationLang) {
         viewModel.loadChapters()
@@ -360,7 +367,11 @@ fun QuranReaderScreen(
             AyahBlock(
                 surah = surahNumber,
                 ayah = num,
-                display = "Surah ${surah?.nameSimple ?: surahNumber}, Ayah $num",
+                display = LocaleHelper.wrap(context).getString(
+                    R.string.quran_ayah_reference,
+                    surah?.nameSimple ?: surahNumber.toString(),
+                    num
+                ),
                 textUthmani = text,
                 translationEn = translations[num],
                 verified = true
@@ -401,7 +412,7 @@ fun QuranReaderScreen(
                             IconButton(onClick = { attemptExit() }) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = "Back",
+                                    contentDescription = stringResource(R.string.common_back),
                                     tint = fg
                                 )
                             }
@@ -410,7 +421,7 @@ fun QuranReaderScreen(
                             IconButton(onClick = { showSettings = true }) {
                                 Icon(
                                     imageVector = Icons.Default.Settings,
-                                    contentDescription = "Settings",
+                                    contentDescription = stringResource(R.string.common_settings),
                                     tint = fg.copy(alpha = 0.7f)
                                 )
                             }
@@ -479,14 +490,14 @@ fun QuranReaderScreen(
                                                 shape = RoundedCornerShape(12.dp)
                                             ) {
                                                 Text(
-                                                    text = it.revelationPlace.uppercase(),
+                                                    text = revelationPlaceLabel(it.revelationPlace).uppercase(),
                                                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                                                     style = MaterialTheme.typography.labelSmall.copy(fontFamily = PlusJakartaSans),
                                                     color = MaterialTheme.colorScheme.primary
                                                 )
                                             }
                                             Text(
-                                                text = "${it.versesCount} VERSES",
+                                                text = pluralStringResource(R.plurals.quran_verse_count, it.versesCount, it.versesCount).uppercase(),
                                                 style = MaterialTheme.typography.labelSmall.copy(fontFamily = PlusJakartaSans),
                                                 color = fg.copy(alpha = 0.6f)
                                             )
@@ -584,7 +595,7 @@ fun QuranReaderScreen(
                                                 bookmarkedAyahKeys + bookmarkKey
                                             }
                                             settingsViewModel.toggleBookmark(topicId, index)
-                                            val msg = if (isBookmarked) "Bookmark removed" else "Bookmark added"
+                                            val msg = if (isBookmarked) bookmarkRemovedMessage else bookmarkAddedMessage
                                             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                                         },
 
@@ -610,7 +621,7 @@ fun QuranReaderScreen(
                                                     sequence = false
                                                 )
                                             }) {
-                                                Text("Retry")
+                                                Text(stringResource(R.string.common_retry))
                                             }
                                         }
                                     }
@@ -626,7 +637,7 @@ fun QuranReaderScreen(
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     Text(
-                                        text = "--- End of Surah ---",
+                                        text = stringResource(R.string.quran_end_of_surah),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = fg.copy(alpha = 0.15f)
                                     )
@@ -662,7 +673,7 @@ fun QuranReaderScreen(
                                         }
 
                                         Text(
-                                            text = if (isArmed) "Release for Next Surah" else "Swipe up for Next Surah",
+                                            text = stringResource(if (isArmed) R.string.quran_next_surah_release else R.string.quran_next_surah_swipe),
                                             style = MaterialTheme.typography.labelMedium,
                                             color = if (isArmed) MaterialTheme.colorScheme.primary else fg.copy(alpha = 0.3f)
                                         )
@@ -701,7 +712,7 @@ fun QuranReaderScreen(
                                         bookmarkedAyahKeys + bookmarkKey
                                     }
                                     settingsViewModel.toggleBookmark(topicId, index)
-                                    val msg = if (isBookmarked) "Bookmark removed" else "Bookmark added"
+                                    val msg = if (isBookmarked) bookmarkRemovedMessage else bookmarkAddedMessage
                                     Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                                     activeBlock = null
                                 },
@@ -791,7 +802,7 @@ fun QuranReaderScreen(
                                         settingsViewModel.setSelectedTranslationLang(meta.id)
                                         showTranslationPicker = false
                                     } else {
-                                        Toast.makeText(context, "Download failed", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, LocaleHelper.wrap(context).getString(R.string.settings_update_download_failed), Toast.LENGTH_SHORT).show()
                                     }
                                 } finally {
                                     isTranslationDownloading = false
@@ -811,12 +822,12 @@ fun QuranReaderScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.Bookmark, contentDescription = null)
                             Spacer(Modifier.width(8.dp))
-                            Text("Not bookmarked")
+                            Text(stringResource(R.string.quran_exit_reminder_title))
                         }
                     },
                     text = {
                         Column {
-                            Text("You haven't bookmarked anything. Are you sure you want to exit?")
+                            Text(stringResource(R.string.quran_exit_reminder_message))
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.padding(top = 8.dp)
@@ -825,7 +836,7 @@ fun QuranReaderScreen(
                                     checked = dontShowExitReminderAgain,
                                     onCheckedChange = { dontShowExitReminderAgain = it }
                                 )
-                                Text("Don't show this again")
+                                Text(stringResource(R.string.quran_exit_reminder_checkbox))
                             }
                         }
                     },
@@ -837,7 +848,7 @@ fun QuranReaderScreen(
                             showExitReminder = false
                             onBack()
                         }) {
-                            Text("Yes, exit")
+                            Text(stringResource(R.string.quran_exit_confirmation))
                         }
                     },
                     dismissButton = {
@@ -847,7 +858,7 @@ fun QuranReaderScreen(
                             }
                             showExitReminder = false
                         }) {
-                            Text("Stay")
+                            Text(stringResource(R.string.quran_exit_stay))
                         }
                     }
                 )
@@ -889,7 +900,7 @@ private fun ReadingModeToggle(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Verse by Verse",
+                text = quranReadingModeLabel("verse_by_verse"),
                 style = MaterialTheme.typography.labelMedium.copy(fontFamily = PlusJakartaSans),
                 color = if (isVerseByVerse) activeColor else inactiveColor,
                 fontWeight = if (isVerseByVerse) FontWeight.SemiBold else FontWeight.Normal
@@ -906,7 +917,7 @@ private fun ReadingModeToggle(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Reading",
+                text = quranReadingModeLabel("reading"),
                 style = MaterialTheme.typography.labelMedium.copy(fontFamily = PlusJakartaSans),
                 color = if (!isVerseByVerse) activeColor else inactiveColor,
                 fontWeight = if (!isVerseByVerse) FontWeight.SemiBold else FontWeight.Normal
