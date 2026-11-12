@@ -7,7 +7,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kaizen.khushu.data.repository.extraPrayerTimingArabicLabel
-import com.kaizen.khushu.data.repository.extraPrayerTimingShortLabel
+
+import com.kaizen.khushu.R
 
 import com.kaizen.khushu.data.repository.PrayerTimeRepository
 import com.kaizen.khushu.data.repository.SettingsRepository
@@ -201,7 +202,7 @@ class HomeViewModel(
             val timing = kotlinx.datetime.Instant.fromEpochMilliseconds(timingDate.time)
             val (hr, min) = getHourMin(timing)
             PrayerInfo(
-                name = extraPrayerTimingShortLabel(id),
+                name = id,
                 ar = extraPrayerTimingArabicLabel(id),
                 time = formatInstant(timing),
                 hour = hr,
@@ -236,20 +237,20 @@ class HomeViewModel(
         val makruhSunrise = MakruhZone(
             tStart = tToArc(sunriseInstant.toEpochMilliseconds()),
             tEnd = tToArc(sunriseInstant.toEpochMilliseconds() + min20),
-            label = "Sunrise",
-            description = "Disliked to pray until the sun rises a spear's height (~20 min). \"Whoever catches a rak'ah of Fajr before sunrise has caught Fajr.\" — Bukhari 579, Muslim 608"
+            id = "SUNRISE",
+            descriptionRes = R.string.home_makruh_sunrise_detail
         )
         val makruhZawal = MakruhZone(
             tStart = tToArc(adjustedDhuhr.toEpochMilliseconds() - min15),
             tEnd = tToArc(adjustedDhuhr.toEpochMilliseconds()),
-            label = "Zawal",
-            description = "Sun at zenith — prayer is forbidden at this moment. \"The Prophet ﷺ forbade prayer when the sun is at its peak (Zawal) until it declines.\" — Muslim 831"
+            id = "ZAWAL",
+            descriptionRes = R.string.home_makruh_zawal_detail
         )
         val makruhSunset = MakruhZone(
             tStart = tToArc(adjustedMaghrib.toEpochMilliseconds() - min15),
             tEnd = tToArc(adjustedMaghrib.toEpochMilliseconds()),
-            label = "Sunset",
-            description = "Disliked to pray as the sun sets. \"Whoever catches a rak'ah of Asr before sunset has caught Asr.\" — Bukhari 556, Muslim 608"
+            id = "SUNSET",
+            descriptionRes = R.string.home_makruh_sunset_detail
         )
 
         val todayHijri = runCatching { java.time.chrono.HijrahDate.now() }.getOrNull()

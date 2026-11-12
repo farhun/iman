@@ -21,6 +21,7 @@ import com.kaizen.khushu.data.repository.SettingsRepository
 import com.kaizen.khushu.data.repository.UserSettings
 import com.kaizen.khushu.data.repository.WidgetVisibilityItems
 import com.kaizen.khushu.i18n.LocaleHelper
+import com.kaizen.khushu.i18n.prayerLabel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -132,7 +133,7 @@ class PrayerWidgetProvider : AppWidgetProvider() {
                 val hijriDate = runCatching {
                     val hijri = java.time.chrono.HijrahDate.now()
                     java.time.format.DateTimeFormatter.ofPattern("d MMMM", Locale.ENGLISH).format(hijri)
-                }.getOrDefault("—")
+                }.getOrDefault(localizedContext.getString(R.string.widget_date_unavailable))
                 views.setTextViewText(
                     R.id.text_gregorian_date,
                     SimpleDateFormat("EEE, d MMMM", Locale.getDefault()).format(nowDate)
@@ -142,7 +143,7 @@ class PrayerWidgetProvider : AppWidgetProvider() {
                 val locationName = if (validLocation) {
                     settings.locationLabel.ifBlank { resolveLocationLabel(localizedContext, settings) }
                 } else {
-                    "Location unavailable"
+                    localizedContext.getString(R.string.widget_location_unavailable)
                 }
                 views.setTextViewText(R.id.text_location, locationName)
 
@@ -159,8 +160,12 @@ class PrayerWidgetProvider : AppWidgetProvider() {
                 }
                 val timeFormatter = SimpleDateFormat("HH:mm", Locale.getDefault())
                 prayerItems.forEach { item ->
-                    views.setTextViewText(item.labelId, item.name)
-                    views.setTextViewText(item.timeId, effectiveTimes[item.name]?.let(timeFormatter::format) ?: "--:--")
+                    views.setTextViewText(item.labelId, prayerLabel(localizedContext, item.name))
+                    views.setTextViewText(
+                        item.timeId,
+                        effectiveTimes[item.name]?.let(timeFormatter::format)
+                            ?: localizedContext.getString(R.string.widget_time_placeholder)
+                    )
                 }
 
                 val orderedTimes = prayerItems.mapNotNull { item ->
@@ -186,10 +191,16 @@ class PrayerWidgetProvider : AppWidgetProvider() {
                 } else {
                     null
                 }
-                views.setTextViewText(R.id.text_next_prayer, nextPrayer?.first?.let { "$it in" } ?: "Next prayer")
+                views.setTextViewText(
+                    R.id.text_next_prayer,
+                    nextPrayer?.first?.let {
+                        localizedContext.getString(R.string.widget_next_prayer_in, prayerLabel(localizedContext, it))
+                    } ?: localizedContext.getString(R.string.widget_next_prayer)
+                )
                 views.setTextViewText(
                     R.id.text_countdown,
-                    nextPrayer?.second?.let { formatCountdown(it - nowMs) } ?: "--:--"
+                    nextPrayer?.second?.let { formatCountdown(it - nowMs) }
+                        ?: localizedContext.getString(R.string.widget_time_placeholder)
                 )
 
                 applyVisibility(views, settings)
@@ -199,7 +210,7 @@ class PrayerWidgetProvider : AppWidgetProvider() {
                 appWidgetManager.updateAppWidget(appWidgetId, views)
             } catch (e: Exception) {
                 Log.e(TAG, "Error updating app widget", e)
-                setUnavailableContent(views)
+                setUnavailableContent(views, localizedContext)
                 appWidgetManager.updateAppWidget(appWidgetId, views)
             } finally {
                 scheduleNextCountdownRefresh(localizedContext)
@@ -211,15 +222,15 @@ class PrayerWidgetProvider : AppWidgetProvider() {
             return String.format(Locale.US, "%02d:%02d", remainingMinutes / 60L, remainingMinutes % 60L)
         }
 
-        private fun setUnavailableContent(views: RemoteViews) {
-            views.setTextViewText(R.id.text_gregorian_date, "—")
-            views.setTextViewText(R.id.text_hijri_date, "—")
-            views.setTextViewText(R.id.text_location, "Location unavailable")
-            views.setTextViewText(R.id.text_next_prayer, "Next prayer")
-            views.setTextViewText(R.id.text_countdown, "--:--")
+        private fun setUnavailableContent(views: RemoteViews, context: Context) {
+            views.setTextViewText(R.id.text_gregorian_date, context.getString(R.string.widget_date_unavailable))
+            views.setTextViewText(R.id.text_hijri_date, context.getString(R.string.widget_date_unavailable))
+            views.setTextViewText(R.id.text_location, context.getString(R.string.widget_location_unavailable))
+            views.setTextViewText(R.id.text_next_prayer, context.getString(R.string.widget_next_prayer))
+            views.setTextViewText(R.id.text_countdown, context.getString(R.string.widget_time_placeholder))
             prayerItems.forEach { item ->
-                views.setTextViewText(item.labelId, item.name)
-                views.setTextViewText(item.timeId, "--:--")
+                views.setTextViewText(item.labelId, prayerLabel(context, item.name))
+                views.setTextViewText(item.timeId, context.getString(R.string.widget_time_placeholder))
             }
         }
 
@@ -350,7 +361,7 @@ class PrayerWidgetProvider : AppWidgetProvider() {
                     best?.subAdminArea?.takeIf { it.isNotBlank() },
                     best?.adminArea?.takeIf { it.isNotBlank() }
                 ).firstOrNull()
-            }.getOrNull() ?: "Your Area"
+            }.getOrNull() ?: context.getString(R.string.widget_your_area)
         }
 
         fun forceWidgetRefresh(context: Context) {

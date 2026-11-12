@@ -79,6 +79,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -140,9 +141,26 @@ private fun qiblaBearingDegrees(latitude: Double, longitude: Double): Double {
     return (Math.toDegrees(atan2(y, x)) + 360.0) % 360.0
 }
 
+@Composable
 private fun compassPointLabel(bearing: Double): String {
-    val points =
-        listOf("N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW")
+    val points = listOf(
+        stringResource(R.string.home_compass_n),
+        stringResource(R.string.home_compass_nne),
+        stringResource(R.string.home_compass_ne),
+        stringResource(R.string.home_compass_ene),
+        stringResource(R.string.home_compass_e),
+        stringResource(R.string.home_compass_ese),
+        stringResource(R.string.home_compass_se),
+        stringResource(R.string.home_compass_sse),
+        stringResource(R.string.home_compass_s),
+        stringResource(R.string.home_compass_ssw),
+        stringResource(R.string.home_compass_sw),
+        stringResource(R.string.home_compass_wsw),
+        stringResource(R.string.home_compass_w),
+        stringResource(R.string.home_compass_wnw),
+        stringResource(R.string.home_compass_nw),
+        stringResource(R.string.home_compass_nnw)
+    )
     val index = (((bearing + 11.25) % 360) / 22.5).toInt()
     return points[index]
 }
@@ -286,12 +304,12 @@ private fun QiblaCompassDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Qibla Direction",
+                    text = stringResource(R.string.home_qibla_direction),
                     style = MaterialTheme.typography.titleLarge.copy(fontFamily = PlusJakartaSans),
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = locationLabel.ifBlank { "Current location" },
+                    text = locationLabel.ifBlank { stringResource(R.string.home_current_location) },
                     style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 4.dp)
@@ -347,7 +365,7 @@ private fun QiblaCompassDialog(
                             .graphicsLayer { rotationZ = -(heading ?: 0f) }
                     ) {
                         Text(
-                            text = "N",
+                            text = stringResource(R.string.home_compass_n),
                             style = MaterialTheme.typography.labelLarge.copy(
                                 fontFamily = PlusJakartaSans,
                                 fontWeight = FontWeight.Bold
@@ -361,14 +379,21 @@ private fun QiblaCompassDialog(
                 }
                 Spacer(modifier = Modifier.height(14.dp))
                 Text(
-                    text = "${bearingDegrees.roundToInt()}° ${compassPointLabel(bearingDegrees)} to Makkah",
+                    text = stringResource(
+                        R.string.home_bearing_to_makkah,
+                        bearingDegrees.roundToInt(),
+                        compassPointLabel(bearingDegrees)
+                    ),
                     style = MaterialTheme.typography.titleMedium.copy(fontFamily = PlusJakartaSans),
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center
                 )
                 Text(
-                    text = heading?.let { "Facing ${it.roundToInt()}° now" }
-                        ?: "Compass sensor unavailable on this device",
+                    text = if (heading != null) {
+                        stringResource(R.string.home_facing_degrees_now, heading.roundToInt())
+                    } else {
+                        stringResource(R.string.home_compass_sensor_unavailable)
+                    },
                     style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -376,7 +401,7 @@ private fun QiblaCompassDialog(
                 )
                 if (needsCalibration) {
                     Text(
-                        text = "Compass needs calibration. Move your phone in a figure-8 motion.",
+                        text = stringResource(R.string.home_compass_calibration),
                         style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                         color = MaterialTheme.colorScheme.error,
                         textAlign = TextAlign.Center,
@@ -384,14 +409,18 @@ private fun QiblaCompassDialog(
                     )
                 }
                 Text(
-                    text = "Coordinates: ${"%.4f".format(Locale.US, latitude)}, ${"%.4f".format(Locale.US, longitude)}",
+                    text = stringResource(
+                        R.string.home_coordinates,
+                        "%.4f".format(Locale.US, latitude),
+                        "%.4f".format(Locale.US, longitude)
+                    ),
                     style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(top = 8.dp)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                TextButton(onClick = onDismiss) { Text("Close") }
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_close)) }
             }
         }
     }
@@ -612,7 +641,7 @@ fun HomeScreen(
     }
 
 
-    val locationLabel = uiState.locationLabel.ifBlank { "Your area" }
+    val locationLabel = uiState.locationLabel.ifBlank { stringResource(R.string.home_your_area) }
     val pullProgress = (pullOffsetPx / refreshThresholdPx).coerceIn(0f, 1f)
 
 
@@ -817,25 +846,25 @@ fun HomeScreen(
     if (showTimeOverrideDialog) {
         AlertDialog(
             onDismissRequest = { showTimeOverrideDialog = false },
-            title = { Text("Preview Prayer Time") },
+            title = { Text(stringResource(R.string.home_preview_time_title)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(
-                        "Set a temporary 24-hour clock time to test next prayer and makruh transitions."
+                        stringResource(R.string.home_preview_time_description)
                     )
                     OutlinedTextField(
                         value = previewHourText,
                         onValueChange = {
                             previewHourText = it.filter(Char::isDigit).take(2)
                         },
-                        label = { Text("Hour (0-23)") }
+                        label = { Text(stringResource(R.string.home_hour_label)) }
                     )
                     OutlinedTextField(
                         value = previewMinuteText,
                         onValueChange = {
                             previewMinuteText = it.filter(Char::isDigit).take(2)
                         },
-                        label = { Text("Minute (0-59)") }
+                        label = { Text(stringResource(R.string.home_minute_label)) }
                     )
                 }
             },
@@ -849,7 +878,7 @@ fun HomeScreen(
                             showTimeOverrideDialog = false
                         }
                     }
-                ) { Text("Apply") }
+                ) { Text(stringResource(R.string.common_apply)) }
             },
             dismissButton = {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -858,8 +887,8 @@ fun HomeScreen(
                             viewModel.clearPreviewTime()
                             showTimeOverrideDialog = false
                         }
-                    ) { Text("Reset") }
-                    TextButton(onClick = { showTimeOverrideDialog = false }) { Text("Close") }
+                    ) { Text(stringResource(R.string.common_reset)) }
+                    TextButton(onClick = { showTimeOverrideDialog = false }) { Text(stringResource(R.string.common_close)) }
                 }
             }
         )

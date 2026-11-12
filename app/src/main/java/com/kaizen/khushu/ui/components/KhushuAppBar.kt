@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
@@ -98,7 +99,7 @@ fun KhushuAppBar(
             ) {
                 Icon(
                     imageVector = Icons.Default.Settings,
-                    contentDescription = "Settings",
+                    contentDescription = stringResource(R.string.common_settings),
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.size(20.dp),
                 )
@@ -140,7 +141,7 @@ fun KhushuAppBar(
                                 if (isLogoTitle) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_iman_logo),
-                                        contentDescription = "Iman",
+                                        contentDescription = stringResource(R.string.app_name),
                                         tint = MaterialTheme.colorScheme.onSurface,
                                         modifier = Modifier.size(64.dp)
                                     )
@@ -170,14 +171,14 @@ fun KhushuAppBar(
                     if (isListMode != null && onGridClick != null && onListClick != null) {
                         AppBarIconButton(
                             iconRes = R.drawable.ic_toggle,
-                            contentDescription = "Grid view",
+                            contentDescription = stringResource(R.string.nav_grid_view),
                             selected = !isListMode,
                             onClick = onGridClick,
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         AppBarIconButton(
                             iconRes = R.drawable.ic_list_view,
-                            contentDescription = "List view",
+                            contentDescription = stringResource(R.string.nav_list_view),
                             selected = isListMode,
                             onClick = onListClick,
                         )
@@ -198,7 +199,7 @@ fun KhushuAppBar(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Bookmarks,
-                                contentDescription = "Bookmarks",
+                                contentDescription = stringResource(R.string.nav_bookmarks),
                                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                 modifier = Modifier.size(20.dp),
                             )
@@ -219,7 +220,7 @@ fun KhushuAppBar(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Settings,
-                            contentDescription = "Settings",
+                            contentDescription = stringResource(R.string.common_settings),
                             tint = MaterialTheme.colorScheme.onPrimaryContainer,
                             modifier = Modifier.size(20.dp),
                         )

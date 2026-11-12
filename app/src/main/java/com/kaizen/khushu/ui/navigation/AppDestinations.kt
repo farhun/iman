@@ -1,5 +1,6 @@
 package com.kaizen.khushu.ui.navigation
 
+import androidx.annotation.StringRes
 import com.kaizen.khushu.R
 
 
@@ -21,10 +22,10 @@ const val TASBEEH_IMMERSIVE_ROUTE = "tasbeeh/immersive/{collectionId}"
 const val TASBEEH_CANVAS_ROUTE = "tasbeeh/canvas"
 
 
-enum class AppDestinations(val label: String, val icon: Int, val route: String) {
-    HOME("Home", R.drawable.ic_home, "home"),
-    TASBEEH("Tasbih", R.drawable.ic_tasbeeh, "tasbeeh"),
-    QURAN("Quran", R.drawable.ic_learn, "quran"),
+enum class AppDestinations(@StringRes val labelRes: Int, val icon: Int, val route: String) {
+    HOME(R.string.nav_home, R.drawable.ic_home, "home"),
+    TASBEEH(R.string.nav_tasbih, R.drawable.ic_tasbeeh, "tasbeeh"),
+    QURAN(R.string.nav_quran, R.drawable.ic_learn, "quran"),
     ;
 
     companion object {

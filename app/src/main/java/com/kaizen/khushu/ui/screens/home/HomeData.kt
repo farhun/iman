@@ -2,8 +2,9 @@
 
 package com.kaizen.khushu.ui.screens.home
 
+import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
-
+import com.kaizen.khushu.R
 import kotlinx.datetime.Instant
 
 // ── Placeholder data — to be replaced by HomeViewModel + real prayer times ──
@@ -31,8 +32,8 @@ data class PrayerInfo(
 data class MakruhZone(
     val tStart: Float,
     val tEnd: Float,
-    val label: String,
-    val description: String,
+    val id: String,
+    @StringRes val descriptionRes: Int,
 )
 
 
@@ -94,15 +95,15 @@ val PLACEHOLDER_PRAYERS = listOf(
 
 val PLACEHOLDER_MAKRUH = listOf(
     MakruhZone(
-        tStart = 0.08f, tEnd = 0.15f, label = "Sunrise",
-        description = "Disliked to pray until the sun rises a spear\u2019s height (~20 min after sunrise)",
+        tStart = 0.08f, tEnd = 0.15f, id = "SUNRISE",
+        descriptionRes = R.string.home_makruh_sunrise_preview,
     ),
     MakruhZone(
-        tStart = 0.48f, tEnd = 0.53f, label = "Zawal",
-        description = "Sun at exact zenith \u2014 forbidden to pray at this moment, just before Dhuhr begins",
+        tStart = 0.48f, tEnd = 0.53f, id = "ZAWAL",
+        descriptionRes = R.string.home_makruh_zawal_preview,
     ),
     MakruhZone(
-        tStart = 0.79f, tEnd = 0.84f, label = "Sunset",
-        description = "Disliked to pray as the sun sets until it fully disappears below the horizon",
+        tStart = 0.79f, tEnd = 0.84f, id = "SUNSET",
+        descriptionRes = R.string.home_makruh_sunset_preview,
     ),
 )

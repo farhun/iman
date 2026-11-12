@@ -66,6 +66,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.kaizen.khushu.R
+import com.kaizen.khushu.i18n.prayerLabel
 import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
 import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import com.kaizen.khushu.ui.theme.NotoSansArabic
@@ -134,7 +137,7 @@ fun SunArcCard(
                     verticalAlignment = Alignment.Top
                 ) {
                     Text(
-                        text = "SUN PATH",
+                        text = stringResource(R.string.home_sun_path),
                         style =
                             MaterialTheme.typography.labelSmall.copy(
                                 fontSize = 8.5.sp,
@@ -164,8 +167,10 @@ fun SunArcCard(
                                     )
                         ) {
                             Text(
-                                text =
-                                    "${inMakruh.label.uppercase()} NOW",
+                                text = stringResource(
+                                    R.string.home_makruh_now,
+                                    prayerLabel(inMakruh.id).uppercase()
+                                ),
                                 style =
                                     MaterialTheme.typography
                                         .labelSmall.copy(
@@ -185,8 +190,8 @@ fun SunArcCard(
                     } else {
                         Text(
                             text =
-                                if (darkTheme) "Night"
-                                else "Morning",
+                                if (darkTheme) stringResource(R.string.home_night)
+                                else stringResource(R.string.home_morning),
                             style =
                                 MaterialTheme.typography.labelSmall
                                     .copy(fontSize = 8.sp),
@@ -574,7 +579,7 @@ fun SunArcCard(
                         .padding(start = 13.dp, bottom = 10.dp)
             ) {
                 Text(
-                    text = "Sunrise",
+                    text = prayerLabel("SUNRISE"),
                     style =
                         MaterialTheme.typography.labelSmall.copy(
                             fontSize = 7.5.sp,
@@ -607,7 +612,7 @@ fun SunArcCard(
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = "Sunset",
+                    text = prayerLabel("SUNSET"),
                     style =
                         MaterialTheme.typography.labelSmall.copy(
                             fontSize = 7.5.sp,
@@ -829,13 +834,13 @@ fun PrayerSunMergedCard(
         allPrayers.filterNot { it.isExtra }.filter { sunT > it.arcT }.map { it.arcT }
 
     val currentMkZone = makruhZones.find { sunT >= it.tStart && sunT <= it.tEnd }
+    val localizedPrayerNames = allPrayers.associate { it.name to prayerLabel(it.name) }
 
     // Dynamic background colors for active Makruh zones
     val makruhOverlayColor =
         when {
             currentMkZone == null -> Color.Transparent
-            currentMkZone.label.contains("Sunrise", ignoreCase = true) ||
-                    currentMkZone.label.contains("Sunset", ignoreCase = true) ->
+            currentMkZone.id == "SUNRISE" || currentMkZone.id == "SUNSET" ->
                 Color(0xFFFFD54F).copy(alpha = 0.12f) // Subtle Yellow
             else -> Color(0xFFE57373).copy(alpha = 0.12f) // Subtle Red (Peak)
         }
@@ -873,7 +878,7 @@ fun PrayerSunMergedCard(
                                 Arrangement.spacedBy(5.dp)
                         ) {
                             Text(
-                                text = "NOW",
+                                text = stringResource(R.string.home_now),
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     fontSize = 8.5.sp,
                                     letterSpacing = 0.09.sp,
@@ -888,7 +893,7 @@ fun PrayerSunMergedCard(
                                 verticalAlignment = Alignment.Bottom
                             ) {
                                 Text(
-                                    text = currentPrayer?.name
+                                    text = currentPrayer?.let { prayerLabel(it.name) }
                                         ?: "—",
                                     style =
                                         MaterialTheme
@@ -965,7 +970,7 @@ fun PrayerSunMergedCard(
                                 Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = "NEXT PRAYER",
+                                text = stringResource(R.string.home_next_prayer),
                                 style =
                                     MaterialTheme.typography
                                         .labelSmall.copy(
@@ -989,7 +994,7 @@ fun PrayerSunMergedCard(
                                 verticalAlignment = Alignment.Bottom
                             ) {
                                 Text(
-                                    text = nextPrayer?.name
+                                    text = nextPrayer?.let { prayerLabel(it.name) }
                                         ?: "—",
                                     style =
                                         MaterialTheme
@@ -1131,22 +1136,14 @@ fun PrayerSunMergedCard(
                         val dayStartT =
                             makruhZones
                                 .firstOrNull {
-                                    it.label.contains(
-                                        "Sunrise",
-                                        ignoreCase =
-                                            true
-                                    )
+                                    it.id == "SUNRISE"
                                 }
                                 ?.tStart
                                 ?: 0.25f
                         val dayEndT =
                             makruhZones
                                 .firstOrNull {
-                                    it.label.contains(
-                                        "Sunset",
-                                        ignoreCase =
-                                            true
-                                    )
+                                    it.id == "SUNSET"
                                 }
                                 ?.tEnd
                                 ?: 0.75f
@@ -1484,7 +1481,7 @@ fun PrayerSunMergedCard(
                                             labelPaint
                                     canvas.nativeCanvas
                                         .drawText(
-                                            prayer.name,
+                                            localizedPrayerNames[prayer.name] ?: prayer.name,
                                             pPos.x,
                                             pPos.y +
                                                     18.dp.toPx(),
@@ -1498,17 +1495,7 @@ fun PrayerSunMergedCard(
                     // time
                     if (currentMkZone != null) {
                         val badgeColor =
-                            if (currentMkZone.label.contains(
-                                    "Sunrise",
-                                    ignoreCase = true
-                                ) ||
-                                currentMkZone.label
-                                    .contains(
-                                        "Sunset",
-                                        ignoreCase =
-                                            true
-                                    )
-                            )
+                            if (currentMkZone.id == "SUNRISE" || currentMkZone.id == "SUNSET")
                                 Color(0xFFFFB300)
                             else Color(0xFFE53935)
                         Box(
@@ -1540,7 +1527,10 @@ fun PrayerSunMergedCard(
                         ) {
                             Text(
                                 text =
-                                    "MAKRUH · ${currentMkZone.label.uppercase()}",
+                                    stringResource(
+                                        R.string.home_makruh_badge,
+                                        prayerLabel(currentMkZone.id).uppercase()
+                                    ),
                                 style =
                                     MaterialTheme
                                         .typography
@@ -1746,8 +1736,10 @@ fun PrayerSunMergedCard(
                         ) {
                             Text(
                                 text =
-                                    "Makruh · ${mk.label}"
-                                        .uppercase(),
+                                    stringResource(
+                                        R.string.home_makruh_tooltip,
+                                        prayerLabel(mk.id)
+                                    ).uppercase(),
                                 style =
                                     MaterialTheme
                                         .typography
@@ -1774,7 +1766,7 @@ fun PrayerSunMergedCard(
                             )
                             Text(
                                 text =
-                                    mk.description,
+                                    stringResource(mk.descriptionRes),
                                 style =
                                     MaterialTheme
                                         .typography
@@ -1851,7 +1843,7 @@ fun NextPrayerCard(
     var activeClock by remember { mutableStateOf("--:--") }
     val sourceLabel =
         when (source) {
-            CalculationSource.LOCAL -> "Local"
+            CalculationSource.LOCAL -> stringResource(R.string.home_local)
             CalculationSource.API -> "API"
         }
 
@@ -2008,7 +2000,7 @@ fun NextPrayerCard(
                             // vertically
                         ) {
                             Text(
-                                text = currentPrayer?.name
+                                text = currentPrayer?.let { prayerLabel(it.name) }
                                     ?: "Prayer",
                                 style =
                                     MaterialTheme.typography
@@ -2078,7 +2070,7 @@ fun NextPrayerCard(
                     Spacer(Modifier.height(14.dp))
                     Column {
                         Text(
-                            text = "NEXT PRAYER",
+                            text = stringResource(R.string.home_next_prayer),
                             style =
                                 MaterialTheme.typography.labelSmall
                                     .copy(
@@ -2105,8 +2097,8 @@ fun NextPrayerCard(
                             // vertically
                         ) {
                             Text(
-                                text = nextPrayer?.name
-                                    ?: "Next prayer",
+                                text = nextPrayer?.let { prayerLabel(it.name) }
+                                    ?: stringResource(R.string.home_next_prayer_fallback),
                                 style =
                                     MaterialTheme.typography
                                         .titleLarge.copy(
@@ -2149,7 +2141,7 @@ fun NextPrayerCard(
                                 Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "${doneCount}/5",
+                                text = stringResource(R.string.home_prayers_done_count, doneCount),
                                 style =
                                     MaterialTheme.typography
                                         .labelSmall.copy(
@@ -2201,7 +2193,7 @@ fun NextPrayerCard(
 
                         if (usingPreviewTime) {
                             Text(
-                                text = "Preview time active",
+                                text = stringResource(R.string.home_preview_time_active),
                                 style =
                                     MaterialTheme.typography
                                         .labelSmall.copy(
@@ -2235,7 +2227,7 @@ fun PrayerSlab(
 ) {
 
     val sourceLabel = when (source) {
-        CalculationSource.LOCAL -> "Local"
+        CalculationSource.LOCAL -> stringResource(R.string.home_local)
         CalculationSource.API -> "API"
     }
 
@@ -2258,7 +2250,7 @@ fun PrayerSlab(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "TODAY'S PRAYERS",
+                        text = stringResource(R.string.home_todays_prayers),
                         style =
                             MaterialTheme.typography.labelSmall.copy(
                                 fontSize = 10.sp,
@@ -2313,7 +2305,7 @@ fun PrayerSlab(
                     ) {
                         // Name
                         Text(
-                            text = p.name,
+                            text = prayerLabel(p.name),
                             style =
                                 MaterialTheme.typography.bodyLarge
                                     .copy(
@@ -2416,7 +2408,7 @@ fun PrayerSlab(
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = "EXTRA TIMINGS",
+                        text = stringResource(R.string.home_extra_timings),
                         style =
                             MaterialTheme.typography.labelSmall.copy(
                                 fontSize = 9.sp,
@@ -2436,7 +2428,7 @@ fun PrayerSlab(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
-                                text = timing.name,
+                                text = prayerLabel(timing.name),
                                 style = MaterialTheme.typography.bodyLarge.copy(
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Light,
@@ -2572,7 +2564,7 @@ private fun QuickDirectoryRow(
     Row(modifier = modifier.fillMaxWidth()) {
         ExploreMiniCard(
             icon = LucideIcons.Compass,
-            label = "Qibla",
+            label = stringResource(R.string.home_qibla),
             supportLabel = null,
             modifier = Modifier.weight(1f),
             onClick = onQiblaClick,

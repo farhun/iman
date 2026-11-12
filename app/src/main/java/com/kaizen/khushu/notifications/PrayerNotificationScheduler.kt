@@ -16,6 +16,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.kaizen.khushu.MainActivity
+import com.kaizen.khushu.R
 import com.kaizen.khushu.i18n.LocaleHelper
 import com.kaizen.khushu.data.repository.PrayerTimeRepository
 import com.kaizen.khushu.data.repository.SettingsRepository
@@ -351,7 +352,7 @@ class PrayerNotificationScheduler(
             manager.createNotificationChannel(
                 NotificationChannel(
                     EXACT_ALARM_PERMISSION_CHANNEL,
-                    "Reminder setup",
+                    appContext.getString(R.string.notif_channel_reminder_setup),
                     NotificationManager.IMPORTANCE_HIGH
                 ).apply { lockscreenVisibility = Notification.VISIBILITY_PUBLIC }
             )
@@ -369,13 +370,13 @@ class PrayerNotificationScheduler(
         val notification = NotificationCompat.Builder(appContext, EXACT_ALARM_PERMISSION_CHANNEL)
             .setSmallIcon(com.kaizen.khushu.R.drawable.ic_notification_glyph)
             .setColor(com.kaizen.khushu.R.color.notification_icon_background)
-            .setContentTitle("Enable exact alarms")
-            .setContentText("Allow exact alarms to receive prayer reminders on time.")
+            .setContentTitle(appContext.getString(R.string.notif_enable_exact_alarms_title))
+            .setContentText(appContext.getString(R.string.notif_enable_exact_alarms_text))
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(settingsPendingIntent)
-            .addAction(0, "Open Settings", settingsPendingIntent)
+            .addAction(0, appContext.getString(R.string.common_open_settings), settingsPendingIntent)
             .build()
         runCatching {
             NotificationManagerCompat.from(appContext)
@@ -544,6 +545,7 @@ class PrayerNotificationScheduler(
         ) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
 
+            val localizedContext = LocaleHelper.wrap(context)
             val notificationManager = context.getSystemService(NotificationManager::class.java)
             val audioAttributes = AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
@@ -556,7 +558,7 @@ class PrayerNotificationScheduler(
             val channels = listOf(
                 NotificationChannel(
                     CHANNEL_PRAYER_DEFAULT,
-                    "Prayer Sound: Default",
+                    localizedContext.getString(R.string.notif_channel_prayer_sound_default),
                     NotificationManager.IMPORTANCE_HIGH
                 ).apply {
                     setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), audioAttributes)
@@ -565,7 +567,7 @@ class PrayerNotificationScheduler(
                 },
                 NotificationChannel(
                     CHANNEL_PRAYER_ADHAN,
-                    "Prayer Sound: Adhan",
+                    localizedContext.getString(R.string.notif_channel_prayer_sound_adhan),
                     NotificationManager.IMPORTANCE_HIGH
                 ).apply {
                     setSound(soundUriForSelection(context, "ADHAN"), audioAttributes)
@@ -574,7 +576,7 @@ class PrayerNotificationScheduler(
                 },
                 NotificationChannel(
                     CHANNEL_PRAYER_TAKBIR,
-                    "Prayer Sound: Takbir",
+                    localizedContext.getString(R.string.notif_channel_prayer_sound_takbir),
                     NotificationManager.IMPORTANCE_HIGH
                 ).apply {
                     setSound(soundUriForSelection(context, "TAKBIR"), audioAttributes)
@@ -583,7 +585,7 @@ class PrayerNotificationScheduler(
                 },
                 NotificationChannel(
                     CHANNEL_PRAYER_SILENT,
-                    "Prayer Sound: Silent",
+                    localizedContext.getString(R.string.notif_channel_prayer_sound_silent),
                     NotificationManager.IMPORTANCE_HIGH
                 ).apply {
                     setSound(null, null)
@@ -592,30 +594,30 @@ class PrayerNotificationScheduler(
                 },
                 NotificationChannel(
                     CHANNEL_SYSTEM_SOUND,
-                    "Prayer Reminders",
+                    localizedContext.getString(R.string.notif_channel_prayer_reminders),
                     NotificationManager.IMPORTANCE_HIGH
                 ).apply {
-                    description = "Prayer reminders with system notification sound and heads-up alerts"
+                    description = localizedContext.getString(R.string.notif_channel_system_description)
                     setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), audioAttributes)
                     enableVibration(true)
                     lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                 },
                 NotificationChannel(
                     customSoundChannelId(customSoundUriString),
-                    "Prayer Reminders Custom",
+                    localizedContext.getString(R.string.notif_channel_prayer_reminders_custom),
                     NotificationManager.IMPORTANCE_HIGH
                 ).apply {
-                    description = "Prayer reminders with a stronger alarm-style tone and heads-up alerts"
+                    description = localizedContext.getString(R.string.notif_channel_custom_description)
                     setSound(customSoundUri, audioAttributes)
                     enableVibration(true)
                     lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                 },
                 NotificationChannel(
                     CHANNEL_VIBRATION,
-                    "Prayer Reminders Vibration",
+                    localizedContext.getString(R.string.notif_channel_prayer_reminders_vibration),
                     NotificationManager.IMPORTANCE_HIGH
                 ).apply {
-                    description = "Prayer reminders with vibration-only heads-up alerts"
+                    description = localizedContext.getString(R.string.notif_channel_vibration_description)
                     setSound(null, null)
                     enableVibration(true)
                     vibrationPattern = longArrayOf(0L, 220L, 140L, 220L)
@@ -623,10 +625,10 @@ class PrayerNotificationScheduler(
                 },
                 NotificationChannel(
                     CHANNEL_SILENT,
-                    "Prayer Reminders Silent",
+                    localizedContext.getString(R.string.notif_channel_prayer_reminders_silent),
                     NotificationManager.IMPORTANCE_HIGH
                 ).apply {
-                    description = "Prayer reminders with no sound or vibration"
+                    description = localizedContext.getString(R.string.notif_channel_silent_description)
                     setSound(null, null)
                     enableVibration(false)
                     setShowBadge(false)

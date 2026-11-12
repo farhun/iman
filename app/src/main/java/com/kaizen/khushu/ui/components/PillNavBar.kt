@@ -42,6 +42,7 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -148,6 +149,7 @@ private fun PillNavItem(
     onPositioned: (LayoutCoordinates) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val destinationLabel = stringResource(destination.labelRes)
     Box(
         modifier = modifier
             .onGloballyPositioned(onPositioned)
@@ -180,14 +182,14 @@ private fun PillNavItem(
         ) { selected ->
             if (selected) {
                 Text(
-                    text = destination.label,
+                    text = destinationLabel,
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             } else {
                 Icon(
                     painter = painterResource(id = destination.icon),
-                    contentDescription = destination.label,
+                    contentDescription = destinationLabel,
                     modifier = Modifier.size(22.dp),
                     tint = MaterialTheme.colorScheme.onSurface,
                 )

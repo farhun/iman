@@ -56,6 +56,7 @@ import com.kaizen.khushu.ui.theme.fontForText
 
 import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import com.kaizen.khushu.R
+import androidx.compose.ui.res.stringResource
 
 import com.kaizen.khushu.ui.util.rememberMorphShape
 import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
@@ -107,7 +108,7 @@ fun TasbeehScreen(
                 LargeTopAppBar(
                     title = {
                         Text(
-                            text = AppDestinations.TASBEEH.label,
+                            text = stringResource(AppDestinations.TASBEEH.labelRes),
                             fontFamily = PlusJakartaSansBold,
                             fontSize = 32.sp,
                             fontWeight = FontWeight.Normal,
