@@ -786,7 +786,7 @@ private fun PrayerOffsetRow(
                 text = if (value > 0) {
                     stringResource(R.string.settings_offset_positive, value)
                 } else {
-                    stringResource(R.string.settings_offset_value, value)
+                    stringResource(R.string.settings_minutes_short, value)
                 },
                 modifier = Modifier.width(40.dp),
                 style = MaterialTheme.typography.bodyLarge.copy(fontFamily = PlusJakartaSans),
@@ -859,7 +859,7 @@ private fun PrayerReminderCard(
     } else {
         stringResource(R.string.settings_pre_off)
     }
-    val summary = stringResource(R.string.settings_prayer_reminder_summary, prayerStatus, prePrayerStatus)
+    val summary = stringResource(R.string.settings_extra_timing_summary, prayerStatus, prePrayerStatus)
     ExpandableSettingsCard(
         title = prayerName,
         summary = summary,

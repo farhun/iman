@@ -37,6 +37,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import com.kaizen.khushu.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,6 +47,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kaizen.khushu.data.model.TasbeehCanvasPresetDomain
+import com.kaizen.khushu.i18n.tasbihCanvasPresetLabel
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
 import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
 import com.kaizen.khushu.ui.theme.PlusJakartaSans
@@ -61,6 +65,8 @@ fun TasbeehCanvasScreen(
     val view = LocalView.current
     val window = (LocalContext.current as Activity).window
     val context = LocalContext.current
+    val beadStringExistsMessage = stringResource(R.string.tasbih_bead_string_exists)
+    val layoutSavedMessage = stringResource(R.string.tasbih_layout_saved)
 
     DisposableEffect(Unit) {
         val controller = WindowCompat.getInsetsController(window, view)
@@ -91,7 +97,7 @@ fun TasbeehCanvasScreen(
     LaunchedEffect(Unit) {
         viewModel.guidanceEvent.collect { event ->
             if (event == TasbeehCanvasViewModel.GuidanceType.STRING_ALREADY_EXISTS) {
-                Toast.makeText(context, "Bead String is already on the canvas", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, beadStringExistsMessage, Toast.LENGTH_SHORT).show()
             } else {
                 guidanceToShow = event
             }
@@ -150,16 +156,16 @@ fun TasbeehCanvasScreen(
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 TextButton(onClick = onExit, colors = ButtonDefaults.textButtonColors(contentColor = if (Color(workingBackground.toLong()) == Color.White) Color.Black.copy(alpha = 0.6f) else Color.White.copy(alpha = 0.6f))) {
-                    Text("Exit")
+                    Text(stringResource(R.string.tasbih_exit))
                 }
                 Button(
                     onClick = {
                         viewModel.saveLayout()
-                        Toast.makeText(context, "Tasbeeh Layout Saved", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, layoutSavedMessage, Toast.LENGTH_SHORT).show()
                     },
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Save")
+                    Text(stringResource(R.string.common_save))
                 }
             }
         }
@@ -185,10 +191,10 @@ fun TasbeehCanvasScreen(
                     modifier = Modifier.padding(8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    EditorMenuAction(icon = Icons.Default.Add, label = "Add", dark = isWhite, onClick = { showAddMenu = true })
-                    EditorMenuAction(icon = Icons.Default.Style, label = "Presets", dark = isWhite, onClick = { showPresetsMenu = true })
-                    EditorMenuAction(icon = Icons.Default.Palette, label = "BG", dark = isWhite, onClick = { showBackgroundMenu = true })
-                    EditorMenuAction(icon = Icons.Default.RestartAlt, label = "Reset", dark = isWhite, onClick = { viewModel.resetToDefault() })
+                    EditorMenuAction(icon = Icons.Default.Add, label = stringResource(R.string.tasbih_add_action), dark = isWhite, onClick = { showAddMenu = true })
+                    EditorMenuAction(icon = Icons.Default.Style, label = stringResource(R.string.tasbih_presets_action), dark = isWhite, onClick = { showPresetsMenu = true })
+                    EditorMenuAction(icon = Icons.Default.Palette, label = stringResource(R.string.tasbih_background_action), dark = isWhite, onClick = { showBackgroundMenu = true })
+                    EditorMenuAction(icon = Icons.Default.RestartAlt, label = stringResource(R.string.common_reset), dark = isWhite, onClick = { viewModel.resetToDefault() })
                 }
             }
         }
@@ -225,15 +231,23 @@ fun TasbeehCanvasScreen(
         guidanceToShow?.let { type ->
             AlertDialog(
                 onDismissRequest = { guidanceToShow = null },
-                confirmButton = { Button(onClick = { guidanceToShow = null }) { Text("Got it") } },
-                title = { Text(if (type == TasbeehCanvasViewModel.GuidanceType.STRING_REMOVED) "String Removed" else if (type == TasbeehCanvasViewModel.GuidanceType.BLIND_MODE_WARNING) "Trackers Removed" else "") },
+                confirmButton = { Button(onClick = { guidanceToShow = null }) { Text(stringResource(R.string.common_got_it)) } },
+                title = {
+                                    Text(
+                                        when (type) {
+                                            TasbeehCanvasViewModel.GuidanceType.STRING_REMOVED -> stringResource(R.string.tasbih_string_removed_title)
+                                            TasbeehCanvasViewModel.GuidanceType.BLIND_MODE_WARNING -> stringResource(R.string.tasbih_trackers_removed_title)
+                                            else -> ""
+                                        }
+                                    )
+                                },
                 text = {
                     Text(
                         when (type) {
                             TasbeehCanvasViewModel.GuidanceType.STRING_REMOVED ->
-                                "Since String widget is removed, for counting tasbih you have to use volume up/down buttons now for doing tasbih."
+                                stringResource(R.string.tasbih_string_removed_message)
                             TasbeehCanvasViewModel.GuidanceType.BLIND_MODE_WARNING ->
-                                "If you remove string and counter then you won't be able to track the count and would have to rely on volume up/down. Consider adding some widget to track count, or if you wanted a minimal look try the Stealth Mode (save the canvas and stealth mode toggle is right outside)."
+                                stringResource(R.string.tasbih_blind_mode_warning)
                             else -> ""
                         }
                     )
@@ -391,7 +405,7 @@ private fun AddTasbihWidgetSheet(
                 .padding(bottom = 32.dp)
         ) {
             Text(
-                text = "ADD TASBIH WIDGET",
+                text = stringResource(R.string.tasbih_add_widget_title),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -399,14 +413,14 @@ private fun AddTasbihWidgetSheet(
 
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 WidgetPreviewCard(
-                    title = "Counter",
+                    title = stringResource(R.string.settings_counter),
                     modifier = Modifier.weight(1f),
                     onClick = { onAdd(TasbihWidget.CounterWidget(id = "counter_${System.currentTimeMillis()}")) }
                 ) {
                     Text("33", fontSize = 40.sp, color = Color.White, fontFamily = PlusJakartaSansBold)
                 }
                 WidgetPreviewCard(
-                    title = "Dhikr Name",
+                    title = stringResource(R.string.tasbih_dhikr_name),
                     modifier = Modifier.weight(1f),
                     onClick = { onAdd(TasbihWidget.DhikrNameWidget(id = "name_${System.currentTimeMillis()}")) }
                 ) {
@@ -416,14 +430,14 @@ private fun AddTasbihWidgetSheet(
             Spacer(Modifier.height(12.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 WidgetPreviewCard(
-                    title = "Bead String",
+                    title = stringResource(R.string.tasbih_bead_string),
                     modifier = Modifier.weight(1f),
                     onClick = { onAdd(TasbihWidget.StringBeadWidget(id = "string_${System.currentTimeMillis()}")) }
                 ) {
                     Box(Modifier.width(2.dp).fillMaxHeight(0.6f).background(Color.White.copy(alpha = 0.3f)))
                 }
                 WidgetPreviewCard(
-                    title = "Custom Text",
+                    title = stringResource(R.string.tasbih_custom_text),
                     modifier = Modifier.weight(1f),
                     onClick = { onAdd(TasbihWidget.CustomText(id = "text_${System.currentTimeMillis()}")) }
                 ) {
@@ -460,19 +474,19 @@ private fun TasbihPresetsSheet(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "Layout Presets",
+                    text = stringResource(R.string.tasbih_layout_presets),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.weight(1f)
                 )
                 Button(onClick = { showSaveDialog = true }, shape = RoundedCornerShape(8.dp)) {
-                    Text("Save New")
+                    Text(stringResource(R.string.tasbih_save_new))
                 }
             }
             Spacer(Modifier.height(24.dp))
 
             if (presets.isEmpty()) {
                 Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Text("No custom presets yet", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f))
+                    Text(stringResource(R.string.tasbih_no_custom_presets), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f))
                 }
             } else {
                 LazyVerticalGrid(
@@ -482,6 +496,7 @@ private fun TasbihPresetsSheet(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(presets) { preset ->
+                        val presetName = tasbihCanvasPresetLabel(preset.id, preset.name)
                         OutlinedCard(
                             onClick = { onLoad(preset); onDismiss() },
                             shape = RoundedCornerShape(16.dp),
@@ -489,15 +504,19 @@ private fun TasbihPresetsSheet(
                         ) {
                             Column(Modifier.padding(12.dp)) {
                                 Text(
-                                    preset.name,
+                                    presetName,
                                     style = MaterialTheme.typography.labelLarge.copy(
-                                        fontFamily = fontForText(preset.name, PlusJakartaSans)
+                                        fontFamily = fontForText(presetName, PlusJakartaSans)
                                     ),
                                     maxLines = 1,
                                 )
                                 Spacer(Modifier.height(8.dp))
                                 Row {
-                                    Text("${preset.widgets.size} widgets", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
+                                    Text(
+                                        pluralStringResource(R.plurals.tasbih_widget_count, preset.widgets.size, preset.widgets.size),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                    )
                                     Spacer(Modifier.weight(1f))
                                     Icon(
                                         Icons.Default.Delete,
@@ -517,7 +536,7 @@ private fun TasbihPresetsSheet(
     if (showSaveDialog) {
         AlertDialog(
             onDismissRequest = { showSaveDialog = false },
-            title = { Text("Save Preset") },
+            title = { Text(stringResource(R.string.tasbih_save_preset)) },
             text = {
                 OutlinedTextField(
                     value = presetName,
@@ -525,14 +544,14 @@ private fun TasbihPresetsSheet(
                     textStyle = MaterialTheme.typography.bodyLarge.copy(
                         fontFamily = fontForText(presetName, PlusJakartaSans)
                     ),
-                    label = { Text("Preset Name") }
+                    label = { Text(stringResource(R.string.tasbih_preset_name)) }
                 )
             },
             confirmButton = {
-                Button(onClick = { onSave(presetName); showSaveDialog = false }) { Text("Save") }
+                Button(onClick = { onSave(presetName); showSaveDialog = false }) { Text(stringResource(R.string.common_save)) }
             },
             dismissButton = {
-                TextButton(onClick = { showSaveDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showSaveDialog = false }) { Text(stringResource(R.string.common_cancel)) }
             }
         )
     }
@@ -553,7 +572,7 @@ private fun TasbihBackgroundSheet(
         sheetState = sheetState,
     ) {
         Column(Modifier.fillMaxWidth().padding(24.dp).padding(bottom = 16.dp)) {
-            Text("Canvas Background", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.tasbih_canvas_background), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(24.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 colors.forEach { color ->
@@ -625,7 +644,7 @@ private fun TasbihWidgetConfigSheet(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "Configure Widget",
+                    text = stringResource(R.string.tasbih_configure_widget),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.weight(1f)
                 )
@@ -643,14 +662,14 @@ private fun TasbihWidgetConfigSheet(
                     textStyle = MaterialTheme.typography.bodyLarge.copy(
                         fontFamily = fontForText(widget.text, PlusJakartaSans)
                     ),
-                    label = { Text("Text Content") },
+                    label = { Text(stringResource(R.string.tasbih_text_content)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(24.dp))
             }
 
             // 2. Color Palette (Presets & Custom)
-            Text("COLORS", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            Text(stringResource(R.string.tasbih_colors), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
             Spacer(Modifier.height(12.dp))
             Row(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -694,7 +713,7 @@ private fun TasbihWidgetConfigSheet(
             Spacer(Modifier.height(24.dp))
 
             // 3. Style & Format
-            Text("STYLE & FORMAT", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            Text(stringResource(R.string.tasbih_style_format), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
             Spacer(Modifier.height(12.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (widget is TasbihWidget.CounterWidget || widget is TasbihWidget.DhikrNameWidget || widget is TasbihWidget.CustomText) {
@@ -720,7 +739,7 @@ private fun TasbihWidgetConfigSheet(
                                 else -> widget
                             })
                         },
-                        label = { Text("Bold") }
+                        label = { Text(stringResource(R.string.tasbih_bold)) }
                     )
                     FilterChip(
                         selected = hasOutline,
@@ -732,7 +751,7 @@ private fun TasbihWidgetConfigSheet(
                                 else -> widget
                             })
                         },
-                        label = { Text("Outline") }
+                        label = { Text(stringResource(R.string.tasbih_outline)) }
                     )
                 }
             }
@@ -740,10 +759,10 @@ private fun TasbihWidgetConfigSheet(
 
             // 4. Sliders (Size, Scale, Opacity)
             if (widget is TasbihWidget.CustomText) {
-                SliderControl("FONT SIZE", widget.fontSize, 12f, 120f) { onUpdate(widget.copy(fontSize = it)) }
+                SliderControl(stringResource(R.string.tasbih_font_size), widget.fontSize, 12f, 120f) { onUpdate(widget.copy(fontSize = it)) }
                 Spacer(Modifier.height(16.dp))
             }
-            SliderControl("OPACITY (${(widget.alpha * 100).toInt()}%)", widget.alpha, 0.1f, 1.0f) { onUpdate(
+            SliderControl(stringResource(R.string.tasbih_opacity, (widget.alpha * 100).toInt()), widget.alpha, 0.1f, 1.0f) { onUpdate(
                 when(widget) {
                     is TasbihWidget.StringBeadWidget -> widget.copy(alpha = it)
                     is TasbihWidget.DhikrNameWidget -> widget.copy(alpha = it)
@@ -754,7 +773,7 @@ private fun TasbihWidgetConfigSheet(
                 }
             )}
             Spacer(Modifier.height(16.dp))
-            SliderControl("GLOBAL SCALE", widget.scale, 0.5f, 3f) { onUpdate(
+            SliderControl(stringResource(R.string.tasbih_global_scale), widget.scale, 0.5f, 3f) { onUpdate(
                 when(widget) {
                     is TasbihWidget.StringBeadWidget -> widget.copy(scale = it)
                     is TasbihWidget.DhikrNameWidget -> widget.copy(scale = it)
@@ -770,24 +789,24 @@ private fun TasbihWidgetConfigSheet(
 
             // 5. String Specific
             if (widget is TasbihWidget.StringBeadWidget) {
-                Text("STRING & PHYSICS", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                Text(stringResource(R.string.tasbih_string_physics), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
                 Spacer(Modifier.height(12.dp))
-                SliderControl("BEAD SIZE", widget.beadSizeScale, 0.5f, 2.5f) { onUpdate(widget.copy(beadSizeScale = it)) }
+                SliderControl(stringResource(R.string.tasbih_bead_size), widget.beadSizeScale, 0.5f, 2.5f) { onUpdate(widget.copy(beadSizeScale = it)) }
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    SliderControl("TOP STACK", widget.topStackLimit.toFloat(), 0f, 10f, Modifier.weight(1f)) { onUpdate(widget.copy(topStackLimit = it.toInt())) }
-                    SliderControl("BOTTOM POOL", widget.bottomStackLimit.toFloat(), 0f, 15f, Modifier.weight(1f)) { onUpdate(widget.copy(bottomStackLimit = it.toInt())) }
+                    SliderControl(stringResource(R.string.tasbih_top_stack), widget.topStackLimit.toFloat(), 0f, 10f, Modifier.weight(1f)) { onUpdate(widget.copy(topStackLimit = it.toInt())) }
+                    SliderControl(stringResource(R.string.tasbih_bottom_pool), widget.bottomStackLimit.toFloat(), 0f, 15f, Modifier.weight(1f)) { onUpdate(widget.copy(bottomStackLimit = it.toInt())) }
                 }
                 Spacer(Modifier.height(16.dp))
-                SliderControl("ELASTICITY", widget.stringElasticity, 1.0f, 3.0f) { onUpdate(widget.copy(stringElasticity = it)) }
-                SliderControl("STIFFNESS", widget.wobbleStiffness, 50f, 500f) { onUpdate(widget.copy(wobbleStiffness = it)) }
-                SliderControl("DAMPING", widget.wobbleDampingRatio, 0.1f, 1.0f) { onUpdate(widget.copy(wobbleDampingRatio = it)) }
+                SliderControl(stringResource(R.string.tasbih_elasticity), widget.stringElasticity, 1.0f, 3.0f) { onUpdate(widget.copy(stringElasticity = it)) }
+                SliderControl(stringResource(R.string.tasbih_stiffness), widget.wobbleStiffness, 50f, 500f) { onUpdate(widget.copy(wobbleStiffness = it)) }
+                SliderControl(stringResource(R.string.tasbih_damping), widget.wobbleDampingRatio, 0.1f, 1.0f) { onUpdate(widget.copy(wobbleDampingRatio = it)) }
                 Spacer(Modifier.height(24.dp))
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 Spacer(Modifier.height(24.dp))
             }
 
             // 6. Alignment
-            Text("ALIGNMENT", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            Text(stringResource(R.string.tasbih_alignment), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
             Spacer(Modifier.height(12.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 listOf(

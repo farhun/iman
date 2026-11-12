@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
@@ -504,7 +505,7 @@ fun TasbihWidgetRenderer(
                         modifier = Modifier.width(156.dp)
                 )
                 Text(
-                        text = "out of ${currentItem?.targetCount ?: 0}",
+                        text = stringResource(R.string.tasbih_out_of, currentItem?.targetCount ?: 0),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color(widget.color).copy(alpha = 0.5f),
                         textAlign = TextAlign.Center,
@@ -532,7 +533,7 @@ fun TasbihWidgetRenderer(
         }
         is TasbihWidget.MeaningWidget -> {
             Text(
-                    text = "Glorified is Allah",
+                    text = stringResource(R.string.tasbih_meaning_preview),
                     style =
                             TextStyle(
                                     color = Color(widget.color).copy(alpha = 0.6f),

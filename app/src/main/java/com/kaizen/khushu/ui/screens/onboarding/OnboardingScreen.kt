@@ -24,6 +24,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -35,6 +36,7 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kaizen.khushu.R
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
 import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
 import com.kaizen.khushu.ui.theme.PlusJakartaSans
@@ -147,9 +149,9 @@ fun OnboardingScreen(
                     }
             ) {
                 if (pagerState.currentPage == 3) {
-                    Text("Begin", modifier = Modifier.padding(horizontal = 24.dp), fontFamily = PlusJakartaSans, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.onboarding_begin), modifier = Modifier.padding(horizontal = 24.dp), fontFamily = PlusJakartaSans, fontWeight = FontWeight.Bold)
                 } else {
-                    Icon(Icons.Default.ArrowForward, contentDescription = "Next")
+                    Icon(Icons.Default.ArrowForward, contentDescription = stringResource(R.string.common_next))
                 }
             }
         }
@@ -188,7 +190,7 @@ private fun PageIdentity(offset: Float) {
                 .graphicsLayer { translationX = offset * -400f } // Text moves fast
         ) {
             Text(
-                text = "KHUSHU",
+                text = "IMAN",
                 fontFamily = PlusJakartaSansBold,
                 fontSize = 84.sp,
                 lineHeight = 84.sp,
@@ -198,7 +200,7 @@ private fun PageIdentity(offset: Float) {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "A minimalist sanctuary for your daily devotion. Engineered for total focus.",
+                text = stringResource(R.string.onboarding_intro_description),
                 fontFamily = PlusJakartaSans,
                 fontSize = 18.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -213,7 +215,7 @@ private fun PageEcosystem(offset: Float) {
         modifier = Modifier.fillMaxSize().padding(32.dp).padding(top = 48.dp)
     ) {
         Text(
-            text = "The Ecosystem",
+            text = stringResource(R.string.onboarding_ecosystem),
             fontFamily = PlusJakartaSansBold,
             fontSize = 42.sp,
             color = MaterialTheme.colorScheme.onBackground,
@@ -225,23 +227,23 @@ private fun PageEcosystem(offset: Float) {
         Row(modifier = Modifier.height(220.dp).fillMaxWidth()) {
             // Box 1: Salah
             BentoCard(
-                title = "Salah Canvas",
-                subtitle = "Immersive tracking",
+                title = stringResource(R.string.onboarding_salah_canvas),
+                subtitle = stringResource(R.string.onboarding_immersive_tracking),
                 modifier = Modifier.weight(1f).fillMaxHeight().graphicsLayer { translationX = offset * 300f }
             )
             Spacer(modifier = Modifier.width(16.dp))
             // Box 2: Quran
             BentoCard(
-                title = "Quran",
-                subtitle = "Authentic text",
+                title = stringResource(R.string.nav_quran),
+                subtitle = stringResource(R.string.onboarding_authentic_text),
                 modifier = Modifier.weight(0.8f).fillMaxHeight().graphicsLayer { translationX = offset * 450f }
             )
         }
         Spacer(modifier = Modifier.height(16.dp))
         // Box 3: Tasbeeh Engine
         BentoCard(
-            title = "Tasbeeh Engine",
-            subtitle = "Haptic precision & OLED stealth",
+            title = stringResource(R.string.onboarding_tasbeeh_engine),
+            subtitle = stringResource(R.string.onboarding_haptic_precision_stealth),
             modifier = Modifier.fillMaxWidth().height(140.dp).graphicsLayer { translationX = offset * 600f }
         )
     }
@@ -264,15 +266,15 @@ private fun PageLocation(viewModel: SettingsViewModel, offset: Float) {
     Column(
         modifier = Modifier.fillMaxSize().padding(32.dp).padding(top = 48.dp).graphicsLayer { translationX = offset * 250f }
     ) {
-        Text("Your Presence", fontFamily = PlusJakartaSansBold, fontSize = 42.sp, color = MaterialTheme.colorScheme.onBackground)
+        Text(stringResource(R.string.onboarding_your_presence), fontFamily = PlusJakartaSansBold, fontSize = 42.sp, color = MaterialTheme.colorScheme.onBackground)
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Accurate prayer times require your coordinates. Iman can find them automatically or you can set them later.",
+            text = stringResource(R.string.onboarding_location_description),
             fontFamily = PlusJakartaSans,
             fontSize = 16.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        
+
         Spacer(modifier = Modifier.height(48.dp))
 
         Surface(
@@ -290,21 +292,21 @@ private fun PageLocation(viewModel: SettingsViewModel, offset: Float) {
         ) {
             Row(modifier = Modifier.padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    Icons.Default.MyLocation, 
-                    contentDescription = null, 
+                    Icons.Default.MyLocation,
+                    contentDescription = null,
                     tint = if (settings.useGpsLocation) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        "Locate Me", 
-                        fontFamily = PlusJakartaSans, 
+                        stringResource(R.string.onboarding_locate_me),
+                        fontFamily = PlusJakartaSans,
                         fontWeight = FontWeight.Bold,
                         color = if (settings.useGpsLocation) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
                     )
                     if (settings.useGpsLocation) {
                         Text(
-                            "Coordinates locked.",
+                            stringResource(R.string.onboarding_coordinates_locked),
                             fontFamily = PlusJakartaSans,
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
@@ -317,7 +319,7 @@ private fun PageLocation(viewModel: SettingsViewModel, offset: Float) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            "Privacy Note: Your location never leaves this device. It is used strictly for offline astronomical calculations.",
+            stringResource(R.string.onboarding_location_privacy_note),
             fontFamily = PlusJakartaSans,
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
@@ -354,10 +356,10 @@ private fun PageCommandCenter(viewModel: SettingsViewModel, offset: Float) {
     Column(
         modifier = Modifier.fillMaxSize().padding(32.dp).padding(top = 48.dp).graphicsLayer { translationX = offset * 250f }
     ) {
-        Text("Your Sanctuary", fontFamily = PlusJakartaSansBold, fontSize = 42.sp, color = MaterialTheme.colorScheme.onBackground)
+        Text(stringResource(R.string.onboarding_your_sanctuary), fontFamily = PlusJakartaSansBold, fontSize = 42.sp, color = MaterialTheme.colorScheme.onBackground)
         Spacer(modifier = Modifier.height(48.dp))
 
-        Text("Aesthetics", fontFamily = PlusJakartaSans, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(bottom = 16.dp))
+        Text(stringResource(R.string.onboarding_aesthetics), fontFamily = PlusJakartaSans, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(bottom = 16.dp))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.fillMaxWidth()) {
             items(colorSeeds.toList()) { (key, color) ->
                 Box(
@@ -381,7 +383,11 @@ private fun PageCommandCenter(viewModel: SettingsViewModel, offset: Float) {
         Row(
             modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(MaterialTheme.colorScheme.surfaceContainerLow).padding(8.dp)
         ) {
-            listOf("Light", "Dark", "System").forEach { mode ->
+            listOf(
+                "Light" to R.string.settings_theme_light,
+                "Dark" to R.string.settings_theme_dark,
+                "System" to R.string.settings_theme_system,
+            ).forEach { (mode, labelRes) ->
                 val isSelected = settings.themeMode == mode
                 Surface(
                     onClick = { viewModel.setThemeMode(mode) },
@@ -391,7 +397,7 @@ private fun PageCommandCenter(viewModel: SettingsViewModel, offset: Float) {
                     contentColor = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                     tonalElevation = if (isSelected) 2.dp else 0.dp
                 ) {
-                    Text(mode, modifier = Modifier.padding(vertical = 12.dp), textAlign = TextAlign.Center, fontFamily = PlusJakartaSans, fontWeight = FontWeight.Medium)
+                    Text(stringResource(labelRes), modifier = Modifier.padding(vertical = 12.dp), textAlign = TextAlign.Center, fontFamily = PlusJakartaSans, fontWeight = FontWeight.Medium)
                 }
             }
         }
@@ -408,7 +414,7 @@ private fun PageCommandCenter(viewModel: SettingsViewModel, offset: Float) {
                 Row(modifier = Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Notifications, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer)
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text("Enable Reminders", fontFamily = PlusJakartaSans, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    Text(stringResource(R.string.onboarding_enable_reminders), fontFamily = PlusJakartaSans, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onPrimaryContainer)
                 }
             }
         }

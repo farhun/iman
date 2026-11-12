@@ -195,7 +195,7 @@ class PrayerWidgetProvider : AppWidgetProvider() {
                     R.id.text_next_prayer,
                     nextPrayer?.first?.let {
                         localizedContext.getString(R.string.widget_next_prayer_in, prayerLabel(localizedContext, it))
-                    } ?: localizedContext.getString(R.string.widget_next_prayer)
+                    } ?: localizedContext.getString(R.string.home_next_prayer_fallback)
                 )
                 views.setTextViewText(
                     R.id.text_countdown,
@@ -226,7 +226,7 @@ class PrayerWidgetProvider : AppWidgetProvider() {
             views.setTextViewText(R.id.text_gregorian_date, context.getString(R.string.widget_date_unavailable))
             views.setTextViewText(R.id.text_hijri_date, context.getString(R.string.widget_date_unavailable))
             views.setTextViewText(R.id.text_location, context.getString(R.string.widget_location_unavailable))
-            views.setTextViewText(R.id.text_next_prayer, context.getString(R.string.widget_next_prayer))
+            views.setTextViewText(R.id.text_next_prayer, context.getString(R.string.home_next_prayer_fallback))
             views.setTextViewText(R.id.text_countdown, context.getString(R.string.widget_time_placeholder))
             prayerItems.forEach { item ->
                 views.setTextViewText(item.labelId, prayerLabel(context, item.name))

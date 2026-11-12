@@ -60,6 +60,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.kaizen.khushu.R
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
@@ -129,12 +131,12 @@ fun CreateCollectionSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "New Tasbih",
+                    text = stringResource(R.string.tasbih_new),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
-                    text = "Close",
+                    text = stringResource(R.string.common_close),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
@@ -164,7 +166,7 @@ fun CreateCollectionSheet(
                         textStyle = MaterialTheme.typography.bodyLarge.copy(
                             fontFamily = fontForText(viewModel.createTitle, PlusJakartaSans)
                         ),
-                        label = { Text("Tasbih name") },
+                        label = { Text(stringResource(R.string.tasbih_name_label)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp),
                         singleLine = true,
@@ -208,7 +210,7 @@ fun CreateCollectionSheet(
                     ) {
                         Icon(Icons.Default.Add, null, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text("Add Dhikr Item")
+                        Text(stringResource(R.string.tasbih_add_dhikr_item))
                     }
                     Spacer(Modifier.height(100.dp)) // Buffer for keyboard
                 }
@@ -246,7 +248,7 @@ fun CreateCollectionSheet(
                         .fillMaxWidth()
                         .padding(horizontal = 28.dp, vertical = 16.dp)
                         .height(52.dp),
-                ) { Text("Save Tasbih") }
+                ) { Text(stringResource(R.string.tasbih_save)) }
             }
         }
     }
@@ -287,7 +289,7 @@ private fun DhikrRowItem(
                 textStyle = MaterialTheme.typography.bodyLarge.copy(
                     fontFamily = fontForText(row.name, PlusJakartaSans)
                 ),
-                placeholder = { Text("Dhikr name") },
+                placeholder = { Text(stringResource(R.string.tasbih_dhikr_name_placeholder)) },
                 modifier = Modifier
                     .weight(1f)
                     .focusRequester(nameFocusRequester),

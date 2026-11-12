@@ -51,11 +51,13 @@ import com.kaizen.khushu.data.model.TasbeehCanvasPresetDomain
 import com.kaizen.khushu.data.model.TasbeehCollection
 import com.kaizen.khushu.data.repository.UserSettings
 import com.kaizen.khushu.ui.navigation.AppDestinations
+import com.kaizen.khushu.i18n.tasbihCanvasPresetLabel
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
 import com.kaizen.khushu.ui.theme.fontForText
 
 import com.kaizen.khushu.ui.theme.PlusJakartaSans
 import com.kaizen.khushu.R
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 
 import com.kaizen.khushu.ui.util.rememberMorphShape
@@ -122,10 +124,10 @@ fun TasbeehScreen(
                                 if (!searchActive) query = ""
                             }
                         ) {
-                            Icon(Icons.Default.Search, contentDescription = "Search Tasbih")
+                            Icon(Icons.Default.Search, contentDescription = stringResource(R.string.tasbih_search_description))
                         }
                         IconButton(onClick = onSettingsClick) {
-                            Icon(Icons.Default.Settings, contentDescription = "Settings")
+                            Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.common_settings))
                         }
                     },
                     colors = TopAppBarDefaults.largeTopAppBarColors(
@@ -158,7 +160,7 @@ fun TasbeehScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(horizontal = 20.dp, vertical = 8.dp),
-                                placeholder = { Text("Search Tasbih") },
+                                placeholder = { Text(stringResource(R.string.tasbih_search_description)) },
                                 singleLine = true,
                             )
                         }
@@ -250,7 +252,7 @@ private fun CollectionDetailSheet(
                 ) {
                     if (showCustomization) {
                         Text(
-                            text = "Back",
+                            text = stringResource(R.string.common_back),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier
@@ -260,7 +262,7 @@ private fun CollectionDetailSheet(
                         )
                     } else {
                         Text(
-                            text = "Edit",
+                            text = stringResource(R.string.tasbih_edit),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier
@@ -269,7 +271,7 @@ private fun CollectionDetailSheet(
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                         )
                         Text(
-                            text = "Customize",
+                            text = stringResource(R.string.tasbih_customize),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier
@@ -285,7 +287,7 @@ private fun CollectionDetailSheet(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "Close",
+                        text = stringResource(R.string.common_close),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
@@ -316,7 +318,7 @@ private fun CollectionDetailSheet(
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             PrepPreviewCard(
-                                title = "Screen UI",
+                                title = stringResource(R.string.tasbih_screen_ui),
                                 cardHeight = 236.dp,
                                 onClick = { showPresets = true }
                             ) {
@@ -337,7 +339,7 @@ private fun CollectionDetailSheet(
                             }
 
                             PrepPreviewCard(
-                                title = "Bead Style",
+                                title = stringResource(R.string.tasbih_bead_style),
                                 cardHeight = 96.dp,
                                 onClick = { showBeadCustomizer = true }
                             ) {
@@ -373,10 +375,12 @@ private fun CollectionDetailSheet(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = collection.title?.takeIf { it.isNotBlank() } ?: "Collection",
+                                text = collection.title?.takeIf { it.isNotBlank() }
+                                    ?: stringResource(R.string.tasbih_collection_fallback),
                                 style = MaterialTheme.typography.headlineMedium,
                                 fontFamily = fontForText(
-                                    collection.title?.takeIf { it.isNotBlank() } ?: "Collection",
+                                    collection.title?.takeIf { it.isNotBlank() }
+                                        ?: stringResource(R.string.tasbih_collection_fallback),
                                     PlusJakartaSans,
                                 ),
                                 fontWeight = FontWeight.Medium,
@@ -387,7 +391,7 @@ private fun CollectionDetailSheet(
                             )
                             Icon(
                                 imageVector = Icons.Default.DeleteOutline,
-                                contentDescription = "Delete",
+                                contentDescription = stringResource(R.string.common_delete),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
                                 modifier = Modifier
                                     .clip(CircleShape)
@@ -397,13 +401,17 @@ private fun CollectionDetailSheet(
                             )
                         }
                         Text(
-                            text = "${collection.items.size} dhikr items",
+                            text = pluralStringResource(
+                                R.plurals.tasbih_dhikr_item_count,
+                                collection.items.size,
+                                collection.items.size,
+                            ),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Spacer(Modifier.height(24.dp))
                         Text(
-                            text = "DHIKR LIST",
+                            text = stringResource(R.string.tasbih_dhikr_list),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(bottom = 8.dp)
@@ -450,13 +458,13 @@ private fun CollectionDetailSheet(
                             onClick = { showDeleteConfirm = false },
                             modifier = Modifier.weight(1f).height(52.dp),
                             shape = RoundedCornerShape(14.dp),
-                        ) { Text("Cancel", style = MaterialTheme.typography.titleSmall) }
+                        ) { Text(stringResource(R.string.common_cancel), style = MaterialTheme.typography.titleSmall) }
                         Button(
                             onClick = onDelete,
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                             modifier = Modifier.weight(1f).height(52.dp),
                             shape = RoundedCornerShape(14.dp),
-                        ) { Text("Confirm Delete", style = MaterialTheme.typography.titleSmall) }
+                        ) { Text(stringResource(R.string.tasbih_confirm_delete), style = MaterialTheme.typography.titleSmall) }
                     }
                 } else {
                     Button(
@@ -465,7 +473,7 @@ private fun CollectionDetailSheet(
                         shape = RoundedCornerShape(14.dp),
                     ) {
                         Text(
-                            text = "Start Tasbih",
+                            text = stringResource(R.string.tasbih_start),
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.SemiBold,
                         )
@@ -613,7 +621,7 @@ private fun PrepPresetsPickerSheet(
                 .padding(bottom = 32.dp)
         ) {
             Text(
-                text = "Choose Screen Preset",
+                text = stringResource(R.string.tasbih_choose_screen_preset),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(bottom = 20.dp)
             )
@@ -625,6 +633,7 @@ private fun PrepPresetsPickerSheet(
                 modifier = Modifier.heightIn(max = 300.dp)
             ) {
                 items(presets) { preset ->
+                    val presetName = tasbihCanvasPresetLabel(preset.id, preset.name)
                     OutlinedCard(
                         onClick = { onLoad(preset); onDismiss() },
                         shape = RoundedCornerShape(16.dp),
@@ -632,14 +641,18 @@ private fun PrepPresetsPickerSheet(
                     ) {
                         Column(Modifier.padding(12.dp)) {
                             Text(
-                                preset.name,
+                                presetName,
                                 style = MaterialTheme.typography.labelLarge.copy(
-                                    fontFamily = fontForText(preset.name, PlusJakartaSans)
+                                    fontFamily = fontForText(presetName, PlusJakartaSans)
                                 ),
                                 maxLines = 1,
                             )
                             Text(
-                                "${preset.widgets.size} widgets",
+                                pluralStringResource(
+                                    R.plurals.tasbih_widget_count,
+                                    preset.widgets.size,
+                                    preset.widgets.size,
+                                ),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                             )
@@ -658,7 +671,7 @@ private fun PrepPresetsPickerSheet(
             ) {
                 Icon(Icons.Default.Tune, null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
-                Text("Customize my own")
+                Text(stringResource(R.string.tasbih_customize_my_own))
             }
         }
     }
@@ -674,7 +687,7 @@ private fun TasbihCollectionListItem(
 
     val collectionTitle = collection.title?.takeIf { it.isNotBlank() }
         ?: collection.items.firstOrNull()?.name
-        ?: "Tasbih"
+        ?: stringResource(R.string.nav_tasbih)
     val resolvedStyle = customBeadStyle?.copy(engravingText = "")
     val customShape = resolvedStyle?.let { beadShapeTypeToShape(it.shapeType) }
     val noiseShader = GlobalNoiseShader.value
@@ -719,7 +732,11 @@ private fun TasbihCollectionListItem(
             )
             Spacer(Modifier.height(2.dp))
             Text(
-                text = "${collection.items.size} dhikr",
+                text = pluralStringResource(
+                    R.plurals.tasbih_dhikr_count,
+                    collection.items.size,
+                    collection.items.size,
+                ),
                 style = MaterialTheme.typography.bodySmall.copy(fontFamily = PlusJakartaSans),
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
             )

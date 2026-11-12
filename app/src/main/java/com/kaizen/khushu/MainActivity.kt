@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.platform.*
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -276,8 +277,8 @@ class MainActivity : ComponentActivity() {
                         showFirstLocationExplanation = false
                         showFirstLocationDeniedDialog = true
                     },
-                    title = { Text("Location access") },
-                    text = { Text("Allow location access to automatically calculate accurate prayer times based on your current location.") },
+                    title = { Text(stringResource(R.string.settings_location_access_title)) },
+                    text = { Text(stringResource(R.string.settings_location_access_message)) },
                     confirmButton = {
                         TextButton(onClick = {
                             showFirstLocationExplanation = false
@@ -287,39 +288,39 @@ class MainActivity : ComponentActivity() {
                             locationPermissionLauncher.launch(
                                 arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
                             )
-                        }) { Text("Continue") }
+                        }) { Text(stringResource(R.string.settings_update_continue)) }
                     },
                     dismissButton = {
                         TextButton(onClick = {
                             showFirstLocationExplanation = false
                             showFirstLocationDeniedDialog = true
-                        }) { Text("Not now") }
+                        }) { Text(stringResource(R.string.settings_not_now)) }
                     }
                 )
             }
             if (showFirstLocationDeniedDialog) {
                 AlertDialog(
                     onDismissRequest = { showFirstLocationDeniedDialog = false },
-                    title = { Text("Location permission not granted") },
-                    text = { Text("Prayer times will continue using your saved location. You can enable device GPS later in Settings.") },
+                    title = { Text(stringResource(R.string.settings_location_permission_denied)) },
+                    text = { Text(stringResource(R.string.settings_location_permission_denied_message)) },
                     confirmButton = {
-                        TextButton(onClick = { showFirstLocationDeniedDialog = false }) { Text("Got it") }
+                        TextButton(onClick = { showFirstLocationDeniedDialog = false }) { Text(stringResource(R.string.common_got_it)) }
                     }
                 )
             }
             if (showLocationServicesDialog) {
                 AlertDialog(
                     onDismissRequest = { showLocationServicesDialog = false },
-                    title = { Text("Enable device location") },
-                    text = { Text("Turn on device location services to find your current location for prayer times.") },
+                    title = { Text(stringResource(R.string.settings_enable_device_location)) },
+                    text = { Text(stringResource(R.string.settings_enable_device_location_message)) },
                     confirmButton = {
                         TextButton(onClick = {
                             showLocationServicesDialog = false
                             startActivity(android.content.Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-                        }) { Text("Open location settings") }
+                        }) { Text(stringResource(R.string.settings_open_location_settings)) }
                     },
                     dismissButton = {
-                        TextButton(onClick = { showLocationServicesDialog = false }) { Text("Not now") }
+                        TextButton(onClick = { showLocationServicesDialog = false }) { Text(stringResource(R.string.settings_not_now)) }
                     }
                 )
             }
@@ -780,7 +781,7 @@ private fun KhushuApp(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Create Tasbih",
+                    contentDescription = stringResource(R.string.tasbih_create),
                     modifier = Modifier.size(24.dp),
                 )
             }

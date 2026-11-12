@@ -1,57 +1,64 @@
 package com.kaizen.khushu.data.repository
 
+import android.content.Context
+import androidx.annotation.StringRes
+import com.kaizen.khushu.R
+import com.kaizen.khushu.i18n.LocaleHelper
+
 data class ExtraPrayerTimingDefinition(
     val id: String,
-    val label: String,
-    val shortLabel: String,
+    @StringRes val labelRes: Int,
+    @StringRes val shortLabelRes: Int,
     val arabicLabel: String,
 )
 
 val EXTRA_PRAYER_TIMINGS = listOf(
     ExtraPrayerTimingDefinition(
         id = "IMSAK",
-        label = "Imsak",
-        shortLabel = "Imsak",
+        labelRes = R.string.prayer_imsak,
+        shortLabelRes = R.string.prayer_imsak,
         arabicLabel = "إمساك",
     ),
     ExtraPrayerTimingDefinition(
         id = "SUNRISE",
-        label = "Sunrise",
-        shortLabel = "Sunrise",
+        labelRes = R.string.prayer_sunrise,
+        shortLabelRes = R.string.prayer_sunrise,
         arabicLabel = "شروق",
     ),
     ExtraPrayerTimingDefinition(
         id = "SUNSET",
-        label = "Sunset",
-        shortLabel = "Sunset",
+        labelRes = R.string.prayer_sunset,
+        shortLabelRes = R.string.prayer_sunset,
         arabicLabel = "غروب",
     ),
     ExtraPrayerTimingDefinition(
         id = "FIRST_THIRD",
-        label = "First Third",
-        shortLabel = "1st Third",
+        labelRes = R.string.prayer_first_third,
+        shortLabelRes = R.string.prayer_first_third_short,
         arabicLabel = "ثلث أول",
     ),
     ExtraPrayerTimingDefinition(
         id = "MIDNIGHT",
-        label = "Midnight",
-        shortLabel = "Midnight",
+        labelRes = R.string.prayer_midnight,
+        shortLabelRes = R.string.prayer_midnight,
         arabicLabel = "منتصف الليل",
     ),
     ExtraPrayerTimingDefinition(
         id = "LAST_THIRD",
-        label = "Last Third",
-        shortLabel = "Last Third",
+        labelRes = R.string.prayer_last_third,
+        shortLabelRes = R.string.prayer_last_third,
         arabicLabel = "الثلث الأخير",
     ),
 )
 
-fun extraPrayerTimingLabel(id: String): String {
-    return EXTRA_PRAYER_TIMINGS.firstOrNull { it.id == id }?.label ?: id
+fun extraPrayerTimingLabel(context: Context, id: String): String {
+    val labelRes = EXTRA_PRAYER_TIMINGS.firstOrNull { it.id == id }?.labelRes ?: return id
+    return LocaleHelper.wrap(context).getString(labelRes)
 }
 
-fun extraPrayerTimingShortLabel(id: String): String {
-    return EXTRA_PRAYER_TIMINGS.firstOrNull { it.id == id }?.shortLabel ?: id
+fun extraPrayerTimingShortLabel(context: Context, id: String): String {
+    val labelRes = EXTRA_PRAYER_TIMINGS.firstOrNull { it.id == id }?.shortLabelRes ?: return id
+    return LocaleHelper.wrap(context).getString(labelRes)
 }
 
 fun extraPrayerTimingArabicLabel(id: String): String {

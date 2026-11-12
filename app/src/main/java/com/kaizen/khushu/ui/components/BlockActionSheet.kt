@@ -111,7 +111,7 @@ fun BlockActionSheet(
             if (contentToCopy.isNotBlank()) {
                 ActionRow(
                     icon = Icons.Default.ContentCopy,
-                    label = "Copy Text",
+                    label = stringResource(R.string.quran_copy_text),
                     onClick = {
                         val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
                         val clip = android.content.ClipData.newPlainText("Iman Text", contentToCopy)
@@ -125,7 +125,7 @@ fun BlockActionSheet(
             if (referenceToCopy != null) {
                 ActionRow(
                     icon = Icons.Default.Link,
-                    label = "Copy Reference",
+                    label = stringResource(R.string.quran_copy_reference),
                     onClick = {
                         val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
                         val clip = android.content.ClipData.newPlainText("Iman Reference", referenceToCopy)

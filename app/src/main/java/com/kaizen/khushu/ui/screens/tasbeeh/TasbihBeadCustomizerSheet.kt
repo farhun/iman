@@ -29,10 +29,12 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kaizen.khushu.R
 import com.kaizen.khushu.data.model.*
 import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
 import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
@@ -146,13 +148,13 @@ fun TasbihBeadCustomizerSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Design Your Bead",
+                    text = stringResource(R.string.tasbih_design_bead),
                     style = MaterialTheme.typography.titleMedium,
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Close",
+                    text = stringResource(R.string.common_close),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
@@ -187,7 +189,7 @@ fun TasbihBeadCustomizerSheet(
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 24.dp)
             ) {
-                SectionHeader("Quick Presets")
+                SectionHeader(stringResource(R.string.tasbih_quick_presets))
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     contentPadding = PaddingValues(bottom = 8.dp)
@@ -217,7 +219,7 @@ fun TasbihBeadCustomizerSheet(
                 }
                 Spacer(Modifier.height(16.dp))
 
-                SectionHeader("Saved Designs")
+                SectionHeader(stringResource(R.string.tasbih_saved_designs))
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     contentPadding = PaddingValues(bottom = 8.dp)
@@ -253,7 +255,7 @@ fun TasbihBeadCustomizerSheet(
 
                 Spacer(Modifier.height(16.dp))
 
-                SectionHeader("Bead Shape")
+                SectionHeader(stringResource(R.string.tasbih_bead_shape))
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -285,7 +287,7 @@ fun TasbihBeadCustomizerSheet(
 
                 Spacer(Modifier.height(24.dp))
 
-                SectionHeader("Base Color")
+                SectionHeader(stringResource(R.string.tasbih_base_color))
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -321,7 +323,7 @@ fun TasbihBeadCustomizerSheet(
 
                 Spacer(Modifier.height(24.dp))
 
-                SectionHeader("Effects")
+                SectionHeader(stringResource(R.string.tasbih_effects))
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -329,19 +331,19 @@ fun TasbihBeadCustomizerSheet(
                     FilterChip(
                         selected = workingStyle.chromaticAberration,
                         onClick = { workingStyle = workingStyle.copy(chromaticAberration = !workingStyle.chromaticAberration, preset = com.kaizen.khushu.data.model.BeadPreset.NONE) },
-                        label = { Text("Chromatic", fontFamily = PlusJakartaSans, style = MaterialTheme.typography.titleMedium) },
+                        label = { Text(stringResource(R.string.tasbih_effect_chromatic), fontFamily = PlusJakartaSans, style = MaterialTheme.typography.titleMedium) },
 //                        modifier = Modifier.weight(1f)
                     )
                     FilterChip(
                         selected = workingStyle.metallicSheen,
                         onClick = { workingStyle = workingStyle.copy(metallicSheen = !workingStyle.metallicSheen, preset = com.kaizen.khushu.data.model.BeadPreset.NONE) },
-                        label = { Text("Metallic", fontFamily = PlusJakartaSans, style = MaterialTheme.typography.titleMedium) },
+                        label = { Text(stringResource(R.string.tasbih_effect_metallic), fontFamily = PlusJakartaSans, style = MaterialTheme.typography.titleMedium) },
 //                        modifier = Modifier.weight(1f)
                     )
                     FilterChip(
                         selected = workingStyle.is3dEnabled,
                         onClick = { workingStyle = workingStyle.copy(is3dEnabled = !workingStyle.is3dEnabled, preset = com.kaizen.khushu.data.model.BeadPreset.NONE) },
-                        label = { Text("3D Depth", fontFamily = PlusJakartaSans, style = MaterialTheme.typography.titleMedium) },
+                        label = { Text(stringResource(R.string.tasbih_effect_3d_depth), fontFamily = PlusJakartaSans, style = MaterialTheme.typography.titleMedium) },
 //                        modifier = Modifier.weight(1f)
                     )
                 }
@@ -351,7 +353,7 @@ fun TasbihBeadCustomizerSheet(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Light",
+                        text = stringResource(R.string.settings_theme_light),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.width(40.dp)
@@ -365,21 +367,21 @@ fun TasbihBeadCustomizerSheet(
                 }
                 Spacer(Modifier.height(24.dp))
 
-                SectionHeader("Engraving")
+                SectionHeader(stringResource(R.string.tasbih_engraving))
                 OutlinedTextField(
                     value = workingStyle.engravingText,
                     onValueChange = { if (it.length <= 10) workingStyle = workingStyle.copy(engravingText = it) },
                     textStyle = MaterialTheme.typography.bodyLarge.copy(
                         fontFamily = fontForText(workingStyle.engravingText, PlusJakartaSans)
                     ),
-                    label = { Text("Custom Text") },
-                    placeholder = { Text("e.g. الله", fontFamily = NotoSansArabic) },
+                    label = { Text(stringResource(R.string.tasbih_custom_text)) },
+                    placeholder = { Text(stringResource(R.string.tasbih_engraving_example, "الله"), fontFamily = NotoSansArabic) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
                     singleLine = true
                 )
                 Text(
-                    text = "Pinch to scale  ·  Drag to move  ·  Double tap to reset",
+                    text = stringResource(R.string.tasbih_engraving_gesture_hint),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 8.dp)
@@ -396,7 +398,7 @@ fun TasbihBeadCustomizerSheet(
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text("Save & Apply Style", fontWeight = FontWeight.Bold, fontFamily = PlusJakartaSans)
+                    Text(stringResource(R.string.tasbih_save_apply_style), fontWeight = FontWeight.Bold, fontFamily = PlusJakartaSans)
                 }
 
                 if (workingStyle.id != DEFAULT_CUSTOM_BEAD_STYLE_ID && settings.customBeadStyles.any { it.id == workingStyle.id }) {
@@ -408,7 +410,7 @@ fun TasbihBeadCustomizerSheet(
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                     ) {
-                        Text("Delete Design")
+                        Text(stringResource(R.string.tasbih_delete_design))
                     }
                 }
 
@@ -455,7 +457,7 @@ fun SimpleColorPickerSheet(
 
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(Modifier.padding(24.dp).padding(bottom = 32.dp)) {
-            Text("Custom Color", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.tasbih_custom_color), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(24.dp))
             Box(Modifier.size(100.dp).align(Alignment.CenterHorizontally).background(currentColor, RoundedCornerShape(16.dp)))
             Spacer(Modifier.height(32.dp))
@@ -474,23 +476,23 @@ fun SimpleColorPickerSheet(
                         } catch (_: Exception) {}
                     }
                 },
-                label = { Text("HEX Code") },
+                label = { Text(stringResource(R.string.tasbih_hex_code)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
             Spacer(Modifier.height(16.dp))
-            Text("Hue: ${hue.toInt()}", style = MaterialTheme.typography.labelMedium)
+            Text(stringResource(R.string.tasbih_hue, hue.toInt()), style = MaterialTheme.typography.labelMedium)
             Slider(value = hue, onValueChange = { hue = it }, valueRange = 0f..360f)
-            Text("Saturation", style = MaterialTheme.typography.labelMedium)
+            Text(stringResource(R.string.tasbih_saturation), style = MaterialTheme.typography.labelMedium)
             Slider(value = saturation, onValueChange = { saturation = it }, valueRange = 0f..1f)
-            Text("Brightness", style = MaterialTheme.typography.labelMedium)
+            Text(stringResource(R.string.tasbih_brightness), style = MaterialTheme.typography.labelMedium)
             Slider(value = value, onValueChange = { value = it }, valueRange = 0f..1f)
             Spacer(Modifier.height(24.dp))
             Button(
                 onClick = { onColorSelected(currentColor); onDismiss() },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Pick Color")
+                Text(stringResource(R.string.tasbih_pick_color))
             }
         }
     }

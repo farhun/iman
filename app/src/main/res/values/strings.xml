@@ -24,6 +24,11 @@
     <string name="common_play">Play</string>
     <string name="common_stop">Stop</string>
 
+    <string name="common_delete">Delete</string>
+    <string name="common_save">Save</string>
+    <string name="common_got_it">Got it</string>
+    <string name="common_next">Next</string>
+
     <string name="about_title">About Iman</string>
     <string name="about_story">Story</string>
     <string name="about_description">Iman is a prayer companion for salah times, Quran reading, and dhikr.</string>
@@ -177,7 +182,7 @@
     <string name="settings_use_system_default">Use System Default</string>
     <string name="settings_pre_prayer_reminder_sound">Pre-prayer reminder sound</string>
     <string name="settings_pre_prayer_reminder_sound_summary">Shared by all pre-prayer reminders.</string>
-    <string name="settings_prayer_reminder_summary">%1$s · %2$s</string>
+
     <string name="settings_prayer_on">Prayer on</string>
     <string name="settings_prayer_off">Prayer off</string>
     <string name="settings_pre_prayer_summary">Pre %1$d min</string>
@@ -216,7 +221,7 @@
     <string name="settings_prayer_offsets_summary">Manually shift calculated timings.</string>
     <string name="settings_shift_by_minutes">Shift by minutes</string>
     <string name="settings_offset_positive">+%1$d min</string>
-    <string name="settings_offset_value">%1$d min</string>
+
     <string name="settings_diagnostics">Diagnostics</string>
     <string name="settings_diagnostics_summary">Setup, coordinates, and notification status.</string>
     <string name="settings_debug_controls">Debug Controls</string>
@@ -292,6 +297,7 @@
     <string name="prayer_sunrise">Sunrise</string>
     <string name="prayer_sunset">Sunset</string>
     <string name="prayer_first_third">First Third</string>
+    <string name="prayer_first_third_short">1st Third</string>
     <string name="prayer_midnight">Midnight</string>
     <string name="prayer_last_third">Last Third</string>
     <string name="prayer_zawal">Zawal</string>
@@ -302,6 +308,133 @@
     <string name="nav_grid_view">Grid view</string>
     <string name="nav_list_view">List view</string>
     <string name="nav_bookmarks">Bookmarks</string>
+
+    <string name="tasbih_search_description">Search Tasbih</string>
+    <string name="tasbih_edit">Edit</string>
+    <string name="tasbih_customize">Customize</string>
+    <string name="tasbih_screen_ui">Screen UI</string>
+    <string name="tasbih_bead_style">Bead Style</string>
+    <string name="tasbih_collection_fallback">Collection</string>
+    <string name="tasbih_dhikr_list">DHIKR LIST</string>
+    <string name="tasbih_confirm_delete">Confirm Delete</string>
+    <string name="tasbih_start">Start Tasbih</string>
+    <string name="tasbih_choose_screen_preset">Choose Screen Preset</string>
+    <string name="tasbih_customize_my_own">Customize my own</string>
+    <string name="tasbih_exit">Exit</string>
+    <string name="tasbih_out_of">out of %1$d</string>
+    <string name="tasbih_meaning_preview">Glorified is Allah</string>
+    <string name="tasbih_release_to_reset_hint">Release to Reset  ·  Swipe Down to Abort</string>
+    <string name="tasbih_holding_to_reset_hint">Holding to Reset...</string>
+    <string name="tasbih_new">New Tasbih</string>
+    <string name="tasbih_name_label">Tasbih name</string>
+    <string name="tasbih_add_dhikr_item">Add Dhikr Item</string>
+    <string name="tasbih_save">Save Tasbih</string>
+    <string name="tasbih_dhikr_name_placeholder">Dhikr name</string>
+    <string name="tasbih_layout_saved">Tasbeeh Layout Saved</string>
+    <string name="tasbih_bead_string_exists">Bead String is already on the canvas</string>
+    <string name="tasbih_add_widget_title">ADD TASBIH WIDGET</string>
+    <string name="tasbih_dhikr_name">Dhikr Name</string>
+    <string name="tasbih_bead_string">Bead String</string>
+    <string name="tasbih_custom_text">Custom Text</string>
+    <string name="tasbih_layout_presets">Layout Presets</string>
+    <string name="tasbih_save_new">Save New</string>
+    <string name="tasbih_no_custom_presets">No custom presets yet</string>
+    <string name="tasbih_save_preset">Save Preset</string>
+    <string name="tasbih_preset_name">Preset Name</string>
+    <string name="tasbih_canvas_background">Canvas Background</string>
+    <string name="tasbih_configure_widget">Configure Widget</string>
+    <string name="tasbih_text_content">Text Content</string>
+    <string name="tasbih_colors">COLORS</string>
+    <string name="tasbih_style_format">STYLE &amp; FORMAT</string>
+    <string name="tasbih_bold">Bold</string>
+    <string name="tasbih_outline">Outline</string>
+    <string name="tasbih_font_size">FONT SIZE</string>
+    <string name="tasbih_opacity">OPACITY (%1$d%%)</string>
+    <string name="tasbih_global_scale">GLOBAL SCALE</string>
+    <string name="tasbih_string_physics">STRING &amp; PHYSICS</string>
+    <string name="tasbih_bead_size">BEAD SIZE</string>
+    <string name="tasbih_top_stack">TOP STACK</string>
+    <string name="tasbih_bottom_pool">BOTTOM POOL</string>
+    <string name="tasbih_elasticity">ELASTICITY</string>
+    <string name="tasbih_stiffness">STIFFNESS</string>
+    <string name="tasbih_damping">DAMPING</string>
+    <string name="tasbih_alignment">ALIGNMENT</string>
+    <string name="tasbih_add_action">Add</string>
+    <string name="tasbih_presets_action">Presets</string>
+    <string name="tasbih_background_action">BG</string>
+    <string name="tasbih_string_removed_title">String Removed</string>
+    <string name="tasbih_trackers_removed_title">Trackers Removed</string>
+    <string name="tasbih_string_removed_message">Since String widget is removed, for counting tasbih you have to use volume up/down buttons now for doing tasbih.</string>
+    <string name="tasbih_blind_mode_warning">If you remove string and counter then you won\'t be able to track the count and would have to rely on volume up/down. Consider adding some widget to track count, or if you wanted a minimal look try the Stealth Mode (save the canvas and stealth mode toggle is right outside).</string>
+    <string name="tasbih_settings_layout">Layout</string>
+    <string name="tasbih_settings_edit_screen">Edit Tasbih Screen</string>
+    <string name="tasbih_settings_edit_screen_summary">Customize layout and widget placement</string>
+    <string name="tasbih_settings_design_beads">Design Tasbih Beads</string>
+    <string name="tasbih_settings_design_beads_summary">Material, shape, and finish</string>
+    <string name="tasbih_settings_behavior">Behavior</string>
+    <string name="tasbih_settings_dynamic_colors">Dynamic Colors</string>
+    <string name="tasbih_settings_dynamic_colors_summary">Use collection colors automatically.</string>
+    <string name="tasbih_settings_stealth_mode">Stealth Mode</string>
+    <string name="tasbih_settings_stealth_mode_summary">Allow hiding widgets for a cleaner view.</string>
+    <string name="tasbih_settings_volume_buttons">Volume Buttons</string>
+    <string name="tasbih_settings_volume_buttons_summary">Use physical volume keys to count.</string>
+    <string name="tasbih_settings_animate_volume_keys">Animate Volume Keys</string>
+    <string name="tasbih_settings_animate_volume_keys_summary">Show bead movement when counting.</string>
+    <string name="tasbih_settings_sound">Sound</string>
+    <string name="tasbih_settings_sound_enabled">Tasbih Sound</string>
+    <string name="tasbih_settings_sound_enabled_summary">Play a soft sound when a bead count commits.</string>
+    <string name="tasbih_settings_sound_style">Sound Style</string>
+    <string name="tasbih_settings_sound_style_summary">Choose the bundled Tasbih sound.</string>
+    <string name="tasbih_settings_preview_sound">Preview Sound</string>
+    <string name="tasbih_sound_soft_click">Soft Click</string>
+    <string name="tasbih_sound_glass_tap">Glass Tap</string>
+    <string name="tasbih_sound_muted_bead">Muted Bead</string>
+    <string name="tasbih_sound_light_chime">Light Chime</string>
+    <string name="tasbih_sound_warm_knock">Warm Knock</string>
+    <string name="tasbih_design_bead">Design Your Bead</string>
+    <string name="tasbih_quick_presets">Quick Presets</string>
+    <string name="tasbih_saved_designs">Saved Designs</string>
+    <string name="tasbih_bead_shape">Bead Shape</string>
+    <string name="tasbih_base_color">Base Color</string>
+    <string name="tasbih_effects">Effects</string>
+    <string name="tasbih_effect_chromatic">Chromatic</string>
+    <string name="tasbih_effect_metallic">Metallic</string>
+    <string name="tasbih_effect_3d_depth">3D Depth</string>
+    <string name="tasbih_engraving">Engraving</string>
+    <string name="tasbih_engraving_example">e.g. %1$s</string>
+    <string name="tasbih_engraving_gesture_hint">Pinch to scale · Drag to move · Double tap to reset</string>
+    <string name="tasbih_save_apply_style">Save &amp; Apply Style</string>
+    <string name="tasbih_delete_design">Delete Design</string>
+    <string name="tasbih_custom_color">Custom Color</string>
+    <string name="tasbih_hex_code">HEX Code</string>
+    <string name="tasbih_hue">Hue: %1$d</string>
+    <string name="tasbih_saturation">Saturation</string>
+    <string name="tasbih_brightness">Brightness</string>
+    <string name="tasbih_pick_color">Pick Color</string>
+    <string name="tasbih_canvas_preset_traditional">Traditional</string>
+    <string name="tasbih_canvas_preset_minimal">Minimal</string>
+    <string name="tasbih_canvas_preset_classic">Classic</string>
+    <string name="onboarding_begin">Begin</string>
+    <string name="onboarding_intro_description">A minimalist sanctuary for your daily devotion. Engineered for total focus.</string>
+    <string name="onboarding_ecosystem">The Ecosystem</string>
+    <string name="onboarding_salah_canvas">Salah Canvas</string>
+    <string name="onboarding_immersive_tracking">Immersive tracking</string>
+    <string name="onboarding_authentic_text">Authentic text</string>
+    <string name="onboarding_tasbeeh_engine">Tasbeeh Engine</string>
+    <string name="onboarding_haptic_precision_stealth">Haptic precision &amp; OLED stealth</string>
+    <string name="onboarding_your_presence">Your Presence</string>
+    <string name="onboarding_location_description">Accurate prayer times require your coordinates. Iman can find them automatically or you can set them later.</string>
+    <string name="onboarding_locate_me">Locate Me</string>
+    <string name="onboarding_coordinates_locked">Coordinates locked.</string>
+    <string name="onboarding_location_privacy_note">Privacy Note: Your location never leaves this device. It is used strictly for offline astronomical calculations.</string>
+    <string name="onboarding_your_sanctuary">Your Sanctuary</string>
+    <string name="onboarding_aesthetics">Aesthetics</string>
+    <string name="onboarding_enable_reminders">Enable Reminders</string>
+    <string name="settings_location_access_title">Location access</string>
+    <string name="settings_location_access_message">Allow location access to automatically calculate accurate prayer times based on your current location.</string>
+    <string name="settings_location_permission_denied">Location permission not granted</string>
+    <string name="settings_location_permission_denied_message">Prayer times will continue using your saved location. You can enable device GPS later in Settings.</string>
+    <string name="tasbih_create">Create Tasbih</string>
 
     <string name="home_sun_path">SUN PATH</string>
     <string name="home_now">NOW</string>
@@ -316,6 +449,7 @@
     <string name="home_morning">Morning</string>
     <string name="home_qibla_direction">Qibla Direction</string>
     <string name="home_current_location">Current location</string>
+    <string name="home_hijri_date_fallback">Hijri Date</string>
     <string name="home_bearing_to_makkah">%1$d° %2$s to Makkah</string>
     <string name="home_facing_degrees_now">Facing %1$d° now</string>
     <string name="home_compass_sensor_unavailable">Compass sensor unavailable on this device</string>
@@ -356,7 +490,7 @@
     <string name="widget_preview_gregorian_date">Fri, 5 June</string>
     <string name="widget_preview_hijri_date" translatable="false">19 Dhul-Hijjah</string>
     <string name="widget_preview_location">Düsseldorf</string>
-    <string name="widget_next_prayer">Next prayer</string>
+
     <string name="widget_next_prayer_in">%1$s in</string>
     <string name="widget_time_placeholder">--:--</string>
     <string name="widget_date_unavailable">—</string>
@@ -513,6 +647,8 @@
     <string name="quran_remove_bookmark">Remove Bookmark</string>
     <string name="quran_add_bookmark">Add Bookmark</string>
     <string name="quran_share">Share</string>
+    <string name="quran_copy_text">Copy Text</string>
+    <string name="quran_copy_reference">Copy Reference</string>
     <string name="quran_share_via">Share via</string>
     <string name="quran_text_copied">Text copied to clipboard</string>
     <string name="quran_reference_copied">Reference copied: %1$s</string>
@@ -523,5 +659,18 @@
     <plurals name="quran_verse_count">
         <item quantity="one">%1$d verse</item>
         <item quantity="other">%1$d verses</item>
+    </plurals>
+
+    <plurals name="tasbih_dhikr_item_count">
+        <item quantity="one">%1$d dhikr item</item>
+        <item quantity="other">%1$d dhikr items</item>
+    </plurals>
+    <plurals name="tasbih_dhikr_count">
+        <item quantity="one">%1$d dhikr</item>
+        <item quantity="other">%1$d dhikr</item>
+    </plurals>
+    <plurals name="tasbih_widget_count">
+        <item quantity="one">%1$d widget</item>
+        <item quantity="other">%1$d widgets</item>
     </plurals>
 </resources>

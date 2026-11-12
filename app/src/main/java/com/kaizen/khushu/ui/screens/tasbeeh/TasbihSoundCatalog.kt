@@ -6,7 +6,7 @@ import com.kaizen.khushu.R
 
 data class TasbihSoundOption(
     val id: String,
-    val label: String,
+    val labelResId: Int,
     val resId: Int,
 )
 
@@ -14,11 +14,11 @@ object TasbihSoundCatalog {
     const val DEFAULT_ID = "1"
 
     val options = listOf(
-        TasbihSoundOption(id = "1", label = "Soft Click", resId = R.raw.tasbih_soft_click),
-        TasbihSoundOption(id = "2", label = "Glass Tap", resId = R.raw.tasbih_glass_tap),
-        TasbihSoundOption(id = "3", label = "Muted Bead", resId = R.raw.tasbih_muted_bead),
-        TasbihSoundOption(id = "4", label = "Light Chime", resId = R.raw.tasbih_light_chime),
-        TasbihSoundOption(id = "5", label = "Warm Knock", resId = R.raw.tasbih_warm_knock),
+        TasbihSoundOption(id = "1", labelResId = R.string.tasbih_sound_soft_click, resId = R.raw.tasbih_soft_click),
+        TasbihSoundOption(id = "2", labelResId = R.string.tasbih_sound_glass_tap, resId = R.raw.tasbih_glass_tap),
+        TasbihSoundOption(id = "3", labelResId = R.string.tasbih_sound_muted_bead, resId = R.raw.tasbih_muted_bead),
+        TasbihSoundOption(id = "4", labelResId = R.string.tasbih_sound_light_chime, resId = R.raw.tasbih_light_chime),
+        TasbihSoundOption(id = "5", labelResId = R.string.tasbih_sound_warm_knock, resId = R.raw.tasbih_warm_knock),
     )
 
     fun optionFor(id: String): TasbihSoundOption {

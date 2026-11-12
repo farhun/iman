@@ -431,10 +431,10 @@ private data class HomeHijriBadgeParts(
     val year: String,
 )
 
-private fun splitHijriBadgeParts(raw: String): HomeHijriBadgeParts {
+private fun splitHijriBadgeParts(raw: String, fallback: String): HomeHijriBadgeParts {
     val compact = raw.trim().replace(Regex("\\s+"), " ")
     if (compact.isBlank()) {
-        return HomeHijriBadgeParts(dayMonth = "Hijri Date", year = "")
+        return HomeHijriBadgeParts(dayMonth = fallback, year = "")
     }
     val pieces = compact.split(" ")
     return if (pieces.size >= 2) {
@@ -615,8 +615,11 @@ fun HomeScreen(
     val displayExtraTimings = uiState.extraTimings.ifEmpty { cachedExtraTimings }
 
     val displayHijriDate = uiState.hijriDate.ifBlank { cachedHijriDate }
+    val hijriDateFallback = stringResource(R.string.home_hijri_date_fallback)
 
-    val hijriBadge = remember(displayHijriDate) { splitHijriBadgeParts(displayHijriDate) }
+    val hijriBadge = remember(displayHijriDate, hijriDateFallback) {
+        splitHijriBadgeParts(displayHijriDate, hijriDateFallback)
+    }
     val qiblaBearing = remember(uiState.locationLat, uiState.locationLng) {
         qiblaBearingDegrees(uiState.locationLat.toDouble(), uiState.locationLng.toDouble())
     }

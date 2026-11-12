@@ -34,6 +34,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.kaizen.khushu.R
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
@@ -463,7 +465,10 @@ fun TasbeehImmersiveScreen(
                     )
                     Spacer(Modifier.width(16.dp))
                     Text(
-                        text = if (resetArmed) "Release to Reset  ·  Swipe Down to Abort" else "Holding to Reset...",
+                        text = stringResource(
+                                                    if (resetArmed) R.string.tasbih_release_to_reset_hint
+                                                    else R.string.tasbih_holding_to_reset_hint,
+                                                ),
                         style = MaterialTheme.typography.bodySmall,
                         color = if (resetArmed) MaterialTheme.colorScheme.error else Color.White
                     )
@@ -483,7 +488,7 @@ fun TasbeehImmersiveScreen(
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White.copy(alpha = 0.2f))
             ) {
-                Text(text = "Exit", style = MaterialTheme.typography.bodyLarge)
+                Text(text = stringResource(R.string.tasbih_exit), style = MaterialTheme.typography.bodyLarge)
             }
         }
     }
