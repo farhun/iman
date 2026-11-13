@@ -216,7 +216,7 @@ class SettingsRepository(private val context: Context) {
                             (parts[0] == "ur" && parts[1] == "54")))) "" else id
                 },
                 selectedReciterId = preferences[PreferencesKeys.SELECTED_RECITER_ID] ?: "everyayah_mishari",
-                selectedScript = (preferences[PreferencesKeys.SELECTED_SCRIPT] ?: "uthmani")
+                selectedScript = (preferences[PreferencesKeys.SELECTED_SCRIPT] ?: "indopak")
                     .let {
                         when (it) {
                             "uthmanic_hafs" -> "uthmani"
@@ -722,7 +722,7 @@ data class UserSettings(
 
     val selectedTranslationLang: String = "",
     val selectedReciterId: String = "everyayah_mishari",
-    val selectedScript: String = "uthmani",
+    val selectedScript: String = "indopak",
 
 
 
