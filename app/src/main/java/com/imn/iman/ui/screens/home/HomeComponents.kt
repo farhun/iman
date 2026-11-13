@@ -676,8 +676,8 @@ fun PrayerSunMergedCardShimmer(modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surfaceContainerLow,
-        shadowElevation = 6.dp,
-        tonalElevation = 4.dp
+        shadowElevation = 0.dp,
+        tonalElevation = 0.dp
     ) {
         Column {
             Row(modifier = Modifier.fillMaxWidth().height(72.dp)) {
@@ -849,8 +849,8 @@ fun PrayerSunMergedCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surfaceContainerLow,
-        shadowElevation = 6.dp,
-        tonalElevation = 4.dp
+        shadowElevation = 0.dp,
+        tonalElevation = 0.dp
     ) {
         Box {
             Column {
@@ -2218,7 +2218,6 @@ fun PrayerSlab(
     prayers: List<PrayerInfo>,
     extraTimings: List<PrayerInfo>,
     activePrayerName: String?,
-    onQiblaClick: () -> Unit,
     ayahRef: String,
     darkTheme: Boolean,
     locationLabel: String,
@@ -2232,9 +2231,9 @@ fun PrayerSlab(
     }
 
     Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(0.dp),
-        color = Color.Transparent,
+        modifier = modifier.fillMaxWidth().padding(horizontal = 14.dp),
+        shape = RoundedCornerShape(24.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
         shadowElevation = 0.dp,
         tonalElevation = 0.dp
     ) {
@@ -2466,10 +2465,44 @@ fun PrayerSlab(
                         }
                     }
                 }
-
-                Spacer(modifier = Modifier.height(18.dp))
-                QuickDirectoryRow(onQiblaClick = onQiblaClick)
             }
+        }
+    }
+}
+
+@Composable
+fun HomeQiblaPill(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier,
+        shape = RoundedCornerShape(50),
+        color = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary,
+        tonalElevation = 0.dp,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 9.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = LucideIcons.Compass,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+            )
+            Text(
+                text = stringResource(R.string.home_qibla),
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 12.sp,
+                ),
+                maxLines = 1,
+                softWrap = false,
+            )
         }
     }
 }

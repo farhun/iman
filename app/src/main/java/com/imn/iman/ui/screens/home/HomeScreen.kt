@@ -781,7 +781,7 @@ fun HomeScreen(
                             .weight(1f)
                             .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)),
                         shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
-                        color = MaterialTheme.colorScheme.surfaceContainerLow,
+                        color = Color.Transparent,
                         contentColor = MaterialTheme.colorScheme.onSurface,
                     ) {
                         Box(modifier = Modifier.fillMaxSize()) {
@@ -802,7 +802,6 @@ fun HomeScreen(
                                             if (uiState.showExtraPrayerTimingsOnHome) displayExtraTimings
                                             else emptyList(),
                                         activePrayerName = currentPrayer?.name,
-                                        onQiblaClick = { selectedQuickAction = HomeQuickAction.QIBLA },
                                         ayahRef = uiState.ayahRef,
                                         darkTheme = darkTheme,
                                         locationLabel = uiState.locationLabel,
@@ -831,7 +830,23 @@ fun HomeScreen(
         ImanAppBar(
             title = "",
             onSettingsClick = onSettingsClick,
-            centerOverlayContent = { HomeHijriBadge(badge = hijriBadge) },
+            centerOverlayContent = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Box(
+                        modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.CenterStart,
+                    ) {
+                        HomeHijriBadge(badge = hijriBadge)
+                    }
+                    HomeQiblaPill(
+                        onClick = { selectedQuickAction = HomeQuickAction.QIBLA },
+                    )
+                }
+            },
             modifier = Modifier.align(Alignment.TopCenter)
         )
     }
