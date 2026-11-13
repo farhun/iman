@@ -16,13 +16,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BugReport
-import androidx.compose.material.icons.filled.Code
+
 
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material3.Icon
 
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
+
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -37,7 +37,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 
-import androidx.compose.ui.text.font.FontWeight
+
 import androidx.compose.ui.unit.dp
 import com.imn.iman.BuildConfig
 import com.imn.iman.R
@@ -48,7 +48,8 @@ private const val IMAN_ISSUES_URL = "https://github.com/farhun/iman/issues"
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutSettingsScreen(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onNavigateCredits: () -> Unit
 ) {
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -95,12 +96,7 @@ fun AboutSettingsScreen(
 //            )
 
             SectionHeader(stringResource(R.string.about_links))
-            MenuSectionItem(
-                title = stringResource(R.string.about_github_repository),
-                detail = stringResource(R.string.about_github_repository_detail),
-                imageVector = Icons.Default.Code,
-                onClick = { openUrl(IMAN_REPO_URL) }
-            )
+
             MenuSectionItem(
                 title = stringResource(R.string.about_project_page),
                 detail = stringResource(R.string.about_project_page_detail),
@@ -115,23 +111,15 @@ fun AboutSettingsScreen(
                 imageVector = Icons.Default.BugReport,
                 onClick = { openUrl(IMAN_ISSUES_URL) }
             )
+
+
+
             MenuSectionItem(
-                title = stringResource(R.string.about_contribute),
-                detail = stringResource(R.string.about_contribute_detail),
+                title = stringResource(R.string.about_credits_title),
+                detail = stringResource(R.string.about_credits_detail),
                 imageVector = Icons.AutoMirrored.Filled.MenuBook,
-                onClick = { openUrl(IMAN_REPO_URL) }
+                onClick = onNavigateCredits
             )
-
-
-            FilledTonalButton(
-                onClick = { openUrl(IMAN_ISSUES_URL) },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = stringResource(R.string.about_report_issue),
-                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold)
-                )
-            }
 
             Text(
                 text = stringResource(R.string.about_version, BuildConfig.VERSION_NAME),

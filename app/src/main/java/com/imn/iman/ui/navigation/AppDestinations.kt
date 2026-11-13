@@ -10,6 +10,7 @@ const val SETTINGS_APPEARANCE_ROUTE = "settings/appearance"
 const val SETTINGS_PRAYER_ROUTE = "settings/prayer"
 const val SETTINGS_WIDGET_ROUTE = "settings/widget"
 const val SETTINGS_ABOUT_ROUTE = "settings/about"
+const val SETTINGS_CREDITS_ROUTE = "settings/credits"
 
 const val ONBOARDING_ROUTE = "onboarding"
 

@@ -667,8 +667,19 @@ private fun ImanApp(
                         popExitTransition = { subScreenPopExit() },
                     ) {
                         AboutSettingsScreen(
-                            onBack = { navController.popBackStack() }
+                            onBack = { navController.popBackStack() },
+                            onNavigateCredits = { navController.navigate(SETTINGS_CREDITS_ROUTE) }
                         )
+                    }
+
+                    composable(
+                        route = SETTINGS_CREDITS_ROUTE,
+                        enterTransition = { subScreenEnter() },
+                        exitTransition = { subScreenExit() },
+                        popEnterTransition = { subScreenPopEnter() },
+                        popExitTransition = { subScreenPopExit() },
+                    ) {
+                        CreditsSettingsScreen(onBack = { navController.popBackStack() })
                     }
 
                     composable(

@@ -44,6 +44,37 @@
     <string name="about_contribute_detail">Follow project progress and contribute on GitHub</string>
     <string name="about_report_issue">Report an Issue</string>
     <string name="about_version">Version %1$s</string>
+    <string name="about_credits_title">Credits</string>
+    <string name="about_credits_detail">Sources, acknowledgements, and license terms</string>
+    <string name="about_credits_view_terms">View terms</string>
+    <string name="about_credits_view_license">View license</string>
+    <string name="about_credits_view_details">View details</string>
+    <string name="about_credits_indopak_title">IndoPak Quran text and font (QuranWBW)</string>
+    <string name="about_credits_uthmani_title">Uthmani Quran text and font (KFGQPC)</string>
+    <string name="about_credits_fonts_title">Fonts</string>
+    <string name="about_credits_audio_title">Audio</string>
+    <string name="about_credits_data_libraries_title">Data and libraries</string>
+    <string name="about_credits_quranwbw_link" translatable="false">QuranWBW.com</string>
+    <string name="about_credits_qul_text_link" translatable="false">QUL text</string>
+    <string name="about_credits_qul_font_link" translatable="false">QUL font</string>
+    <string name="about_credits_archive_link" translatable="false">Internet Archive</string>
+    <string name="about_credits_public_domain_link" translatable="false">Public Domain Mark 1.0</string>
+    <string name="about_credits_everyayah_link" translatable="false">EveryAyah</string>
+    <string name="about_credits_quranwbw_intro" translatable="false">The IndoPak (Hanafi) Quran text and the AlQuranNeo font come from QuranWBW.com, prepared by Ayman Siddiqui and R. Siddiqua exclusively for the service of the Noble Qur\'an as a Sadaqah Jariyah initiative.</string>
+    <string name="about_credits_quranwbw_permission" translatable="false">Prior written permission was obtained from QuranWBW.com to use the original, unmodified Quran text and font in this app. The permission is restricted to displaying the Quran text only.</string>
+    <string name="about_credits_quranwbw_copyright" translatable="false">Copyright holders and sources: © Ayman Siddiqui, © Al-Qalam and Ghandhara Software, © King Fahd Glorious Quran Printing Complex (KFGQPC).</string>
+    <string name="about_credits_quranwbw_text_sources" translatable="false">Quran text sources: King Fahd Glorious Quran Printing Complex (KFGQPC), TypeMyBook.com (Ata Rafi), InPage Quran Publishing Resources.</string>
+    <string name="about_credits_quranwbw_font_development" translatable="false">Font development: Ayman Siddiqui and R. Siddiqua, the Al-Qalam Font Project, Ghandhara Software, King Fahd Glorious Quran Printing Complex (KFGQPC).</string>
+    <string name="about_credits_quranwbw_verification" translatable="false">Verification and quality assurance: Hafiz Muhammad Zain Viqar, Content Lead at Deen App, and his team of Huffuz: Hafiz Muavia bin Muhammad Haneef, Hafiz Ali Ahmed bin Aftab Ahmed, and Hafiz Abdul Rehman bin Ramzan.</string>
+    <string name="about_credits_quranwbw_thanks" translatable="false">Special thanks: Abdul Majeed Khan, Arif Karim, Shakir-ul-Qadree, and Jawad (Al Qalam Quran Majeed font), and all contributors who directly or indirectly assisted in the digitization, preservation, verification, testing, and enhancement of Quranic text and typography.</string>
+    <string name="about_credits_qpc_hafs" translatable="false">The Uthmani script uses the QPC Hafs text (Ayah by Ayah) and the KFGQPC Uthmanic Hafs font, published by the King Fahd Glorious Quran Printing Complex (KFGQPC) and obtained from the Quranic Universal Library (QUL). They are used unmodified, and only for Quran text.</string>
+    <string name="about_credits_noto_sans_arabic" translatable="false">Noto Sans Arabic, © The Noto Project Authors, SIL Open Font License 1.1.</string>
+    <string name="about_credits_plus_jakarta_sans" translatable="false">Plus Jakarta Sans, © The Plus Jakarta Sans Project Authors (Tokotype), SIL Open Font License 1.1.</string>
+    <string name="about_credits_adhan" translatable="false">The adhan and takbir sounds come from "Adhan Recordings from Doha, Qatar" on the Internet Archive, marked Public Domain Mark 1.0. The takbir is a shortened excerpt of the same recording.</string>
+    <string name="about_credits_everyayah" translatable="false">Ayah-by-ayah recitation is streamed from EveryAyah (everyayah.com).</string>
+    <string name="about_credits_prayer_times" translatable="false">Prayer times are calculated with the adhan2 library, with an optional AlAdhan API mode (aladhan.com).</string>
+    <string name="about_credits_translations" translatable="false">Translations come from the Free Quran API by Fawaz Ahmed (github.com/fawazahmed0/quran-api). Each translation keeps its own translator\'s or publisher\'s copyright.</string>
+    <string name="about_credits_libraries" translatable="false">Iman is built with Android Jetpack and other open-source libraries, each under its own license.</string>
 
     <string name="settings_preferences">Preferences</string>
     <string name="settings_prayer_times">Prayer Times</string>

@@ -1,0 +1,103 @@
+QURANWBW INDOPAK TEXT AND ALQURANNEO FONT: TERMS AND PERMISSION
+===============================================================
+
+What it is
+  Text:  IndoPak (Hanafi) Quran text, assets/quran/indopak.json, converted from
+         the QuranWBW text file. Only the file format was changed. The Arabic
+         text was not edited.
+  Font:  AlQuranNeo, app/src/main/res/font/quran_neo_arabic.ttf, from the same
+         QuranWBW package. The file was only renamed. It was not modified.
+  Version stated in the package README: Quran text IndoPak v5.3.1, font
+  AlQuranNeo v5.3.2 (released 06 September 2025). Maintained by Ayman Siddiqui
+  and R. Siddiqua. Website: https://www.QuranWBW.com
+
+This text and font are NOT covered by the GPLv3 license of the Iman source code.
+
+Package README: "Copyright, Attribution & Usage Restrictions" (summary)
+  The package contains Indopak Quranic text data, font files, and supporting
+  resources prepared exclusively for the service of the Noble Qur'an and
+  distributed as a Sadaqah Jariyah initiative. It incorporates work from
+  various sources, and remains subject to the rights of its owners.
+
+  Copyright holders and sources:
+    (c) Ayman Siddiqui
+    (c) Al-Qalam and Ghandhara Software
+    (c) King Fahd Glorious Quran Printing Complex (KFGQPC)
+  All rights remain with their respective owners.
+
+  Permitted, with prior written permission: personal use, educational use,
+  research use, non-commercial Quranic projects, and Islamic learning
+  applications. All subject to NO-ADS, NO-PAYWALL, and ONLY Sadaqa-e-Jaria with
+  clear attribution.
+
+  Permitted only with review and prior written permission: free (Sadaqa-e-Jaria)
+  apps with paid premium features that do not contain ads, and educational
+  platform projects that pay the teachers only and contain no ads.
+
+  Strictly prohibited:
+    - Sale of the font or the bundled package
+    - Redistribution without attribution
+    - Removal of credits or acknowledgements
+    - Modification of font files
+    - Creation of derivative font works
+    - Commercial resale or relicensing
+    - Misrepresentation of source or authorship
+
+  Permissions and corrections: quranwbw[at]gmail.com
+
+  Compatibility: from the IndoPak v5.x series, the text files work only with the
+  accompanying AlQuranNeo v5.x font. Older fonts and third-party fonts are not
+  supported and can render incorrectly.
+
+Written permission
+  Received from the QuranWBW Team by email on [7-11-2026]. Keep the email. It is the
+  proof of permission.
+
+  Conditions given in that email (summarized)
+  1. The project stays free (Sadaqa-e-Jaria) for all users, with no ads and no
+     Quran text behind a paywall.
+  2. The font is used only with its matching Quran text, with no modification.
+     The text must appear exactly as on QUL, Quran.com, and QuranWBW.com.
+  3. The font is used only to display Quran text, or duas from the Quran with
+     reference to the exact ayah.
+  4. The font is not used for anything else: no non-Quranic duas, notices,
+     buttons, headings, or other text.
+  5. Mention all credits listed in the package README (below), and state that
+     prior permission was obtained to use the original, unmodified Quran text
+     and font, with the permission restricted to displaying the Quran text only.
+  They also prefer that the font is kept out of any open-source repository,
+  because anyone could then use or distribute it without their permission.
+
+How Iman follows this
+  - The app is free, with no ads and no paywall. If a paid feature is ever
+    added, ask QuranWBW for a review first (see "Permitted only with review").
+  - The font is used only for IndoPak ayah text in the Quran reader, and for
+    the 1:1 sample in the script picker, shown with its reference.
+  - The text and font files are not modified. The font file is not in the
+    repository, and the README explains where to get it.
+  - The credits below are in the README and in the app's About screen.
+
+Credits (from the package README)
+  Quran text sources
+    King Fahd Glorious Quran Printing Complex (KFGQPC)
+    TypeMyBook.com (Ata Rafi)
+    InPage Quran Publishing Resources
+  Font development
+    Ayman Siddiqui and R. Siddiqua
+    Al-Qalam Font Project
+    Ghandhara Software
+    King Fahd Glorious Quran Printing Complex (KFGQPC)
+  Verification and quality assurance
+    Hafiz Muhammad Zain Viqar, Content Lead at Deen App, and his team of Huffuz:
+      Hafiz Muavia bin Muhammad Haneef
+      Hafiz Ali Ahmed bin Aftab Ahmed
+      Hafiz Abdul Rehman bin Ramzan
+  Special thanks
+    Abdul Majeed Khan, Arif Karim, Shakir-ul-Qadree, and Jawad (Al Qalam Quran
+    Majeed font), and all contributors who directly or indirectly assisted in
+    the digitization, preservation, verification, testing, and enhancement of
+    Quranic text and typography.
+
+If the repository is made public
+  Do not include the font file in it. It is already listed in .gitignore. Old
+  copies stay in Git history, so publish from a fresh repository.
