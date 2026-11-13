@@ -83,8 +83,7 @@
     <string name="settings_appearance_summary">Theme, colors, and startup screen</string>
     <string name="widget_title">Widget</string>
     <string name="widget_settings_summary">Custom backgrounds and transparency</string>
-    <string name="settings_counter">Counter</string>
-    <string name="settings_counter_summary">Haptics and hardware behavior</string>
+
     <string name="settings_tasbih_screen">Tasbih Screen</string>
     <string name="settings_tasbih_screen_summary">Customize the tasbih screen and canvas</string>
     <string name="settings_about_summary">Story, project links, and reporting</string>
@@ -106,12 +105,10 @@
     <string name="settings_pure_amoled_black">Pure AMOLED Black</string>
     <string name="settings_pure_amoled_black_summary">Use an absolute black background in dark mode.</string>
 
-    <string name="settings_haptics">Haptics</string>
+
     <string name="settings_haptic_feedback">Haptic Feedback</string>
     <string name="settings_haptic_feedback_summary">Vibrate slightly when a count increments.</string>
-    <string name="settings_hardware">Hardware</string>
-    <string name="settings_volume_key_counting">Volume Key Counting</string>
-    <string name="settings_volume_key_counting_summary">Use the hardware volume buttons to count.</string>
+
 
     <string name="widget_designer">Widget Designer</string>
     <string name="widget_visible_items">Visible Items</string>

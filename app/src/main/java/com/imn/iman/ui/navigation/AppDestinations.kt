@@ -5,7 +5,7 @@ import com.imn.iman.R
 
 
 const val SETTINGS_ROUTE = "settings"
-const val SETTINGS_COUNTER_ROUTE = "settings/counter"
+
 const val SETTINGS_APPEARANCE_ROUTE = "settings/appearance"
 const val SETTINGS_PRAYER_ROUTE = "settings/prayer"
 const val SETTINGS_WIDGET_ROUTE = "settings/widget"

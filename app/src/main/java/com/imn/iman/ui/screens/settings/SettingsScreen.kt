@@ -13,7 +13,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.TouchApp
+
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -39,7 +39,6 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    onNavigateCounter: () -> Unit,
     onNavigateAppearance: () -> Unit,
     onNavigateWidget: () -> Unit,
     onNavigatePrayer: () -> Unit,
@@ -120,12 +119,6 @@ fun SettingsScreen(
                     onClick = onNavigateWidget
                 )
 
-                SettingsMenuItem(
-                    title = stringResource(R.string.settings_counter),
-                    subtitle = stringResource(R.string.settings_counter_summary),
-                    imageVector = Icons.Default.TouchApp,
-                    onClick = onNavigateCounter
-                )
 
                 SettingsMenuItem(
                     title = stringResource(R.string.settings_tasbih_screen),

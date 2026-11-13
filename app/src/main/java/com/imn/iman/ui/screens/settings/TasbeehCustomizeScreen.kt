@@ -125,10 +125,16 @@ fun TasbeehCustomizeScreen(
                         title = stringResource(R.string.tasbih_settings_animate_volume_keys),
                         subtitle = stringResource(R.string.tasbih_settings_animate_volume_keys_summary),
                         checked = settings.tasbeehVolumeAnimation,
-                        onCheckedChange = { viewModel.toggleTasbeehVolumeAnimation(it) },
-                        showDivider = false
+                        onCheckedChange = { viewModel.toggleTasbeehVolumeAnimation(it) }
                     )
                 }
+                SettingsToggleItem(
+                    title = stringResource(R.string.settings_haptic_feedback),
+                    subtitle = stringResource(R.string.settings_haptic_feedback_summary),
+                    checked = settings.hapticsEnabled,
+                    onCheckedChange = { viewModel.toggleHaptics(it) },
+                    showDivider = false
+                )
             }
 
             SettingsGroup(

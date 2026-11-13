@@ -60,7 +60,7 @@ class SettingsRepository(private val context: Context) {
         val DYNAMIC_COLOR = booleanPreferencesKey("dynamic_color")
         val PURE_BLACK = booleanPreferencesKey("pure_black")
         val KEEP_SCREEN_AWAKE = booleanPreferencesKey("keep_screen_awake")
-        val VOLUME_COUNTING = booleanPreferencesKey("volume_counting")
+
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val SHOW_STEP_TIMER = booleanPreferencesKey("show_step_timer")
         val FLUID_TRANSITIONS = booleanPreferencesKey("fluid_transitions")
@@ -172,7 +172,7 @@ class SettingsRepository(private val context: Context) {
                 dynamicColor = preferences[PreferencesKeys.DYNAMIC_COLOR] ?: false,
                 pureBlack = preferences[PreferencesKeys.PURE_BLACK] ?: false,
                 keepScreenAwake = preferences[PreferencesKeys.KEEP_SCREEN_AWAKE] ?: true,
-                volumeCounting = preferences[PreferencesKeys.VOLUME_COUNTING] ?: false,
+
                 themeMode = preferences[PreferencesKeys.THEME_MODE] ?: "System",
                 showStepTimer = preferences[PreferencesKeys.SHOW_STEP_TIMER] ?: true,
                 fluidTransitions = preferences[PreferencesKeys.FLUID_TRANSITIONS] ?: true,
@@ -564,9 +564,6 @@ class SettingsRepository(private val context: Context) {
         context.dataStore.edit { it[PreferencesKeys.KEEP_SCREEN_AWAKE] = enabled }
     }
 
-    suspend fun updateVolumeCounting(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.VOLUME_COUNTING] = enabled }
-    }
 
     suspend fun updateThemeMode(mode: String) {
         context.dataStore.edit { it[PreferencesKeys.THEME_MODE] = mode }
@@ -693,7 +690,7 @@ data class UserSettings(
     val dynamicColor: Boolean,
     val pureBlack: Boolean,
     val keepScreenAwake: Boolean,
-    val volumeCounting: Boolean,
+
     val themeMode: String,
     val showStepTimer: Boolean,
     val fluidTransitions: Boolean,

@@ -369,7 +369,7 @@ class MainActivity : ComponentActivity() {
         // and the user has volume-counting enabled. Everywhere else, pass the
         // event to the OS so the system volume slider works normally.
         if (isOnTasbeehImmersive &&
-            settings.volumeCounting &&
+            settings.tasbeehVolumeEnabled &&
             (keyCode == KeyEvent.KEYCODE_VOLUME_UP ||
                     keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
         ) {
@@ -583,9 +583,7 @@ private fun ImanApp(
                         popExitTransition = { subScreenPopExit() },
                     ) {
                         SettingsScreen(
-                            onNavigateCounter = {
-                                navController.navigate(SETTINGS_COUNTER_ROUTE)
-                            },
+
                             onNavigateAppearance = {
                                 navController.navigate(SETTINGS_APPEARANCE_ROUTE)
                             },
@@ -607,18 +605,6 @@ private fun ImanApp(
                         )
                     }
 
-                    composable(
-                        route = SETTINGS_COUNTER_ROUTE,
-                        enterTransition = { subScreenEnter() },
-                        exitTransition = { subScreenExit() },
-                        popEnterTransition = { subScreenPopEnter() },
-                        popExitTransition = { subScreenPopExit() },
-                    ) {
-                        CounterSettingsScreen(
-                            viewModel = settingsViewModel,
-                            onBack = { navController.popBackStack() }
-                        )
-                    }
 
                     composable(
                         route = SETTINGS_APPEARANCE_ROUTE,

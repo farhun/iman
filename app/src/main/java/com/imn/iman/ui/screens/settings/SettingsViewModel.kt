@@ -54,7 +54,7 @@ class SettingsViewModel(
             dynamicColor = false,
             pureBlack = false,
             keepScreenAwake = true,
-            volumeCounting = false,
+
             themeMode = "System",
             showStepTimer = true,
             fluidTransitions = true,
@@ -147,9 +147,6 @@ class SettingsViewModel(
         viewModelScope.launch { repository.updateKeepScreenAwake(enabled) }
     }
 
-    fun toggleVolumeCounting(enabled: Boolean) {
-        viewModelScope.launch { repository.updateVolumeCounting(enabled) }
-    }
 
     fun setThemeMode(mode: String) {
         viewModelScope.launch { repository.updateThemeMode(mode) }

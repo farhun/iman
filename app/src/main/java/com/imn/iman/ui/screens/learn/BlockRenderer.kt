@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.appendInlineContent
+
 import androidx.compose.material.icons.Icons
 
 
@@ -68,7 +68,7 @@ import com.imn.iman.data.model.HeadingBlock
 import com.imn.iman.data.model.ParagraphBlock
 import com.imn.iman.data.repository.CatalogRepository
 import com.imn.iman.data.repository.UserSettings
-import com.imn.iman.ui.components.AyahEndMarker
+
 import com.imn.iman.ui.theme.PlusJakartaSans
 import com.imn.iman.ui.theme.NotoSansArabic
 
@@ -211,40 +211,12 @@ private fun AyahBlockView(
             contentColor,
             scriptMap,
             arabicFontFamily,
-            inlineContent = if (settings.selectedScript == "uthmani") {
-                remember(block.ayah, contentColor, settings.selectedScript) {
-                    mapOf(
-                        "marker" to androidx.compose.foundation.text.InlineTextContent(
-                            androidx.compose.ui.text.Placeholder(
-                                width = 38.sp,
-                                height = 32.sp,
-                                placeholderVerticalAlign = androidx.compose.ui.text.PlaceholderVerticalAlign.Center
-                            )
-                        ) { AyahEndMarker(number = block.ayah, fg = contentColor) }
-                    )
-                }
-            } else emptyMap(),
+
             modifier = modifier.background(highlightBg)
         )
         return
     }
 
-    // Inline ayah-end marker
-    val inlineContent = if (settings.selectedScript == "uthmani") {
-        remember(block.ayah, contentColor, settings.selectedScript) {
-            mapOf(
-                "marker" to androidx.compose.foundation.text.InlineTextContent(
-                    androidx.compose.ui.text.Placeholder(
-                        width = 38.sp,
-                        height = 32.sp,
-                        placeholderVerticalAlign = androidx.compose.ui.text.PlaceholderVerticalAlign.Center
-                    )
-                ) {
-                    AyahEndMarker(number = block.ayah, fg = contentColor)
-                }
-            )
-        }
-    } else emptyMap()
 
     Column(
         modifier = modifier
@@ -295,9 +267,7 @@ private fun AyahBlockView(
                 val annotatedString = remember(plainArabicText, contentColor, settings.selectedScript) {
                     buildAnnotatedString {
                         append(plainArabicText)
-                        if (settings.selectedScript == "uthmani") {
-                            appendInlineContent("marker", "[marker]")
-                        }
+
                     }
                 }
                 Text(
@@ -307,7 +277,7 @@ private fun AyahBlockView(
                     lineHeight = (settings.arabicSizeSp * 1.8f).sp,
                     textAlign = TextAlign.Start,
                     color = contentColor,
-                    inlineContent = inlineContent,
+
                     style = MaterialTheme.typography.bodyLarge.copy(
                         textDirection = TextDirection.Rtl,
                         fontFamily = arabicFontFamily,
@@ -427,7 +397,7 @@ private fun ReadingModeAyah(
     contentColor: Color,
     scriptMap: Map<String, String>,
     arabicFontFamily: FontFamily,
-    inlineContent: Map<String, androidx.compose.foundation.text.InlineTextContent>,
+
     modifier: Modifier = Modifier,
 ) {
     val verseKey = "${block.surah}:${block.ayah}"
@@ -440,9 +410,7 @@ private fun ReadingModeAyah(
             val annotatedString = remember(plainArabicText, settings.selectedScript) {
                 buildAnnotatedString {
                     append(plainArabicText)
-                    if (settings.selectedScript == "uthmani") {
-                        appendInlineContent("marker", "[marker]")
-                    }
+
                 }
             }
             Text(
@@ -452,7 +420,7 @@ private fun ReadingModeAyah(
                 lineHeight = (settings.arabicSizeSp * 2.0f).sp,
                 // No inter-verse gap — seamless reading flow
                 color = contentColor,
-                inlineContent = inlineContent,
+
                 style = MaterialTheme.typography.bodyLarge.copy(
                     textDirection = TextDirection.Rtl,
                     fontFamily = arabicFontFamily,

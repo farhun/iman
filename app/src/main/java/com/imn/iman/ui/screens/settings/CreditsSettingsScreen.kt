@@ -20,7 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -218,9 +218,7 @@ private fun CreditTextDialog(resourceId: Int, title: String, onDismiss: () -> Un
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.weight(1f)
                     )
-                    TextButton(onClick = onDismiss) {
-                        Text(stringResource(R.string.common_close))
-                    }
+
                 }
                 if (documentText == null) {
                     CircularProgressIndicator()
