@@ -54,8 +54,8 @@ docs/superpowers/
 output-metadata.json
 
 # Local agent files
-AGENTS.md
-I18N_RULES.md
+# AGENTS.md
+# I18N_RULES.md
 
 # QuranWBW font: permission asks to keep it out of the repo
 app/src/main/res/font/quran_neo_arabic.ttf
