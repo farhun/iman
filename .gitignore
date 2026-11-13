@@ -57,3 +57,14 @@ docs/khushu-handoff/
 **/build/
 
 output-metadata.json
+
+# Local agent files
+AGENTS.md
+I18N_RULES.md
+
+# QuranWBW font: permission asks to keep it out of the repo
+app/src/main/res/font/quran_neo_arabic.ttf
+
+# Build output
+app/full/
+app/release/
