@@ -1,0 +1,38 @@
+QPC HAFS QURAN TEXT AND FONT (KFGQPC)
+=====================================
+
+What Iman uses (Uthmani script, Quran reader only)
+  Text:  "QPC Hafs script - Ayah by Ayah", published by the King Fahd Glorious
+         Quran Printing Complex (KFGQPC).
+         https://qul.tarteel.ai/resources/quran-script/86
+  Font:  "QPC Hafs" / KFGQPC Uthmanic Hafs, file uthmanic_hafs_v2_2.ttf.
+         https://qul.tarteel.ai/resources/font/245
+  Both were obtained from the Quranic Universal Library (QUL):
+  https://qul.tarteel.ai/
+
+Attribution
+  Quran text and font: King Fahd Glorious Quran Printing Complex (KFGQPC),
+  via the Quranic Universal Library (QUL).
+
+Terms
+  KFGQPC publishes its digital Quran resources for free use, including in
+  software. See its usage statements:
+  https://dm.qurancomplex.gov.sa/rights/
+  https://qurancomplex.gov.sa/privacypolicy/
+
+  The font's embedded copyright notice reads:
+  "The digitally signed machine readable Typeface(Font) licensed to you is
+  copyrighted, (2010), King Fahd Glorious Quran Printing Complex.
+  ISBN: 978-603-8010-15-0, Accession No. 1430/7278.
+  All rights reserved. This Font is the property of King Fahd Glorious Quran
+  Printing Complex, and may not be reproduced, modified without the express
+  written approval of King Fahd Glorious Quran Printing Complex."
+
+  The text and font remain the property of KFGQPC and are not covered by
+  Iman's GPLv3 license.
+
+How Iman follows this
+  - Free of charge, no ads, no paywall.
+  - The text and font are not modified.
+  - They are used only for Quran text.
+  - The font file is not in the repository.

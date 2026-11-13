@@ -8,6 +8,6 @@ import androidx.compose.ui.text.font.FontFamily
 fun rememberArabicScriptFontFamily(script: String, availableScripts: Set<String>): FontFamily =
     when (script) {
         "indopak" -> QuranIndoPak
-        "uthmani" -> AmiriQuran
-        else -> AmiriQuran
+        "uthmani" -> QuranUthmani
+        else -> QuranUthmani
     }

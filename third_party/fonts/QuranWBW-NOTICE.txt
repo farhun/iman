@@ -10,7 +10,6 @@ What it is
   Version stated in the package README: Quran text IndoPak v5.3.1, font
   AlQuranNeo v5.3.2 (released 06 September 2025). Maintained by Ayman Siddiqui
   and R. Siddiqua. Website: https://www.QuranWBW.com
-  [Confirm the version: the download folder was labelled v5.4.]
 
 This text and font are NOT covered by the GPLv3 license of the Iman source code.
 
@@ -51,7 +50,7 @@ Package README: "Copyright, Attribution & Usage Restrictions" (summary)
   supported and can render incorrectly.
 
 Written permission
-  Received from the QuranWBW Team by email on [DATE]. Keep the email. It is the
+  Received from the QuranWBW Team by email on [7-11-2026]. Keep the email. It is the
   proof of permission.
 
   Conditions given in that email (summarized)
@@ -74,8 +73,6 @@ How Iman follows this
     added, ask QuranWBW for a review first (see "Permitted only with review").
   - The font is used only for IndoPak ayah text in the Quran reader, and for
     the 1:1 sample in the script picker, shown with its reference.
-  - The Uthmani script uses Amiri Quran. All other Arabic text uses Noto Sans
-    Arabic. The interface uses Plus Jakarta Sans.
   - The text and font files are not modified. The font file is not in the
     repository, and the README explains where to get it.
   - The credits below are in the README and in the app's About screen.

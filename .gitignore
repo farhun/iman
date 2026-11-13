@@ -60,6 +60,9 @@ output-metadata.json
 # QuranWBW font: permission asks to keep it out of the repo
 app/src/main/res/font/quran_neo_arabic.ttf
 
+# QPC Hafs font :
+app/src/main/res/font/uthmanic_hafs_v2_2.ttf
+
 # Build output
 app/full/
 app/release/

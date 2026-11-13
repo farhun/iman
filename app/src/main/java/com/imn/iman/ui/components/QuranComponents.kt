@@ -13,7 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.imn.iman.ui.theme.AmiriQuran
+import com.imn.iman.ui.theme.QuranUthmani
 import com.imn.iman.ui.theme.NotoSansArabic
 
 fun Int.toArabicIndic() = this.toString().map { c ->
@@ -47,7 +47,7 @@ fun AyahEndMarker(number: Int, fg: Color) {
             text = number.toArabicIndic(),
             fontSize = 12.sp,
             color = fg,
-            fontFamily = AmiriQuran,
+            fontFamily = QuranUthmani,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
             modifier = Modifier.offset(y = 2.dp)
