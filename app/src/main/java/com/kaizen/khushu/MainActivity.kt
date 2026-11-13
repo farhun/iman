@@ -51,7 +51,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
-import com.kaizen.khushu.data.local.CanvasDatabase
+
 
 import com.kaizen.khushu.data.repository.ReleaseNotesRepository
 import com.kaizen.khushu.data.repository.SettingsRepository
@@ -95,7 +95,6 @@ class MainActivity : ComponentActivity() {
     private lateinit var settingsViewModel: SettingsViewModel
     private lateinit var tasbeehViewModel: TasbeehViewModel
 
-    private lateinit var tasbeehCanvasViewModel: TasbeehCanvasViewModel
 
     private lateinit var quranViewModel: com.kaizen.khushu.ui.screens.quran.QuranViewModel
 
@@ -201,14 +200,6 @@ class MainActivity : ComponentActivity() {
         tasbeehViewModel =
             ViewModelProvider(this as ViewModelStoreOwner, TasbeehViewModel.factory(dao))[
                 TasbeehViewModel::class.java]
-
-        val canvasDao = CanvasDatabase.getInstance(applicationContext).canvasDao()
-
-        tasbeehCanvasViewModel =
-            ViewModelProvider(
-                this as ViewModelStoreOwner,
-                TasbeehCanvasViewModel.factory(canvasDao)
-            )[TasbeehCanvasViewModel::class.java]
 
 
         quranViewModel = ViewModelProvider(this)[com.kaizen.khushu.ui.screens.quran.QuranViewModel::class.java]
@@ -361,7 +352,7 @@ class MainActivity : ComponentActivity() {
                     KhushuApp(
                         settingsViewModel = settingsViewModel,
                         tasbeehViewModel = tasbeehViewModel,
-                        tasbeehCanvasViewModel = tasbeehCanvasViewModel,
+
                         quranViewModel = quranViewModel,
                         homeViewModel = homeViewModel,
                         darkTheme = darkTheme,
@@ -382,7 +373,7 @@ class MainActivity : ComponentActivity() {
             (keyCode == KeyEvent.KEYCODE_VOLUME_UP ||
                     keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
         ) {
-            tasbeehViewModel.incrementActiveCount()
+            tasbeehViewModel.incrementActiveCount(animate = settings.tasbeehVolumeAnimation)
             return true
         }
         return super.onKeyDown(keyCode, event)
@@ -394,7 +385,7 @@ class MainActivity : ComponentActivity() {
 private fun KhushuApp(
     settingsViewModel: SettingsViewModel,
     tasbeehViewModel: TasbeehViewModel,
-    tasbeehCanvasViewModel: TasbeehCanvasViewModel,
+
     quranViewModel: com.kaizen.khushu.ui.screens.quran.QuranViewModel,
     homeViewModel: HomeViewModel,
     darkTheme: Boolean,
@@ -515,13 +506,12 @@ private fun KhushuApp(
                     ) {
                         TasbeehScreen(
                             viewModel = tasbeehViewModel,
-                            settingsViewModel = settingsViewModel,
-                            canvasViewModel = tasbeehCanvasViewModel,
+                            beadColor = Color(android.graphics.Color.parseColor(settings.tasbihBeadColor)),
                             onCollectionTap = { collection ->
                                 navController.navigate("tasbeeh/immersive/${collection.id}")
                             },
                             onEditCollection = { showCreateSheet = true },
-                            onCustomizeCanvas = { navController.navigate("tasbeeh/canvas") },
+
                             onSettingsClick = {
                                 navController.navigate(SETTINGS_ROUTE) { launchSingleTop = true }
                             },
@@ -690,7 +680,7 @@ private fun KhushuApp(
                     ) {
                         TasbeehCustomizeScreen(
                             viewModel = settingsViewModel,
-                            onPreview = { navController.navigate(TASBEEH_CANVAS_ROUTE) },
+
                             onBack = { navController.popBackStack() }
                         )
                     }
@@ -709,16 +699,12 @@ private fun KhushuApp(
                         val collections by tasbeehViewModel.collections.collectAsStateWithLifecycle()
                         val collection = collections.find { it.id.toString() == collectionId }
                         if (collection != null) {
-                            val beadStyle =
-                                if (settings.tasbihBeadStyle == "DARK_ONYX") BeadStyle.DARK_ONYX else BeadStyle.CLASSIC_AMBER
-                            val customBeadStyle = settings.customBeadStyles.find { it.id == settings.activeBeadStyleId }
 
                             TasbeehImmersiveScreen(
                                 viewModel = tasbeehViewModel,
-                                canvasViewModel = tasbeehCanvasViewModel,
+
                                 collection = collection,
-                                beadStyle = beadStyle,
-                                customBeadStyle = customBeadStyle,
+
                                 settings = settings,
                                 onExit = { navController.popBackStack() },
                             )
@@ -726,20 +712,6 @@ private fun KhushuApp(
                     }
 
 
-
-                    composable(
-                        route = TASBEEH_CANVAS_ROUTE,
-                        enterTransition = { subScreenEnter() },
-                        exitTransition = { subScreenExit() },
-                        popEnterTransition = { subScreenPopEnter() },
-                        popExitTransition = { subScreenPopExit() },
-                    ) {
-                        TasbeehCanvasScreen(
-                            viewModel = tasbeehCanvasViewModel,
-                            settingsViewModel = settingsViewModel,
-                            onExit = { navController.popBackStack() }
-                        )
-                    }
 
 
                 }

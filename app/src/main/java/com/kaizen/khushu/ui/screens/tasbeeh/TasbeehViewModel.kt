@@ -103,11 +103,11 @@ class TasbeehViewModel(private val dao: TasbeehDao) : ViewModel() {
             initialValue = emptyList(),
         )
 
-    private val _countIncrementSignal = kotlinx.coroutines.flow.MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    private val _countIncrementSignal = kotlinx.coroutines.flow.MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
     val countIncrementSignal = _countIncrementSignal.asSharedFlow()
 
-    fun incrementActiveCount() {
-        viewModelScope.launch { _countIncrementSignal.emit(Unit) }
+    fun incrementActiveCount(animate: Boolean = false) {
+        viewModelScope.launch { _countIncrementSignal.emit(animate) }
     }
 
     init {

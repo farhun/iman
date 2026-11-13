@@ -369,7 +369,8 @@ private fun WidgetVisibilityToggle(
 fun AdvancedColorPickerSheet(
     initialColor: Color,
     onColorSelected: (Color) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onResetToDefault: (() -> Unit)? = null,
 ) {
     var hue by remember { mutableStateOf(0f) }
     var saturation by remember { mutableStateOf(1f) }
@@ -386,6 +387,7 @@ fun AdvancedColorPickerSheet(
     }
 
     val currentColor = Color.hsv(hue, saturation, value)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LaunchedEffect(hue, saturation, value) {
         hexString = String.format("#%06X", 0xFFFFFF and currentColor.toArgb())
@@ -393,11 +395,14 @@ fun AdvancedColorPickerSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
+        sheetState = sheetState,
         dragHandle = null,
         containerColor = Color.White // Match the look from the user's image
     ) {
         Column(
             modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
                 .padding(24.dp)
                 .padding(bottom = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -522,7 +527,17 @@ fun AdvancedColorPickerSheet(
                 )
             }
 
-            Spacer(Modifier.height(48.dp))
+            if (onResetToDefault != null) {
+                Spacer(Modifier.height(24.dp))
+                TextButton(
+                    onClick = onResetToDefault,
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                ) {
+                    Text(stringResource(R.string.tasbih_reset_to_default), color = Color.Gray, fontFamily = PlusJakartaSans)
+                }
+            }
+
+            Spacer(Modifier.height(24.dp))
 
             // Action Buttons
             Row(

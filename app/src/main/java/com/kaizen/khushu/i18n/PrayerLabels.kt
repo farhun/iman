@@ -33,17 +33,3 @@ fun prayerLabel(context: Context, id: String): String {
     val labelRes = prayerLabelRes(id)
     return if (labelRes == 0) id else LocaleHelper.wrap(context).getString(labelRes)
 }
-
-@StringRes
-fun tasbihCanvasPresetLabelRes(id: String): Int = when (id) {
-    "traditional" -> R.string.tasbih_canvas_preset_traditional
-    "minimal" -> R.string.tasbih_canvas_preset_minimal
-    "classic" -> R.string.tasbih_canvas_preset_classic
-    else -> 0
-}
-
-@Composable
-fun tasbihCanvasPresetLabel(id: String, fallback: String): String {
-    val labelRes = tasbihCanvasPresetLabelRes(id)
-    return if (labelRes == 0) fallback else stringResource(labelRes)
-}

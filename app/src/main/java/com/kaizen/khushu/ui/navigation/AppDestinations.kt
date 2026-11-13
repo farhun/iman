@@ -16,10 +16,8 @@ const val ONBOARDING_ROUTE = "onboarding"
 
 const val SETTINGS_TASBEEH_ROUTE = "settings/tasbeeh"
 
-// Immersive & Editor Routes
+// Immersive route
 const val TASBEEH_IMMERSIVE_ROUTE = "tasbeeh/immersive/{collectionId}"
-
-const val TASBEEH_CANVAS_ROUTE = "tasbeeh/canvas"
 
 
 enum class AppDestinations(@StringRes val labelRes: Int, val icon: Int, val route: String) {

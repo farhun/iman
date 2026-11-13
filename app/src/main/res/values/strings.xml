@@ -314,6 +314,10 @@
     <string name="tasbih_customize">Customize</string>
     <string name="tasbih_screen_ui">Screen UI</string>
     <string name="tasbih_bead_style">Bead Style</string>
+    <string name="tasbih_bead_mode_summary">Choose how a bead counts.</string>
+    <string name="tasbih_bead_mode_slide">Slide</string>
+    <string name="tasbih_bead_mode_press">Press</string>
+    <string name="tasbih_press_bead_description">Count with bead</string>
     <string name="tasbih_collection_fallback">Collection</string>
     <string name="tasbih_dhikr_list">DHIKR LIST</string>
     <string name="tasbih_confirm_delete">Confirm Delete</string>
@@ -366,6 +370,11 @@
     <string name="tasbih_trackers_removed_title">Trackers Removed</string>
     <string name="tasbih_string_removed_message">Since String widget is removed, for counting tasbih you have to use volume up/down buttons now for doing tasbih.</string>
     <string name="tasbih_blind_mode_warning">If you remove string and counter then you won\'t be able to track the count and would have to rely on volume up/down. Consider adding some widget to track count, or if you wanted a minimal look try the Stealth Mode (save the canvas and stealth mode toggle is right outside).</string>
+    <string name="tasbih_settings_colors">Colors</string>
+    <string name="tasbih_background_color">Background color</string>
+    <string name="tasbih_bead_color">Bead color</string>
+    <string name="tasbih_text_color">Text color</string>
+    <string name="tasbih_reset_to_default">Reset to default</string>
     <string name="tasbih_settings_layout">Layout</string>
     <string name="tasbih_settings_edit_screen">Edit Tasbih Screen</string>
     <string name="tasbih_settings_edit_screen_summary">Customize layout and widget placement</string>

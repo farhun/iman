@@ -9,17 +9,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.BorderStroke
+
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Tune
+
 import androidx.compose.material3.*
 
 import androidx.compose.runtime.*
@@ -41,20 +38,19 @@ import androidx.compose.ui.geometry.Offset
 
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
+
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 
-import com.kaizen.khushu.data.model.CustomBeadStyle
-import com.kaizen.khushu.data.model.TasbeehCanvasPresetDomain
+
 import com.kaizen.khushu.data.model.TasbeehCollection
-import com.kaizen.khushu.data.repository.UserSettings
+
 import com.kaizen.khushu.ui.navigation.AppDestinations
-import com.kaizen.khushu.i18n.tasbihCanvasPresetLabel
-import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
+
+
 import com.kaizen.khushu.ui.theme.fontForText
 
 import com.kaizen.khushu.ui.theme.PlusJakartaSans
@@ -72,18 +68,15 @@ import kotlinx.coroutines.launch
 @Composable
 fun TasbeehScreen(
     viewModel: TasbeehViewModel,
-    settingsViewModel: SettingsViewModel,
-    canvasViewModel: TasbeehCanvasViewModel,
+    beadColor: Color,
     onCollectionTap: (TasbeehCollection) -> Unit,
     onEditCollection: () -> Unit,
-    onCustomizeCanvas: () -> Unit,
     onSettingsClick: () -> Unit,
     hazeState: dev.chrisbanes.haze.HazeState,
     contentPadding: PaddingValues = PaddingValues(),
     modifier: Modifier = Modifier,
 ) {
     val collections by viewModel.collections.collectAsStateWithLifecycle(initialValue = emptyList())
-    val settings by settingsViewModel.settings.collectAsStateWithLifecycle()
     var searchActive by remember { mutableStateOf(false) }
     var query by remember { mutableStateOf("") }
     var selectedCollection by remember { mutableStateOf<TasbeehCollection?>(null) }
@@ -183,8 +176,7 @@ fun TasbeehScreen(
                     items(filtered, key = { "real_${it.id}" }) { collection ->
                         TasbihCollectionListItem(
                             collection = collection,
-                            customBeadStyle = settings.customBeadStyles.find { it.id == settings.activeBeadStyleId },
-                            beadStyle = if (settings.tasbihBeadStyle == "DARK_ONYX") BeadStyle.DARK_ONYX else BeadStyle.CLASSIC_AMBER,
+                            beadColor = beadColor,
                             onClick = { selectedCollection = collection },
                         )
                     }
@@ -197,15 +189,13 @@ fun TasbeehScreen(
     selectedCollection?.let { collection ->
         CollectionDetailSheet(
             collection = collection,
-            accentColor = MaterialTheme.colorScheme.primary,
-            settingsViewModel = settingsViewModel,
-            canvasViewModel = canvasViewModel,
+
             onDismiss = { selectedCollection = null },
             onStart = {
                 onCollectionTap(collection)
                 selectedCollection = null
             },
-            onCustomizeCanvas = onCustomizeCanvas,
+
             onEdit = {
                 viewModel.loadCollectionForEdit(collection)
                 selectedCollection = null
@@ -222,25 +212,15 @@ fun TasbeehScreen(
 @Composable
 private fun CollectionDetailSheet(
     collection: TasbeehCollection,
-    accentColor: Color,
-    settingsViewModel: SettingsViewModel,
-    canvasViewModel: TasbeehCanvasViewModel,
+
     onDismiss: () -> Unit,
     onStart: () -> Unit,
-    onCustomizeCanvas: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
 ) {
     var showDeleteConfirm by remember { mutableStateOf(false) }
-    var showBeadCustomizer by remember { mutableStateOf(false) }
-    var showPresets by remember { mutableStateOf(false) }
-    var showCustomization by remember { mutableStateOf(false) }
-
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val settings by settingsViewModel.settings.collectAsStateWithLifecycle()
-    val layout by canvasViewModel.layout.collectAsStateWithLifecycle()
-    val presets by canvasViewModel.presets.collectAsStateWithLifecycle()
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -265,36 +245,15 @@ private fun CollectionDetailSheet(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
-                    if (showCustomization) {
-                        Text(
-                            text = stringResource(R.string.common_back),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .clickable { showCustomization = false }
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                        )
-                    } else {
-                        Text(
-                            text = stringResource(R.string.tasbih_edit),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .clickable { onEdit() }
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                        )
-                        Text(
-                            text = stringResource(R.string.tasbih_customize),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .clickable { showCustomization = true }
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                        )
-                    }
+                    Text(
+                        text = stringResource(R.string.tasbih_edit),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable { onEdit() }
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
                 }
 
                 Row(
@@ -325,64 +284,7 @@ private fun CollectionDetailSheet(
                     .weight(1f),
                 contentPadding = PaddingValues(start = 28.dp, end = 28.dp, bottom = 8.dp),
             ) {
-                if (showCustomization) {
-                    item {
-                        Spacer(Modifier.height(10.dp))
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            PrepPreviewCard(
-                                title = stringResource(R.string.tasbih_screen_ui),
-                                cardHeight = 236.dp,
-                                onClick = { showPresets = true }
-                            ) {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    MiniTasbihScreenPreview(
-                                        collection = collection,
-                                        layout = layout,
-                                        settings = settings,
-                                        modifier = Modifier
-                                            .fillMaxHeight()
-                                            .padding(vertical = 10.dp)
-                                            .aspectRatio(0.54f)
-                                    )
-                                }
-                            }
-
-                            PrepPreviewCard(
-                                title = stringResource(R.string.tasbih_bead_style),
-                                cardHeight = 96.dp,
-                                onClick = { showBeadCustomizer = true }
-                            ) {
-                               val customBeadStyle = settings.customBeadStyles.find { it.id == settings.activeBeadStyleId }
-                               val legacyBeadStyle = if (settings.tasbihBeadStyle == "DARK_ONYX") BeadStyle.DARK_ONYX else BeadStyle.CLASSIC_AMBER
-                               val customShape = customBeadStyle?.let { beadShapeTypeToShape(it.shapeType) }
-                               val noiseShader = GlobalNoiseShader.value
-                               val noiseBrush = remember(noiseShader) { ShaderBrush(noiseShader) }
-                               val arabicEngravingTypeface = rememberArabicEngravingTypeface()
-
-                               Canvas(modifier = Modifier.size(52.dp)) {
-                                   val r = size.minDimension / 2f
-                                   drawBeadWrapper(
-                                       center = Offset(r, r),
-                                       radius = r,
-                                       legacyStyle = legacyBeadStyle,
-                                       customStyle = customBeadStyle,
-                                       customShape = customShape,
-                                       noiseBrush = noiseBrush,
-                                       arabicTypeface = arabicEngravingTypeface,
-                                   )
-                               }
-                            }
-                        }
-                        Spacer(Modifier.height(28.dp))
-                    }
-                } else {
-                    item {
+                item {
                         Spacer(Modifier.height(10.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -455,7 +357,6 @@ private fun CollectionDetailSheet(
                             )
                         }
                     }
-                }
             }
 
             // Footer (Sticky)
@@ -498,215 +399,21 @@ private fun CollectionDetailSheet(
         }
     }
 
-    if (showBeadCustomizer) {
-        TasbihBeadCustomizerSheet(
-            settingsViewModel = settingsViewModel,
-            onDismiss = { showBeadCustomizer = false }
-        )
-    }
 
-    if (showPresets) {
-        PrepPresetsPickerSheet(
-            presets = presets,
-            onLoad = { canvasViewModel.loadPreset(it) },
-            onCustomizeMyOwn = {
-                showPresets = false
-                onDismiss()
-                onCustomizeCanvas()
-            },
-            onDismiss = { showPresets = false }
-        )
-    }
 }
 
-@Composable
-private fun MiniTasbihScreenPreview(
-    collection: TasbeehCollection,
-    layout: TasbeehCanvasLayout,
-    settings: UserSettings,
-    modifier: Modifier = Modifier,
-) {
-    val currentItem = collection.items.firstOrNull()
-    val customBeadStyle = settings.customBeadStyles.find { it.id == settings.activeBeadStyleId }
-    val beadStyle = if (settings.tasbihBeadStyle == "DARK_ONYX") BeadStyle.DARK_ONYX else BeadStyle.CLASSIC_AMBER
 
-    BoxWithConstraints(
-        modifier = modifier
-            .padding(horizontal = 6.dp, vertical = 4.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color(layout.backgroundColorInt.toLong()))
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.55f),
-                shape = RoundedCornerShape(16.dp)
-            )
-    ) {
-        val previewWidth = constraints.maxWidth.toFloat()
-        val previewHeight = constraints.maxHeight.toFloat()
-        val scaleMultiplier = 0.24f
 
-        layout.widgets.sortedBy { it.zIndex }.forEach { widget ->
-            Box(
-                modifier = Modifier.graphicsLayer {
-                    translationX = (widget.offsetX * previewWidth) - (size.width / 2f)
-                    translationY = (widget.offsetY * previewHeight) - (size.height / 2f)
-                    scaleX = widget.scale * scaleMultiplier
-                    scaleY = widget.scale * scaleMultiplier
-                    transformOrigin = TransformOrigin.Center
-                    clip = false
-                }
-            ) {
-                TasbihWidgetRenderer(
-                    widget = widget,
-                    currentCount = (currentItem?.targetCount ?: 33) / 3,
-                    currentItem = currentItem,
-                    countedBeads = (currentItem?.targetCount ?: 33) / 3,
-                    totalBeads = currentItem?.targetCount ?: 33,
-                    beadStyle = beadStyle,
-                    customBeadStyle = customBeadStyle,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun PrepPreviewCard(
-    modifier: Modifier = Modifier,
-    title: String,
-    cardHeight: Dp = 104.dp,
-    onClick: () -> Unit,
-    previewContent: @Composable BoxScope.() -> Unit
-) {
-    OutlinedCard(
-        onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth()
-            .height(cardHeight),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Box(
-                modifier = Modifier.fillMaxWidth().weight(1f),
-                contentAlignment = Alignment.Center,
-                content = previewContent
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)
-                    .padding(vertical = 6.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(Modifier.width(4.dp))
-                    Icon(Icons.Default.Tune, null, modifier = Modifier.size(10.dp), tint = MaterialTheme.colorScheme.primary)
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun PrepPresetsPickerSheet(
-    presets: List<TasbeehCanvasPresetDomain>,
-    onLoad: (TasbeehCanvasPresetDomain) -> Unit,
-    onCustomizeMyOwn: () -> Unit,
-    onDismiss: () -> Unit,
-) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 32.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.tasbih_choose_screen_preset),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(bottom = 20.dp)
-            )
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.heightIn(max = 300.dp)
-            ) {
-                items(presets) { preset ->
-                    val presetName = tasbihCanvasPresetLabel(preset.id, preset.name)
-                    OutlinedCard(
-                        onClick = { onLoad(preset); onDismiss() },
-                        shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
-                    ) {
-                        Column(Modifier.padding(12.dp)) {
-                            Text(
-                                presetName,
-                                style = MaterialTheme.typography.labelLarge.copy(
-                                    fontFamily = fontForText(presetName, PlusJakartaSans)
-                                ),
-                                maxLines = 1,
-                            )
-                            Text(
-                                pluralStringResource(
-                                    R.plurals.tasbih_widget_count,
-                                    preset.widgets.size,
-                                    preset.widgets.size,
-                                ),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                            )
-                        }
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            Button(
-                onClick = onCustomizeMyOwn,
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer, contentColor = MaterialTheme.colorScheme.onSecondaryContainer)
-            ) {
-                Icon(Icons.Default.Tune, null, modifier = Modifier.size(18.dp))
-                Spacer(Modifier.width(8.dp))
-                Text(stringResource(R.string.tasbih_customize_my_own))
-            }
-        }
-    }
-}
 
 @Composable
 private fun TasbihCollectionListItem(
     collection: TasbeehCollection,
-    customBeadStyle: CustomBeadStyle?,
-    beadStyle: BeadStyle,
+    beadColor: Color,
     onClick: () -> Unit,
 ) {
-
     val collectionTitle = collection.title?.takeIf { it.isNotBlank() }
         ?: collection.items.firstOrNull()?.name
         ?: stringResource(R.string.nav_tasbih)
-    val resolvedStyle = customBeadStyle?.copy(engravingText = "")
-    val customShape = resolvedStyle?.let { beadShapeTypeToShape(it.shapeType) }
-    val noiseShader = GlobalNoiseShader.value
-    val noiseBrush = remember(noiseShader) { ShaderBrush(noiseShader) }
 
     Row(
         modifier = Modifier
@@ -722,14 +429,7 @@ private fun TasbihCollectionListItem(
         ) {
             Canvas(modifier = Modifier.size(22.dp)) {
                 val radius = size.minDimension / 2f
-                drawBeadWrapper(
-                    center = Offset(radius, radius),
-                    radius = radius,
-                    legacyStyle = beadStyle,
-                    customStyle = resolvedStyle,
-                    customShape = customShape,
-                    noiseBrush = noiseBrush,
-                )
+                drawTasbihBead(Offset(radius, radius), radius, baseColor = beadColor)
             }
         }
 

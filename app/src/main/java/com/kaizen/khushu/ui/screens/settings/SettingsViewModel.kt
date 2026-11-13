@@ -14,9 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.kaizen.khushu.R
 import com.kaizen.khushu.i18n.LocaleHelper
-import com.kaizen.khushu.data.model.CustomBeadStyle
-import com.kaizen.khushu.data.model.DEFAULT_CUSTOM_BEAD_STYLE_ID
-import com.kaizen.khushu.data.model.defaultCustomBeadStyle
+
 import com.kaizen.khushu.data.repository.QuranScriptFontRepository
 import com.kaizen.khushu.data.repository.SettingsRepository
 import com.kaizen.khushu.data.repository.UserSettings
@@ -66,10 +64,6 @@ class SettingsViewModel(
             colorSeed = "default",
             tasbeehListMode = true,
             startupTab = "home",
-            tasbihBeadStyle = "CLASSIC_AMBER",
-
-            customBeadStyles = listOf(defaultCustomBeadStyle()),
-            activeBeadStyleId = DEFAULT_CUSTOM_BEAD_STYLE_ID,
             tasbihSoundEnabled = true,
             tasbihSoundId = "1",
             lastSeenAppVersionCode = 0,
@@ -182,13 +176,26 @@ class SettingsViewModel(
         viewModelScope.launch { repository.updateColorSeed(seed) }
     }
 
+    fun setTasbihBackgroundColor(color: String) {
+        viewModelScope.launch { repository.updateTasbihBackgroundColor(color) }
+    }
+
+    fun setTasbihBeadColor(color: String) {
+        viewModelScope.launch { repository.updateTasbihBeadColor(color) }
+    }
+
+    fun setTasbihBeadMode(mode: String) {
+        viewModelScope.launch { repository.updateTasbihBeadMode(mode) }
+    }
+
+    fun setTasbihTextColor(color: String) {
+        viewModelScope.launch { repository.updateTasbihTextColor(color) }
+    }
+
     fun toggleTasbeehListMode(isList: Boolean) {
         viewModelScope.launch { repository.updateTasbeehListMode(isList) }
     }
 
-    fun toggleTasbeehDynamicColors(enabled: Boolean) {
-        viewModelScope.launch { repository.updateTasbeehDynamicColors(enabled) }
-    }
 
     fun toggleTasbeehStealthModeAllowed(enabled: Boolean) {
         viewModelScope.launch { repository.updateTasbeehStealthModeAllowed(enabled) }
@@ -223,48 +230,10 @@ class SettingsViewModel(
     }
 
 
-    fun setStringElasticity(value: Float) {
-        viewModelScope.launch { repository.updateStringElasticity(value) }
-    }
 
-    fun setWobbleStiffness(value: Float) {
-        viewModelScope.launch { repository.updateWobbleStiffness(value) }
-    }
-
-    fun setWobbleDampingRatio(value: Float) {
-        viewModelScope.launch { repository.updateWobbleDampingRatio(value) }
-    }
-
-    fun setBeadMicroScale(value: Float) {
-        viewModelScope.launch { repository.updateBeadMicroScale(value) }
-    }
-
-    fun saveCustomBeadStyle(style: CustomBeadStyle) {
-        val currentList = settings.value.customBeadStyles.toMutableList()
-        val index = currentList.indexOfFirst { it.id == style.id }
-        if (index != -1) {
-            currentList[index] = style
-        } else {
-            currentList.add(style)
-        }
-        viewModelScope.launch { repository.updateCustomBeadStyles(currentList) }
-    }
-
-    fun deleteCustomBeadStyle(id: String) {
-        val newList = settings.value.customBeadStyles.filter { it.id != id }
-        viewModelScope.launch { repository.updateCustomBeadStyles(newList) }
-    }
-
-    fun setActiveBeadStyleId(id: String) {
-        viewModelScope.launch { repository.updateActiveBeadStyleId(id) }
-    }
 
     fun setStartupTab(route: String) {
         viewModelScope.launch { repository.updateStartupTab(route) }
-    }
-
-    fun setTasbihBeadStyle(style: String) {
-        viewModelScope.launch { repository.updateTasbihBeadStyle(style) }
     }
 
 

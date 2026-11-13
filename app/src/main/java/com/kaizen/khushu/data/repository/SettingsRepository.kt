@@ -4,14 +4,11 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
-import com.kaizen.khushu.data.model.CustomBeadStyle
-import com.kaizen.khushu.data.model.DEFAULT_CUSTOM_BEAD_STYLE_ID
-import com.kaizen.khushu.data.model.defaultCustomBeadStyle
+
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+
 import java.io.IOException
 
 object WidgetVisibilityItems {
@@ -28,6 +25,11 @@ object WidgetVisibilityItems {
 }
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+
+const val DEFAULT_TASBIH_BACKGROUND_COLOR = "#000000"
+const val DEFAULT_TASBIH_BEAD_COLOR = "#D4850A"
+const val DEFAULT_TASBIH_TEXT_COLOR = "#FFFFFF"
+const val DEFAULT_TASBIH_BEAD_MODE = "slide"
 private val PRAYER_SOUND_OPTIONS = setOf("DEFAULT", "ADHAN", "TAKBIR", "SILENT")
 
 internal fun supportsLocalCalculationMethod(methodStr: String): Boolean = when (methodStr) {
@@ -68,7 +70,10 @@ class SettingsRepository(private val context: Context) {
         val COLOR_SEED = stringPreferencesKey("color_seed")
         val TASBEEH_LIST_MODE = booleanPreferencesKey("tasbeeh_list_mode")
         val STARTUP_TAB = stringPreferencesKey("startup_tab")
-        val TASBIH_BEAD_STYLE = stringPreferencesKey("tasbih_bead_style")
+        val TASBIH_BACKGROUND_COLOR = stringPreferencesKey("tasbih_background_color")
+        val TASBIH_BEAD_COLOR = stringPreferencesKey("tasbih_bead_color")
+        val TASBIH_TEXT_COLOR = stringPreferencesKey("tasbih_text_color")
+        val TASBIH_BEAD_MODE = stringPreferencesKey("tasbih_bead_mode")
 
         val READING_THEME = stringPreferencesKey("reading_theme")
         val ARABIC_SIZE_SP = floatPreferencesKey("arabic_size_sp")
@@ -86,17 +91,8 @@ class SettingsRepository(private val context: Context) {
 
         val SELECTED_RECITER_ID = stringPreferencesKey("selected_reciter_id")
         val SELECTED_SCRIPT = stringPreferencesKey("selected_script")
-        val TASBEEH_DYNAMIC_COLORS = booleanPreferencesKey("tasbeeh_dynamic_colors")
 
-        // Tasbih Physics
-        val STRING_ELASTICITY = floatPreferencesKey("string_elasticity")
-        val WOBBLE_STIFFNESS = floatPreferencesKey("wobble_stiffness")
-        val WOBBLE_DAMPING_RATIO = floatPreferencesKey("wobble_damping_ratio")
-        val BEAD_MICRO_SCALE = floatPreferencesKey("bead_micro_scale")
 
-        // Custom Bead Styles
-        val CUSTOM_BEAD_STYLES_JSON = stringPreferencesKey("custom_bead_styles_json")
-        val ACTIVE_BEAD_STYLE_ID = stringPreferencesKey("active_bead_style_id")
 
         // Tasbeeh Interaction
         val TASBEEH_STEALTH_MODE_ALLOWED = booleanPreferencesKey("tasbeeh_stealth_mode_allowed")
@@ -170,21 +166,6 @@ class SettingsRepository(private val context: Context) {
                 throw exception
             }
         }.map { preferences ->
-            val customStylesJson = preferences[PreferencesKeys.CUSTOM_BEAD_STYLES_JSON] ?: "[]"
-            val customStyles = try {
-                Json.decodeFromString<List<CustomBeadStyle>>(customStylesJson)
-            } catch (e: Exception) {
-                emptyList()
-            }
-            val resolvedCustomStyles = if (customStyles.isEmpty()) {
-                listOf(defaultCustomBeadStyle())
-            } else {
-                customStyles
-            }
-            val requestedActiveStyleId = preferences[PreferencesKeys.ACTIVE_BEAD_STYLE_ID]
-            val resolvedActiveStyleId = requestedActiveStyleId
-                ?.takeIf { id -> resolvedCustomStyles.any { it.id == id } }
-                ?: DEFAULT_CUSTOM_BEAD_STYLE_ID
 
             UserSettings(
                 hapticsEnabled = preferences[PreferencesKeys.HAPTICS_ENABLED] ?: true,
@@ -201,7 +182,14 @@ class SettingsRepository(private val context: Context) {
                 colorSeed = preferences[PreferencesKeys.COLOR_SEED] ?: "default",
                 tasbeehListMode = preferences[PreferencesKeys.TASBEEH_LIST_MODE] ?: true,
                 startupTab = preferences[PreferencesKeys.STARTUP_TAB] ?: "home",
-                tasbihBeadStyle = preferences[PreferencesKeys.TASBIH_BEAD_STYLE] ?: "CLASSIC_AMBER",
+                tasbihBackgroundColor = preferences[PreferencesKeys.TASBIH_BACKGROUND_COLOR]
+                    ?: DEFAULT_TASBIH_BACKGROUND_COLOR,
+                tasbihBeadColor = preferences[PreferencesKeys.TASBIH_BEAD_COLOR]
+                    ?: DEFAULT_TASBIH_BEAD_COLOR,
+                tasbihTextColor = preferences[PreferencesKeys.TASBIH_TEXT_COLOR]
+                    ?: DEFAULT_TASBIH_TEXT_COLOR,
+                tasbihBeadMode = preferences[PreferencesKeys.TASBIH_BEAD_MODE]
+                    ?: DEFAULT_TASBIH_BEAD_MODE,
 
                 readingTheme = preferences[PreferencesKeys.READING_THEME] ?: "AUTO",
                 arabicSizeSp = preferences[PreferencesKeys.ARABIC_SIZE_SP] ?: 32f,
@@ -236,13 +224,9 @@ class SettingsRepository(private val context: Context) {
                             else -> it
                         }
                     },
-                tasbeehDynamicColors = preferences[PreferencesKeys.TASBEEH_DYNAMIC_COLORS] ?: true,
-                stringElasticity = preferences[PreferencesKeys.STRING_ELASTICITY] ?: 1.8f,
-                wobbleStiffness = preferences[PreferencesKeys.WOBBLE_STIFFNESS] ?: 140f,
-                wobbleDampingRatio = preferences[PreferencesKeys.WOBBLE_DAMPING_RATIO] ?: 0.25f,
-                beadMicroScale = preferences[PreferencesKeys.BEAD_MICRO_SCALE] ?: 1.2f,
-                customBeadStyles = resolvedCustomStyles,
-                activeBeadStyleId = resolvedActiveStyleId,
+
+
+
                 tasbeehStealthModeAllowed = preferences[PreferencesKeys.TASBEEH_STEALTH_MODE_ALLOWED] ?: false,
                 tasbeehVolumeEnabled = preferences[PreferencesKeys.TASBEEH_VOLUME_ENABLED] ?: true,
                 tasbeehVolumeAnimation = preferences[PreferencesKeys.TASBEEH_VOLUME_ANIMATION] ?: true,
@@ -547,34 +531,22 @@ class SettingsRepository(private val context: Context) {
     }
 
 
-    suspend fun updateCustomBeadStyles(styles: List<CustomBeadStyle>) {
-        val json = Json.encodeToString(styles)
-        context.dataStore.edit { it[PreferencesKeys.CUSTOM_BEAD_STYLES_JSON] = json }
+    suspend fun updateTasbihBackgroundColor(color: String) {
+        context.dataStore.edit { it[PreferencesKeys.TASBIH_BACKGROUND_COLOR] = color }
     }
 
-    suspend fun updateActiveBeadStyleId(id: String) {
-        context.dataStore.edit { it[PreferencesKeys.ACTIVE_BEAD_STYLE_ID] = id }
+    suspend fun updateTasbihBeadColor(color: String) {
+        context.dataStore.edit { it[PreferencesKeys.TASBIH_BEAD_COLOR] = color }
     }
 
-    suspend fun updateTasbeehDynamicColors(enabled: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.TASBEEH_DYNAMIC_COLORS] = enabled }
+    suspend fun updateTasbihTextColor(color: String) {
+        context.dataStore.edit { it[PreferencesKeys.TASBIH_TEXT_COLOR] = color }
     }
 
-    suspend fun updateStringElasticity(value: Float) {
-        context.dataStore.edit { it[PreferencesKeys.STRING_ELASTICITY] = value }
+    suspend fun updateTasbihBeadMode(mode: String) {
+        context.dataStore.edit { it[PreferencesKeys.TASBIH_BEAD_MODE] = mode }
     }
 
-    suspend fun updateWobbleStiffness(value: Float) {
-        context.dataStore.edit { it[PreferencesKeys.WOBBLE_STIFFNESS] = value }
-    }
-
-    suspend fun updateWobbleDampingRatio(value: Float) {
-        context.dataStore.edit { it[PreferencesKeys.WOBBLE_DAMPING_RATIO] = value }
-    }
-
-    suspend fun updateBeadMicroScale(value: Float) {
-        context.dataStore.edit { it[PreferencesKeys.BEAD_MICRO_SCALE] = value }
-    }
 
     suspend fun updateHaptics(enabled: Boolean) {
         context.dataStore.edit { it[PreferencesKeys.HAPTICS_ENABLED] = enabled }
@@ -627,10 +599,6 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun updateStartupTab(route: String) {
         context.dataStore.edit { it[PreferencesKeys.STARTUP_TAB] = route }
-    }
-
-    suspend fun updateTasbihBeadStyle(style: String) {
-        context.dataStore.edit { it[PreferencesKeys.TASBIH_BEAD_STYLE] = style }
     }
 
 
@@ -735,7 +703,10 @@ data class UserSettings(
     val colorSeed: String,
     val tasbeehListMode: Boolean,
     val startupTab: String,
-    val tasbihBeadStyle: String,
+    val tasbihBackgroundColor: String = DEFAULT_TASBIH_BACKGROUND_COLOR,
+    val tasbihBeadColor: String = DEFAULT_TASBIH_BEAD_COLOR,
+    val tasbihTextColor: String = DEFAULT_TASBIH_TEXT_COLOR,
+    val tasbihBeadMode: String = DEFAULT_TASBIH_BEAD_MODE,
 
     val readingTheme: String = "DARK",
     val arabicSizeSp: Float = 32f,
@@ -752,13 +723,9 @@ data class UserSettings(
     val selectedTranslationLang: String = "",
     val selectedReciterId: String = "everyayah_mishari",
     val selectedScript: String = "uthmani",
-    val tasbeehDynamicColors: Boolean = true,
-    val stringElasticity: Float = 1.8f,
-    val wobbleStiffness: Float = 140f,
-    val wobbleDampingRatio: Float = 0.25f,
-    val beadMicroScale: Float = 1.2f,
-    val customBeadStyles: List<CustomBeadStyle> = listOf(defaultCustomBeadStyle()),
-    val activeBeadStyleId: String = DEFAULT_CUSTOM_BEAD_STYLE_ID,
+
+
+
     val tasbeehStealthModeAllowed: Boolean = false,
     val tasbeehVolumeEnabled: Boolean = true,
     val tasbeehVolumeAnimation: Boolean = true,
