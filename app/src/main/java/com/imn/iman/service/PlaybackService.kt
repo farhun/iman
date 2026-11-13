@@ -1,4 +1,4 @@
-package com.kaizen.khushu.service
+package com.imn.iman.service
 
 import android.content.Intent
 import androidx.media3.common.AudioAttributes
@@ -6,7 +6,7 @@ import androidx.media3.common.C
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
-import com.kaizen.khushu.i18n.LocaleHelper
+import com.imn.iman.i18n.LocaleHelper
 
 class PlaybackService : MediaSessionService() {
     private var mediaSession: MediaSession? = null

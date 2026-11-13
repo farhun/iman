@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.util
+package com.imn.iman.ui.util
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.unit.Dp

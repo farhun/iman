@@ -1,9 +1,9 @@
-package com.kaizen.khushu.data.repository
+package com.imn.iman.data.repository
 
 import android.content.Context
 import androidx.annotation.StringRes
-import com.kaizen.khushu.R
-import com.kaizen.khushu.i18n.LocaleHelper
+import com.imn.iman.R
+import com.imn.iman.i18n.LocaleHelper
 
 data class ExtraPrayerTimingDefinition(
     val id: String,

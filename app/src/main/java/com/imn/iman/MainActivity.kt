@@ -1,4 +1,4 @@
-package com.kaizen.khushu
+package com.imn.iman
 
 import android.app.Activity
 import android.os.Bundle
@@ -17,7 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.enableEdgeToEdge
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
-import com.kaizen.khushu.service.PlaybackService
+import com.imn.iman.service.PlaybackService
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import androidx.compose.animation.*
@@ -53,27 +53,27 @@ import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 
 
-import com.kaizen.khushu.data.repository.ReleaseNotesRepository
-import com.kaizen.khushu.data.repository.SettingsRepository
-import com.kaizen.khushu.data.model.TasbeehCollection
-import com.kaizen.khushu.data.model.DhikrItem
-import com.kaizen.khushu.data.local.TasbeehDatabase
-import com.kaizen.khushu.i18n.LocaleHelper
-import com.kaizen.khushu.notifications.PrayerNotificationScheduler
-import com.kaizen.khushu.notifications.toPrayerNotificationScheduleConfig
-import com.kaizen.khushu.ui.components.PillNavBar
-import com.kaizen.khushu.ui.components.ReleaseNotesDialog
-import com.kaizen.khushu.ui.navigation.*
-import com.kaizen.khushu.ui.screens.onboarding.OnboardingScreen
-import com.kaizen.khushu.ui.screens.home.HomeScreen
-import com.kaizen.khushu.ui.screens.home.HomeViewModel
-import com.kaizen.khushu.data.repository.PrayerTimeRepository
+import com.imn.iman.data.repository.ReleaseNotesRepository
+import com.imn.iman.data.repository.SettingsRepository
+import com.imn.iman.data.model.TasbeehCollection
+import com.imn.iman.data.model.DhikrItem
+import com.imn.iman.data.local.TasbeehDatabase
+import com.imn.iman.i18n.LocaleHelper
+import com.imn.iman.notifications.PrayerNotificationScheduler
+import com.imn.iman.notifications.toPrayerNotificationScheduleConfig
+import com.imn.iman.ui.components.PillNavBar
+import com.imn.iman.ui.components.ReleaseNotesDialog
+import com.imn.iman.ui.navigation.*
+import com.imn.iman.ui.screens.onboarding.OnboardingScreen
+import com.imn.iman.ui.screens.home.HomeScreen
+import com.imn.iman.ui.screens.home.HomeViewModel
+import com.imn.iman.data.repository.PrayerTimeRepository
 
-import com.kaizen.khushu.ui.screens.settings.*
-import com.kaizen.khushu.ui.screens.tasbeeh.*
-import com.kaizen.khushu.ui.theme.KhushuTheme
-import com.kaizen.khushu.ui.theme.ThemeTransitionProvider
-import com.kaizen.khushu.ui.util.add
+import com.imn.iman.ui.screens.settings.*
+import com.imn.iman.ui.screens.tasbeeh.*
+import com.imn.iman.ui.theme.ImanTheme
+import com.imn.iman.ui.theme.ThemeTransitionProvider
+import com.imn.iman.ui.util.add
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
 import kotlinx.coroutines.delay
@@ -96,10 +96,10 @@ class MainActivity : ComponentActivity() {
     private lateinit var tasbeehViewModel: TasbeehViewModel
 
 
-    private lateinit var quranViewModel: com.kaizen.khushu.ui.screens.quran.QuranViewModel
+    private lateinit var quranViewModel: com.imn.iman.ui.screens.quran.QuranViewModel
 
     private lateinit var prayerTimeRepository: PrayerTimeRepository
-    private lateinit var homeViewModel: com.kaizen.khushu.ui.screens.home.HomeViewModel
+    private lateinit var homeViewModel: com.imn.iman.ui.screens.home.HomeViewModel
 
     // Tracks whether the tasbeeh immersive screen is currently active so that
     // volume key interception only fires there and not app-wide.
@@ -183,18 +183,18 @@ class MainActivity : ComponentActivity() {
         prayerTimeRepository = PrayerTimeRepository(settingsRepository)
 
         val prayerNotificationScheduler = PrayerNotificationScheduler(applicationContext)
-        val prayerManager = com.kaizen.khushu.logic.PrayerManager(settingsRepository, prayerTimeRepository)
+        val prayerManager = com.imn.iman.logic.PrayerManager(settingsRepository, prayerTimeRepository)
 
         homeViewModel = ViewModelProvider(
             this as ViewModelStoreOwner,
-            com.kaizen.khushu.ui.screens.home.HomeViewModel.factory(
+            com.imn.iman.ui.screens.home.HomeViewModel.factory(
                 settingsRepository,
                 prayerTimeRepository,
                 prayerManager,
                 settingsViewModel,
                 applicationContext
             )
-        )[com.kaizen.khushu.ui.screens.home.HomeViewModel::class.java]
+        )[com.imn.iman.ui.screens.home.HomeViewModel::class.java]
 
         val dao = TasbeehDatabase.getInstance(applicationContext).tasbeehDao()
         tasbeehViewModel =
@@ -202,7 +202,7 @@ class MainActivity : ComponentActivity() {
                 TasbeehViewModel::class.java]
 
 
-        quranViewModel = ViewModelProvider(this)[com.kaizen.khushu.ui.screens.quran.QuranViewModel::class.java]
+        quranViewModel = ViewModelProvider(this)[com.imn.iman.ui.screens.quran.QuranViewModel::class.java]
 
 
         lifecycleScope.launch {
@@ -343,13 +343,13 @@ class MainActivity : ComponentActivity() {
             }
 
             ThemeTransitionProvider {
-                KhushuTheme(
+                ImanTheme(
                     darkTheme = darkTheme,
                     dynamicColor = settings.dynamicColor,
                     pureBlack = settings.pureBlack,
                     colorSeed = settings.colorSeed
                 ) {
-                    KhushuApp(
+                    ImanApp(
                         settingsViewModel = settingsViewModel,
                         tasbeehViewModel = tasbeehViewModel,
 
@@ -382,11 +382,11 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun KhushuApp(
+private fun ImanApp(
     settingsViewModel: SettingsViewModel,
     tasbeehViewModel: TasbeehViewModel,
 
-    quranViewModel: com.kaizen.khushu.ui.screens.quran.QuranViewModel,
+    quranViewModel: com.imn.iman.ui.screens.quran.QuranViewModel,
     homeViewModel: HomeViewModel,
     darkTheme: Boolean,
     media3Controller: MediaController?
@@ -399,7 +399,7 @@ private fun KhushuApp(
     val releaseNotesRepository = remember(appContext) { ReleaseNotesRepository(appContext) }
     val systemBarsPadding = WindowInsets.systemBars.asPaddingValues()
     val screenContentPadding = systemBarsPadding.add(top = 64.dp, bottom = 86.dp)
-    var pendingReleaseNotes by remember { mutableStateOf<com.kaizen.khushu.data.model.ReleaseNote?>(null) }
+    var pendingReleaseNotes by remember { mutableStateOf<com.imn.iman.data.model.ReleaseNote?>(null) }
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -528,7 +528,7 @@ private fun KhushuApp(
                         popEnterTransition = { tabEnter() },
                         popExitTransition = { tabExit() },
                     ) {
-                        com.kaizen.khushu.ui.screens.quran.QuranSurahListScreen(
+                        com.imn.iman.ui.screens.quran.QuranSurahListScreen(
                             onSurahTap = { num -> navController.navigate("quran/$num") },
                             onBookmarkedAyahTap = { surah, ayah ->
                                 navController.navigate("quran/$surah?ayah=$ayah")
@@ -558,7 +558,7 @@ private fun KhushuApp(
                     ) { backStackEntry ->
                         val surahNumber = backStackEntry.arguments?.getInt("surahNumber") ?: 1
                         val initialAyahIndex = backStackEntry.arguments?.getString("ayah")?.toIntOrNull()
-                        com.kaizen.khushu.ui.screens.quran.QuranReaderScreen(
+                        com.imn.iman.ui.screens.quran.QuranReaderScreen(
                             surahNumber = surahNumber,
                             initialAyahIndex = initialAyahIndex,
                             onBack = { navController.popBackStack() },
@@ -593,13 +593,13 @@ private fun KhushuApp(
                                 navController.navigate(SETTINGS_WIDGET_ROUTE)
                             },
                             onNavigatePrayer = {
-                                navController.navigate(com.kaizen.khushu.ui.navigation.SETTINGS_PRAYER_ROUTE)
+                                navController.navigate(com.imn.iman.ui.navigation.SETTINGS_PRAYER_ROUTE)
                             },
                             onNavigateTasbeeh = {
                                 navController.navigate(SETTINGS_TASBEEH_ROUTE)
                             },
                             onNavigateAbout = {
-                                navController.navigate(com.kaizen.khushu.ui.navigation.SETTINGS_ABOUT_ROUTE)
+                                navController.navigate(com.imn.iman.ui.navigation.SETTINGS_ABOUT_ROUTE)
                             },
                             onBack = {
                                 navController.popBackStack()
@@ -634,7 +634,7 @@ private fun KhushuApp(
                     }
 
                     composable(
-                        route = com.kaizen.khushu.ui.navigation.SETTINGS_PRAYER_ROUTE,
+                        route = com.imn.iman.ui.navigation.SETTINGS_PRAYER_ROUTE,
                         enterTransition = { subScreenEnter() },
                         exitTransition = { subScreenExit() },
                         popEnterTransition = { subScreenPopEnter() },
@@ -660,7 +660,7 @@ private fun KhushuApp(
                     }
 
                     composable(
-                        route = com.kaizen.khushu.ui.navigation.SETTINGS_ABOUT_ROUTE,
+                        route = com.imn.iman.ui.navigation.SETTINGS_ABOUT_ROUTE,
                         enterTransition = { subScreenEnter() },
                         exitTransition = { subScreenExit() },
                         popEnterTransition = { subScreenPopEnter() },

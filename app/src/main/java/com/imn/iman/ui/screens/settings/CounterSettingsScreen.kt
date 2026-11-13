@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.screens.settings
+package com.imn.iman.ui.screens.settings
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -10,7 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import com.kaizen.khushu.R
+import com.imn.iman.R
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,7 +43,7 @@ fun CounterSettingsScreen(
 
             SettingsGroup(
                 title = stringResource(R.string.settings_haptics),
-//                description = "Physical feedback that applies across Khushu counters."
+//                description = "Physical feedback that applies across Iman counters."
             ) {
                 SettingsToggleItem(
                     title = stringResource(R.string.settings_haptic_feedback),

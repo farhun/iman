@@ -1,12 +1,12 @@
 @file:OptIn(kotlin.time.ExperimentalTime::class)
-package com.kaizen.khushu.logic
+package com.imn.iman.logic
 
 import com.batoulapps.adhan2.Coordinates
 import com.batoulapps.adhan2.Prayer
 import com.batoulapps.adhan2.PrayerTimes
-import com.kaizen.khushu.data.repository.PrayerTimeRepository
-import com.kaizen.khushu.data.repository.SettingsRepository
-import com.kaizen.khushu.data.repository.toDate
+import com.imn.iman.data.repository.PrayerTimeRepository
+import com.imn.iman.data.repository.SettingsRepository
+import com.imn.iman.data.repository.toDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

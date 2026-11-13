@@ -1,11 +1,11 @@
-package com.kaizen.khushu.data.local
+package com.imn.iman.data.local
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.kaizen.khushu.data.model.TasbeehCollection
+import com.imn.iman.data.model.TasbeehCollection
 
 @Database(entities = [TasbeehCollection::class], version = 1, exportSchema = false)
 @TypeConverters(DhikrItemListConverter::class)

@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.components
+package com.imn.iman.ui.components
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -17,9 +17,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.kaizen.khushu.R
-import com.kaizen.khushu.data.model.*
-import com.kaizen.khushu.data.repository.UserSettings
+import com.imn.iman.R
+import com.imn.iman.data.model.*
+import com.imn.iman.data.repository.UserSettings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

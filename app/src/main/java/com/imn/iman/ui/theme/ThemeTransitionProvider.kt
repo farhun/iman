@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.theme
+package com.imn.iman.ui.theme
 
 import android.graphics.Bitmap
 import android.graphics.Canvas

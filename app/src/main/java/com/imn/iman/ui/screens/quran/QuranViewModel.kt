@@ -1,13 +1,13 @@
-package com.kaizen.khushu.ui.screens.quran
+package com.imn.iman.ui.screens.quran
 
 import android.app.Application
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.kaizen.khushu.data.model.SurahMeta
-import com.kaizen.khushu.data.repository.QuranRepository
+import com.imn.iman.data.model.SurahMeta
+import com.imn.iman.data.repository.QuranRepository
 
-import com.kaizen.khushu.data.repository.VerseMeta
+import com.imn.iman.data.repository.VerseMeta
 
 
 import kotlinx.coroutines.Dispatchers

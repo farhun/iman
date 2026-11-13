@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.screens.settings
+package com.imn.iman.ui.screens.settings
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -13,15 +13,15 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import com.kaizen.khushu.R
-import com.kaizen.khushu.i18n.LocaleHelper
+import com.imn.iman.R
+import com.imn.iman.i18n.LocaleHelper
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.kaizen.khushu.data.repository.DEFAULT_TASBIH_BACKGROUND_COLOR
-import com.kaizen.khushu.data.repository.DEFAULT_TASBIH_BEAD_COLOR
-import com.kaizen.khushu.data.repository.DEFAULT_TASBIH_TEXT_COLOR
-import com.kaizen.khushu.ui.screens.tasbeeh.TasbihSoundCatalog
-import com.kaizen.khushu.ui.screens.tasbeeh.TasbihSoundPlayer
+import com.imn.iman.data.repository.DEFAULT_TASBIH_BACKGROUND_COLOR
+import com.imn.iman.data.repository.DEFAULT_TASBIH_BEAD_COLOR
+import com.imn.iman.data.repository.DEFAULT_TASBIH_TEXT_COLOR
+import com.imn.iman.ui.screens.tasbeeh.TasbihSoundCatalog
+import com.imn.iman.ui.screens.tasbeeh.TasbihSoundPlayer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

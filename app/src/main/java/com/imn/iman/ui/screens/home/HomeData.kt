@@ -1,10 +1,10 @@
 @file:OptIn(kotlin.time.ExperimentalTime::class)
 
-package com.kaizen.khushu.ui.screens.home
+package com.imn.iman.ui.screens.home
 
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
-import com.kaizen.khushu.R
+import com.imn.iman.R
 import kotlinx.datetime.Instant
 
 // ── Placeholder data — to be replaced by HomeViewModel + real prayer times ──

@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.screens.quran
+package com.imn.iman.ui.screens.quran
 
 import android.app.Application
 
@@ -11,11 +11,11 @@ import androidx.lifecycle.AndroidViewModel
 
 import androidx.lifecycle.viewModelScope
 
-import com.kaizen.khushu.data.model.AyahBlock
-import com.kaizen.khushu.data.model.ContentBlock
-import com.kaizen.khushu.R
-import com.kaizen.khushu.data.model.ReciterMeta
-import com.kaizen.khushu.i18n.LocaleHelper
+import com.imn.iman.data.model.AyahBlock
+import com.imn.iman.data.model.ContentBlock
+import com.imn.iman.R
+import com.imn.iman.data.model.ReciterMeta
+import com.imn.iman.i18n.LocaleHelper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 

@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.screens.settings
+package com.imn.iman.ui.screens.settings
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -28,8 +28,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
-import com.kaizen.khushu.R
-import com.kaizen.khushu.ui.theme.PlusJakartaSans
+import com.imn.iman.R
+import com.imn.iman.ui.theme.PlusJakartaSans
 import androidx.compose.runtime.*
 
 @OptIn(ExperimentalMaterial3Api::class)

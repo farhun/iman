@@ -1,8 +1,8 @@
-package com.kaizen.khushu.ui.theme
+package com.imn.iman.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-object KhushuColors {
+object ImanColors {
     // Card Accents (Shared across Learn and Tasbeeh)
     val SalahBasics = Color(0xFF3B4A6B)
     val Fatiha = Color(0xFF4A3B6B)
@@ -31,16 +31,16 @@ object KhushuColors {
 }
 
 val prayerCardPalette = listOf(
-    "Salah Basics" to KhushuColors.SalahBasics,
-    "Surah Al-Fatiha" to KhushuColors.Fatiha,
-    "Prayer Times" to KhushuColors.PrayerTimes,
-    "Wudu Guide" to KhushuColors.Wudu,
-    "Qibla Direction" to KhushuColors.Qibla,
-    "Friday Prayer" to KhushuColors.Friday,
+    "Salah Basics" to ImanColors.SalahBasics,
+    "Surah Al-Fatiha" to ImanColors.Fatiha,
+    "Prayer Times" to ImanColors.PrayerTimes,
+    "Wudu Guide" to ImanColors.Wudu,
+    "Qibla Direction" to ImanColors.Qibla,
+    "Friday Prayer" to ImanColors.Friday,
 )
 
 val duaCardPalette = listOf(
-    "Morning Adhkar" to KhushuColors.MorningAdhkar,
-    "Evening Adhkar" to KhushuColors.EveningAdhkar,
-    "Dua After Salah" to KhushuColors.AfterSalahDua,
+    "Morning Adhkar" to ImanColors.MorningAdhkar,
+    "Evening Adhkar" to ImanColors.EveningAdhkar,
+    "Dua After Salah" to ImanColors.AfterSalahDua,
 )

@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.screens.tasbeeh
+package com.imn.iman.ui.screens.tasbeeh
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -61,23 +61,23 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import com.kaizen.khushu.R
+import com.imn.iman.R
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.kaizen.khushu.ui.theme.KhushuColors
-import com.kaizen.khushu.ui.theme.PlusJakartaSans
-import com.kaizen.khushu.ui.theme.fontForText
+import com.imn.iman.ui.theme.ImanColors
+import com.imn.iman.ui.theme.PlusJakartaSans
+import com.imn.iman.ui.theme.fontForText
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.kaizen.khushu.data.model.DhikrItem
-import com.kaizen.khushu.data.model.TasbeehCollection
-import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
+import com.imn.iman.data.model.DhikrItem
+import com.imn.iman.data.model.TasbeehCollection
+import com.imn.iman.ui.screens.settings.SettingsViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.*
@@ -95,7 +95,7 @@ fun CreateCollectionSheet(
     val settings by settingsViewModel.settings.collectAsState()
 
     val dhikrRows = viewModel.createDhikrRows
-    val selectedColor = KhushuColors.Palette[viewModel.createColorIndex]
+    val selectedColor = ImanColors.Palette[viewModel.createColorIndex]
     val lazyListState = rememberLazyListState()
 
     val canSave = dhikrRows.any { it.name.trim().isNotBlank() && it.count.toIntOrNull() != null }

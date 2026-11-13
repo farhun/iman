@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.kaizen.khushu"
+    namespace = "com.imn.iman"
     androidResources {
         generateLocaleConfig = true
     }

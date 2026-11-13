@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.screens.home
+package com.imn.iman.ui.screens.home
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
@@ -67,11 +67,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
-import com.kaizen.khushu.R
-import com.kaizen.khushu.i18n.prayerLabel
-import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
-import com.kaizen.khushu.ui.theme.PlusJakartaSans
-import com.kaizen.khushu.ui.theme.NotoSansArabic
+import com.imn.iman.R
+import com.imn.iman.i18n.prayerLabel
+import com.imn.iman.ui.theme.PlusJakartaSansBold
+import com.imn.iman.ui.theme.PlusJakartaSans
+import com.imn.iman.ui.theme.NotoSansArabic
 import java.util.Calendar
 import kotlin.math.max
 import kotlin.math.min

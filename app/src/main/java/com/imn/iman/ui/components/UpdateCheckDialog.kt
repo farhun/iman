@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.components
+package com.imn.iman.ui.components
 
 import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
@@ -35,10 +35,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.kaizen.khushu.R
-import com.kaizen.khushu.data.repository.AppUpdateRepository
-import com.kaizen.khushu.data.repository.DownloadState
-import com.kaizen.khushu.data.repository.UpdateCheckResult
+import com.imn.iman.R
+import com.imn.iman.data.repository.AppUpdateRepository
+import com.imn.iman.data.repository.DownloadState
+import com.imn.iman.data.repository.UpdateCheckResult
 import java.io.File
 import kotlinx.coroutines.launch
 
@@ -130,7 +130,7 @@ fun UpdateCheckDialog(
                         Text(
                             text = stringResource(
                                 R.string.settings_update_latest_version,
-                                com.kaizen.khushu.BuildConfig.VERSION_NAME
+                                com.imn.iman.BuildConfig.VERSION_NAME
                             ),
                             style = MaterialTheme.typography.bodyMedium,
                         )

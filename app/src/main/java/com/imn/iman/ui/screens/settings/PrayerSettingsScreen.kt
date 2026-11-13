@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.screens.settings
+package com.imn.iman.ui.screens.settings
 
 import android.Manifest
 import android.app.Activity
@@ -53,22 +53,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.KeyboardType
-import com.kaizen.khushu.ui.theme.PlusJakartaSans
+import com.imn.iman.ui.theme.PlusJakartaSans
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import com.kaizen.khushu.MainActivity
-import com.kaizen.khushu.R
-import com.kaizen.khushu.i18n.LocaleHelper
-import com.kaizen.khushu.i18n.alertStyleLabelRes
-import com.kaizen.khushu.i18n.madhabLabelRes
-import com.kaizen.khushu.i18n.methodLabelRes
-import com.kaizen.khushu.i18n.prayerLabel
-import com.kaizen.khushu.i18n.soundOptionLabelRes
-import com.kaizen.khushu.i18n.sourceTypeLabelRes
-import com.kaizen.khushu.data.repository.EXTRA_PRAYER_TIMINGS
-import com.kaizen.khushu.receiver.PrayerAlarmReceiver
+import com.imn.iman.MainActivity
+import com.imn.iman.R
+import com.imn.iman.i18n.LocaleHelper
+import com.imn.iman.i18n.alertStyleLabelRes
+import com.imn.iman.i18n.madhabLabelRes
+import com.imn.iman.i18n.methodLabelRes
+import com.imn.iman.i18n.prayerLabel
+import com.imn.iman.i18n.soundOptionLabelRes
+import com.imn.iman.i18n.sourceTypeLabelRes
+import com.imn.iman.data.repository.EXTRA_PRAYER_TIMINGS
+import com.imn.iman.receiver.PrayerAlarmReceiver
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -354,7 +354,7 @@ fun PrayerSettingsScreen(
 
             SettingsGroup(
                 title = stringResource(R.string.settings_calculation),
-//                description = "How Khushu computes the daily prayer times."
+//                description = "How Iman computes the daily prayer times."
             ) {
                 Box(modifier = Modifier.padding(horizontal = 20.dp)) {
                     SettingsDropdown(

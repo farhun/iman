@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.screens.settings
+package com.imn.iman.ui.screens.settings
 
 import android.Manifest
 import android.content.Context
@@ -12,14 +12,14 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaizen.khushu.R
-import com.kaizen.khushu.i18n.LocaleHelper
+import com.imn.iman.R
+import com.imn.iman.i18n.LocaleHelper
 
-import com.kaizen.khushu.data.repository.QuranScriptFontRepository
-import com.kaizen.khushu.data.repository.SettingsRepository
-import com.kaizen.khushu.data.repository.UserSettings
+import com.imn.iman.data.repository.QuranScriptFontRepository
+import com.imn.iman.data.repository.SettingsRepository
+import com.imn.iman.data.repository.UserSettings
 
-import com.kaizen.khushu.widget.PrayerWidgetProvider
+import com.imn.iman.widget.PrayerWidgetProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 

@@ -1,10 +1,10 @@
-package com.kaizen.khushu.i18n
+package com.imn.iman.i18n
 
 import android.content.Context
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import com.kaizen.khushu.R
+import com.imn.iman.R
 
 @StringRes
 fun revelationPlaceLabelRes(id: String): Int = when (id) {

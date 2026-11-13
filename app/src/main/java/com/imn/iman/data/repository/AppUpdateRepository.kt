@@ -1,12 +1,12 @@
-package com.kaizen.khushu.data.repository
+package com.imn.iman.data.repository
 
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.core.content.FileProvider
-import com.kaizen.khushu.BuildConfig
-import com.kaizen.khushu.R
-import com.kaizen.khushu.i18n.LocaleHelper
+import com.imn.iman.BuildConfig
+import com.imn.iman.R
+import com.imn.iman.i18n.LocaleHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName

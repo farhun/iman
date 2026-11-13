@@ -19,7 +19,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_app_identity_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Khushu"
+        android:theme="@style/Theme.Iman"
         android:enableOnBackInvokedCallback="true">
 
         <service
@@ -41,7 +41,7 @@
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/khushu_widget_info" />
+                android:resource="@xml/iman_widget_info" />
         </receiver>
         <receiver
             android:name=".receiver.PrayerAlarmReceiver"

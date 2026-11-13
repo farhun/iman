@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.screens.tasbeeh
+package com.imn.iman.ui.screens.tasbeeh
 
 
 
@@ -46,20 +46,20 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 
 
-import com.kaizen.khushu.data.model.TasbeehCollection
+import com.imn.iman.data.model.TasbeehCollection
 
-import com.kaizen.khushu.ui.navigation.AppDestinations
+import com.imn.iman.ui.navigation.AppDestinations
 
 
-import com.kaizen.khushu.ui.theme.fontForText
+import com.imn.iman.ui.theme.fontForText
 
-import com.kaizen.khushu.ui.theme.PlusJakartaSans
-import com.kaizen.khushu.R
+import com.imn.iman.ui.theme.PlusJakartaSans
+import com.imn.iman.R
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 
-import com.kaizen.khushu.ui.util.rememberMorphShape
-import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
+import com.imn.iman.ui.util.rememberMorphShape
+import com.imn.iman.ui.theme.PlusJakartaSansBold
 
 
 import kotlinx.coroutines.launch

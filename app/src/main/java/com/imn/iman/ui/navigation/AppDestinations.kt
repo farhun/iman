@@ -1,7 +1,7 @@
-package com.kaizen.khushu.ui.navigation
+package com.imn.iman.ui.navigation
 
 import androidx.annotation.StringRes
-import com.kaizen.khushu.R
+import com.imn.iman.R
 
 
 const val SETTINGS_ROUTE = "settings"

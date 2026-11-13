@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.screens.settings
+package com.imn.iman.ui.screens.settings
 
 import android.app.Activity
 import android.content.ContextWrapper
@@ -26,11 +26,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
-import com.kaizen.khushu.R
-import com.kaizen.khushu.i18n.LocaleHelper
-import com.kaizen.khushu.i18n.SUPPORTED_LANGUAGES
-import com.kaizen.khushu.notifications.PrayerNotificationScheduler
-import com.kaizen.khushu.widget.PrayerWidgetProvider
+import com.imn.iman.R
+import com.imn.iman.i18n.LocaleHelper
+import com.imn.iman.i18n.SUPPORTED_LANGUAGES
+import com.imn.iman.notifications.PrayerNotificationScheduler
+import com.imn.iman.widget.PrayerWidgetProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.components
+package com.imn.iman.ui.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Spring
@@ -46,7 +46,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.kaizen.khushu.ui.navigation.AppDestinations
+import com.imn.iman.ui.navigation.AppDestinations
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.hazeEffect

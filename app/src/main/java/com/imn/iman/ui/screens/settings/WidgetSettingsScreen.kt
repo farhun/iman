@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.screens.settings
+package com.imn.iman.ui.screens.settings
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -37,14 +37,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kaizen.khushu.R
-import com.kaizen.khushu.i18n.prayerLabel
-import com.kaizen.khushu.data.repository.SettingsRepository
-import com.kaizen.khushu.data.repository.UserSettings
-import com.kaizen.khushu.data.repository.WidgetVisibilityItems
-import com.kaizen.khushu.widget.PrayerWidgetProvider
+import com.imn.iman.R
+import com.imn.iman.i18n.prayerLabel
+import com.imn.iman.data.repository.SettingsRepository
+import com.imn.iman.data.repository.UserSettings
+import com.imn.iman.data.repository.WidgetVisibilityItems
+import com.imn.iman.widget.PrayerWidgetProvider
 import kotlinx.coroutines.launch
-import com.kaizen.khushu.ui.theme.PlusJakartaSans
+import com.imn.iman.ui.theme.PlusJakartaSans
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.hypot

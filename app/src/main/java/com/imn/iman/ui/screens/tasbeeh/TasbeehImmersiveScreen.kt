@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.screens.tasbeeh
+package com.imn.iman.ui.screens.tasbeeh
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
@@ -48,7 +48,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import com.kaizen.khushu.R
+import com.imn.iman.R
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
@@ -83,8 +83,8 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 
-import com.kaizen.khushu.data.model.TasbeehCollection
-import com.kaizen.khushu.data.repository.UserSettings
+import com.imn.iman.data.model.TasbeehCollection
+import com.imn.iman.data.repository.UserSettings
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

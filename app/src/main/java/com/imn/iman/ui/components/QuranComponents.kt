@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.components
+package com.imn.iman.ui.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
@@ -13,8 +13,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kaizen.khushu.ui.theme.AmiriQuran
-import com.kaizen.khushu.ui.theme.NotoSansArabic
+import com.imn.iman.ui.theme.AmiriQuran
+import com.imn.iman.ui.theme.NotoSansArabic
 
 fun Int.toArabicIndic() = this.toString().map { c ->
     when (c) {

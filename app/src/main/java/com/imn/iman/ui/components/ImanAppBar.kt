@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.components
+package com.imn.iman.ui.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
@@ -53,12 +53,12 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.kaizen.khushu.R
+import com.imn.iman.R
 import androidx.compose.ui.geometry.Size  // NOT android.util.Size
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun KhushuAppBar(
+fun ImanAppBar(
     title: String,
     onSettingsClick: () -> Unit,
     onBookmarksClick: (() -> Unit)? = null,

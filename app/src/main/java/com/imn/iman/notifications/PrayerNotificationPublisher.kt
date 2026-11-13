@@ -1,4 +1,4 @@
-package com.kaizen.khushu.notifications
+package com.imn.iman.notifications
 
 import android.app.PendingIntent
 import android.content.Context
@@ -7,10 +7,10 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import com.kaizen.khushu.MainActivity
-import com.kaizen.khushu.R
-import com.kaizen.khushu.data.repository.UserSettings
-import com.kaizen.khushu.i18n.LocaleHelper
+import com.imn.iman.MainActivity
+import com.imn.iman.R
+import com.imn.iman.data.repository.UserSettings
+import com.imn.iman.i18n.LocaleHelper
 
 object PrayerNotificationPublisher {
 

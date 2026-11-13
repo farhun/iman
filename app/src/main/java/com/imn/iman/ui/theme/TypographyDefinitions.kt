@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.theme
+package com.imn.iman.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
@@ -6,7 +6,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.kaizen.khushu.R
+import com.imn.iman.R
 
 // Bundled in /res/font/plusjakartasans_bold.ttf
 val PlusJakartaSansBold = FontFamily(
@@ -16,7 +16,7 @@ val PlusJakartaSansBold = FontFamily(
 // Fallback display font if Plus Jakarta Sans Bold doesn't load properly
 val DisplayFontFallback = FontFamily.Default
 
-fun createKhushuTypography(
+fun createImanTypography(
     plusJakartaSans: FontFamily,
     quranIndopak: FontFamily,
 ): Typography {

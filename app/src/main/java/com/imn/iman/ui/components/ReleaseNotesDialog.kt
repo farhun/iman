@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.components
+package com.imn.iman.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,9 +23,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.kaizen.khushu.R
-import com.kaizen.khushu.data.model.ReleaseNote
-import com.kaizen.khushu.ui.theme.PlusJakartaSans
+import com.imn.iman.R
+import com.imn.iman.data.model.ReleaseNote
+import com.imn.iman.ui.theme.PlusJakartaSans
 
 @Composable
 fun ReleaseNotesDialog(

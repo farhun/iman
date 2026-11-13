@@ -1,4 +1,4 @@
-package com.kaizen.khushu.data.model
+package com.imn.iman.data.model
 
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive

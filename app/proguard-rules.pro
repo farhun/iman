@@ -21,8 +21,8 @@
 -keep @androidx.room.Dao interface * { *; }
 
 # Keep our data models intact
--keep class com.kaizen.khushu.data.entity.** { *; }
--keep class com.kaizen.khushu.data.model.** { *; }
+-keep class com.imn.iman.data.entity.** { *; }
+-keep class com.imn.iman.data.model.** { *; }
 
 # Haze (Blur effect library)
 -keep class dev.chrisbanes.haze.** { *; }
@@ -37,5 +37,5 @@
 -dontwarn org.conscrypt.**
 
 # AlAdhan API Models (in PrayerTimeRepository)
--keep class com.kaizen.khushu.data.repository.AlAdhanResponse { *; }
--keep class com.kaizen.khushu.data.repository.AlAdhanData { *; }
+-keep class com.imn.iman.data.repository.AlAdhanResponse { *; }
+-keep class com.imn.iman.data.repository.AlAdhanData { *; }

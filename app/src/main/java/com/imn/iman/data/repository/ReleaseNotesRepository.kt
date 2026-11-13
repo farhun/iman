@@ -1,7 +1,7 @@
-package com.kaizen.khushu.data.repository
+package com.imn.iman.data.repository
 
 import android.content.Context
-import com.kaizen.khushu.data.model.ReleaseNote
+import com.imn.iman.data.model.ReleaseNote
 import kotlinx.serialization.json.Json
 
 class ReleaseNotesRepository(

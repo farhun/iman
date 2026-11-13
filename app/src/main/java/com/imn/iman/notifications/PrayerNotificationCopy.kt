@@ -1,13 +1,13 @@
-package com.kaizen.khushu.notifications
+package com.imn.iman.notifications
 
 import android.content.Context
 import android.location.Geocoder
 import android.os.Build
 import androidx.annotation.StringRes
-import com.kaizen.khushu.R
-import com.kaizen.khushu.i18n.LocaleHelper
-import com.kaizen.khushu.i18n.prayerLabel
-import com.kaizen.khushu.data.repository.UserSettings
+import com.imn.iman.R
+import com.imn.iman.i18n.LocaleHelper
+import com.imn.iman.i18n.prayerLabel
+import com.imn.iman.data.repository.UserSettings
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.screens.onboarding
+package com.imn.iman.ui.screens.onboarding
 
 import android.Manifest
 import android.os.Build
@@ -36,11 +36,11 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kaizen.khushu.R
-import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
-import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
-import com.kaizen.khushu.ui.theme.PlusJakartaSans
-import com.kaizen.khushu.ui.theme.colorSeeds
+import com.imn.iman.R
+import com.imn.iman.ui.screens.settings.SettingsViewModel
+import com.imn.iman.ui.theme.PlusJakartaSansBold
+import com.imn.iman.ui.theme.PlusJakartaSans
+import com.imn.iman.ui.theme.colorSeeds
 import kotlinx.coroutines.launch
 import kotlin.math.hypot
 import androidx.compose.foundation.BorderStroke

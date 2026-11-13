@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.theme
+package com.imn.iman.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -26,7 +26,7 @@ val colorSeeds = mapOf(
 val DefaultSeedColor = Color(0xFF293041)
 
 @Composable
-fun KhushuTheme(
+fun ImanTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false,
     pureBlack: Boolean = false,

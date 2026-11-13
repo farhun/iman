@@ -1,6 +1,6 @@
 @file:OptIn(kotlin.time.ExperimentalTime::class)
 
-package com.kaizen.khushu.ui.screens.home
+package com.imn.iman.ui.screens.home
 
 import android.content.Context
 import android.content.Intent
@@ -91,9 +91,9 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.kaizen.khushu.R
-import com.kaizen.khushu.ui.components.KhushuAppBar
-import com.kaizen.khushu.ui.theme.PlusJakartaSans
+import com.imn.iman.R
+import com.imn.iman.ui.components.ImanAppBar
+import com.imn.iman.ui.theme.PlusJakartaSans
 import dev.chrisbanes.haze.HazeState
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -484,7 +484,7 @@ private fun HomeHijriBadge(
 }
 
 @Composable
-private fun KhushuPullRefreshIndicator(
+private fun ImanPullRefreshIndicator(
     progress: Float,
     isRefreshing: Boolean,
     darkTheme: Boolean,
@@ -811,7 +811,7 @@ fun HomeScreen(
                                     )
                                 }
                             }
-                            KhushuPullRefreshIndicator(
+                            ImanPullRefreshIndicator(
                                 progress = if (thresholdReached || uiState.isRefreshing) 1f else pullProgress,
                                 isRefreshing = uiState.isRefreshing,
                                 darkTheme = darkTheme,
@@ -828,7 +828,7 @@ fun HomeScreen(
             }
         }
 
-        KhushuAppBar(
+        ImanAppBar(
             title = "",
             onSettingsClick = onSettingsClick,
             centerOverlayContent = { HomeHijriBadge(badge = hijriBadge) },

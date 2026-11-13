@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.components
+package com.imn.iman.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -37,20 +37,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-import com.kaizen.khushu.data.repository.CatalogRepository
-import com.kaizen.khushu.R
-import com.kaizen.khushu.data.model.TranslationMeta
-import com.kaizen.khushu.data.model.ReciterMeta
-import com.kaizen.khushu.i18n.quranReadingThemeLabel
-import com.kaizen.khushu.i18n.quranScriptLabel
+import com.imn.iman.data.repository.CatalogRepository
+import com.imn.iman.R
+import com.imn.iman.data.model.TranslationMeta
+import com.imn.iman.data.model.ReciterMeta
+import com.imn.iman.i18n.quranReadingThemeLabel
+import com.imn.iman.i18n.quranScriptLabel
 
-import com.kaizen.khushu.data.repository.TranslationRepository
-import com.kaizen.khushu.data.repository.QuranScriptFontRepository
-import com.kaizen.khushu.data.repository.UserSettings
+import com.imn.iman.data.repository.TranslationRepository
+import com.imn.iman.data.repository.QuranScriptFontRepository
+import com.imn.iman.data.repository.UserSettings
 
-import com.kaizen.khushu.ui.theme.PlusJakartaSans
-import com.kaizen.khushu.ui.theme.NotoSansArabic
-import com.kaizen.khushu.ui.theme.rememberArabicScriptFontFamily
+import com.imn.iman.ui.theme.PlusJakartaSans
+import com.imn.iman.ui.theme.NotoSansArabic
+import com.imn.iman.ui.theme.rememberArabicScriptFontFamily
 
 @Composable
 private fun SlidingSegmentedControl(

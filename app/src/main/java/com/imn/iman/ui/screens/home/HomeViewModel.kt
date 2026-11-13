@@ -1,21 +1,21 @@
 @file:OptIn(kotlin.time.ExperimentalTime::class)
 
-package com.kaizen.khushu.ui.screens.home
+package com.imn.iman.ui.screens.home
 
 import android.content.Context
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kaizen.khushu.data.repository.extraPrayerTimingArabicLabel
+import com.imn.iman.data.repository.extraPrayerTimingArabicLabel
 
-import com.kaizen.khushu.R
+import com.imn.iman.R
 
-import com.kaizen.khushu.data.repository.PrayerTimeRepository
-import com.kaizen.khushu.data.repository.SettingsRepository
-import com.kaizen.khushu.logic.PrayerManager
-import com.kaizen.khushu.notifications.PrayerNotificationScheduler
-import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
-import com.kaizen.khushu.widget.PrayerWidgetProvider
+import com.imn.iman.data.repository.PrayerTimeRepository
+import com.imn.iman.data.repository.SettingsRepository
+import com.imn.iman.logic.PrayerManager
+import com.imn.iman.notifications.PrayerNotificationScheduler
+import com.imn.iman.ui.screens.settings.SettingsViewModel
+import com.imn.iman.widget.PrayerWidgetProvider
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

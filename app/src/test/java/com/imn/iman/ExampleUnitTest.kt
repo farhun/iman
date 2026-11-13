@@ -1,4 +1,4 @@
-package com.kaizen.khushu
+package com.imn.iman
 
 import org.junit.Test
 

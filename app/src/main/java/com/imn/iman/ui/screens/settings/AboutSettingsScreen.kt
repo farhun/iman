@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.screens.settings
+package com.imn.iman.ui.screens.settings
 
 import android.content.Intent
 import android.net.Uri
@@ -39,11 +39,11 @@ import androidx.compose.ui.res.stringResource
 
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.kaizen.khushu.BuildConfig
-import com.kaizen.khushu.R
+import com.imn.iman.BuildConfig
+import com.imn.iman.R
 
-private const val KHUSHU_REPO_URL = "https://github.com/farhun/iman"
-private const val KHUSHU_ISSUES_URL = "https://github.com/farhun/iman/issues"
+private const val IMAN_REPO_URL = "https://github.com/farhun/iman"
+private const val IMAN_ISSUES_URL = "https://github.com/farhun/iman/issues"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -99,13 +99,13 @@ fun AboutSettingsScreen(
                 title = stringResource(R.string.about_github_repository),
                 detail = stringResource(R.string.about_github_repository_detail),
                 imageVector = Icons.Default.Code,
-                onClick = { openUrl(KHUSHU_REPO_URL) }
+                onClick = { openUrl(IMAN_REPO_URL) }
             )
             MenuSectionItem(
                 title = stringResource(R.string.about_project_page),
                 detail = stringResource(R.string.about_project_page_detail),
                 imageVector = Icons.Default.Language,
-                onClick = { openUrl(KHUSHU_REPO_URL) }
+                onClick = { openUrl(IMAN_REPO_URL) }
             )
 
             SectionHeader(stringResource(R.string.about_support))
@@ -113,18 +113,18 @@ fun AboutSettingsScreen(
                 title = stringResource(R.string.about_report_bug),
                 detail = stringResource(R.string.about_report_bug_detail),
                 imageVector = Icons.Default.BugReport,
-                onClick = { openUrl(KHUSHU_ISSUES_URL) }
+                onClick = { openUrl(IMAN_ISSUES_URL) }
             )
             MenuSectionItem(
                 title = stringResource(R.string.about_contribute),
                 detail = stringResource(R.string.about_contribute_detail),
                 imageVector = Icons.AutoMirrored.Filled.MenuBook,
-                onClick = { openUrl(KHUSHU_REPO_URL) }
+                onClick = { openUrl(IMAN_REPO_URL) }
             )
 
 
             FilledTonalButton(
-                onClick = { openUrl(KHUSHU_ISSUES_URL) },
+                onClick = { openUrl(IMAN_ISSUES_URL) },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(

@@ -1,7 +1,7 @@
-package com.kaizen.khushu.data.repository
+package com.imn.iman.data.repository
 
 import android.content.Context
-import com.kaizen.khushu.data.model.SurahMeta
+import com.imn.iman.data.model.SurahMeta
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive

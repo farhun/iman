@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.screens.tasbeeh
+package com.imn.iman.ui.screens.tasbeeh
 
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -6,13 +6,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.toArgb
-import com.kaizen.khushu.ui.theme.KhushuColors
+import com.imn.iman.ui.theme.ImanColors
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.kaizen.khushu.data.model.DhikrItem
-import com.kaizen.khushu.data.model.TasbeehCollection
-import com.kaizen.khushu.data.local.TasbeehDao
+import com.imn.iman.data.model.DhikrItem
+import com.imn.iman.data.model.TasbeehCollection
+import com.imn.iman.data.local.TasbeehDao
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -85,7 +85,7 @@ class TasbeehViewModel(private val dao: TasbeehDao) : ViewModel() {
 
     fun loadCollectionForEdit(collection: TasbeehCollection) {
         createTitle = collection.title ?: ""
-        createColorIndex = KhushuColors.Palette.indexOfFirst { it.toArgb() == collection.colorInt }.coerceAtLeast(0)
+        createColorIndex = ImanColors.Palette.indexOfFirst { it.toArgb() == collection.colorInt }.coerceAtLeast(0)
         createDhikrRows.clear()
         collection.items.forEachIndexed { index, item ->
             createDhikrRows.add(CreateDhikrRow(id = index, name = item.name, count = item.targetCount.toString()))
@@ -127,7 +127,7 @@ class TasbeehViewModel(private val dao: TasbeehDao) : ViewModel() {
         val seeds = listOf(
             TasbeehCollection(
                 title = "أذكار بعد الصلاة",
-                colorInt = KhushuColors.Palette[0].toArgb(),
+                colorInt = ImanColors.Palette[0].toArgb(),
                 items = listOf(
                     DhikrItem("سُبْحَانَ الله", 33),
                     DhikrItem("الْحَمْدُ لِلَّه", 33),
@@ -136,7 +136,7 @@ class TasbeehViewModel(private val dao: TasbeehDao) : ViewModel() {
             ),
             TasbeehCollection(
                 title = "الصلاة على النبي ﷺ",
-                colorInt = KhushuColors.Palette[1].toArgb(),
+                colorInt = ImanColors.Palette[1].toArgb(),
                 items = listOf(
                     DhikrItem("اللَّهُمَّ صَلِّ عَلَى مُحَمَّد", 100),
                     DhikrItem("اللَّهُمَّ بَارِكْ عَلَى مُحَمَّد", 100),
@@ -144,7 +144,7 @@ class TasbeehViewModel(private val dao: TasbeehDao) : ViewModel() {
             ),
             TasbeehCollection(
                 title = "الاستغفار",
-                colorInt = KhushuColors.Palette[2].toArgb(),
+                colorInt = ImanColors.Palette[2].toArgb(),
                 items = listOf(
                     DhikrItem("أَسْتَغْفِرُ الله", 100),
                     DhikrItem("سُبْحَانَ اللهِ وَبِحَمْدِهِ", 100),

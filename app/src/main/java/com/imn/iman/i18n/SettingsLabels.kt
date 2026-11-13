@@ -1,7 +1,7 @@
-package com.kaizen.khushu.i18n
+package com.imn.iman.i18n
 
 import androidx.annotation.StringRes
-import com.kaizen.khushu.R
+import com.imn.iman.R
 
 @StringRes
 fun methodLabelRes(id: String): Int = when (id) {

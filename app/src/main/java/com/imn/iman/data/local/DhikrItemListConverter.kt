@@ -1,7 +1,7 @@
-package com.kaizen.khushu.data.local
+package com.imn.iman.data.local
 
 import androidx.room.TypeConverter
-import com.kaizen.khushu.data.model.DhikrItem
+import com.imn.iman.data.model.DhikrItem
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 

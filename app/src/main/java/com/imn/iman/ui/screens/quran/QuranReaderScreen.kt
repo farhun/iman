@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.screens.quran
+package com.imn.iman.ui.screens.quran
 
 import android.widget.Toast
 import android.os.Build
@@ -35,27 +35,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.media3.session.MediaController
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.kaizen.khushu.R
-import com.kaizen.khushu.data.model.AyahBlock
-import com.kaizen.khushu.data.model.ContentBlock
-import com.kaizen.khushu.data.model.ContentSource
-import com.kaizen.khushu.i18n.LocaleHelper
-import com.kaizen.khushu.i18n.quranReadingModeLabel
-import com.kaizen.khushu.i18n.revelationPlaceLabel
+import com.imn.iman.R
+import com.imn.iman.data.model.AyahBlock
+import com.imn.iman.data.model.ContentBlock
+import com.imn.iman.data.model.ContentSource
+import com.imn.iman.i18n.LocaleHelper
+import com.imn.iman.i18n.quranReadingModeLabel
+import com.imn.iman.i18n.revelationPlaceLabel
 
-import com.kaizen.khushu.ui.components.BlockActionSheet
-import com.kaizen.khushu.ui.components.ReadingSettingsSheet
-import com.kaizen.khushu.ui.components.TranslationPickerSheet
+import com.imn.iman.ui.components.BlockActionSheet
+import com.imn.iman.ui.components.ReadingSettingsSheet
+import com.imn.iman.ui.components.TranslationPickerSheet
 
-import com.kaizen.khushu.data.repository.TranslationRepository
+import com.imn.iman.data.repository.TranslationRepository
 
-import com.kaizen.khushu.ui.screens.learn.BlockRenderer
-import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
-import com.kaizen.khushu.ui.theme.PlusJakartaSans
-import com.kaizen.khushu.ui.theme.NotoSansArabic
-import com.kaizen.khushu.ui.theme.rememberArabicScriptFontFamily
-import com.kaizen.khushu.ui.theme.colorSeeds
-import com.kaizen.khushu.ui.theme.DefaultSeedColor
+import com.imn.iman.ui.screens.learn.BlockRenderer
+import com.imn.iman.ui.screens.settings.SettingsViewModel
+import com.imn.iman.ui.theme.PlusJakartaSans
+import com.imn.iman.ui.theme.NotoSansArabic
+import com.imn.iman.ui.theme.rememberArabicScriptFontFamily
+import com.imn.iman.ui.theme.colorSeeds
+import com.imn.iman.ui.theme.DefaultSeedColor
 import com.materialkolor.PaletteStyle
 import com.materialkolor.dynamicColorScheme
 import kotlinx.coroutines.Dispatchers

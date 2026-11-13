@@ -1,9 +1,9 @@
-package com.kaizen.khushu.ui.theme
+package com.imn.iman.ui.theme
 
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 
-import com.kaizen.khushu.R
+import com.imn.iman.R
 import androidx.compose.ui.text.font.Font
 
 
@@ -17,7 +17,7 @@ val PlusJakartaSans = FontFamily(
     Font(R.font.plusjakartasans_bold, weight = FontWeight.Bold),
 )
 
-val Typography = createKhushuTypography(
+val Typography = createImanTypography(
     plusJakartaSans = PlusJakartaSans,
     quranIndopak = QuranIndoPak,
 )

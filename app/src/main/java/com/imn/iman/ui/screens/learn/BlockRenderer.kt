@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.screens.learn
+package com.imn.iman.ui.screens.learn
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -56,21 +56,21 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kaizen.khushu.R
-import com.kaizen.khushu.data.model.ArabicBlock
-import com.kaizen.khushu.data.model.AyahBlock
-import com.kaizen.khushu.data.model.CalloutBlock
-import com.kaizen.khushu.data.model.ContentBlock
-import com.kaizen.khushu.data.model.ContentSource
-import com.kaizen.khushu.data.model.DividerBlock
-import com.kaizen.khushu.data.model.HadithBlock
-import com.kaizen.khushu.data.model.HeadingBlock
-import com.kaizen.khushu.data.model.ParagraphBlock
-import com.kaizen.khushu.data.repository.CatalogRepository
-import com.kaizen.khushu.data.repository.UserSettings
-import com.kaizen.khushu.ui.components.AyahEndMarker
-import com.kaizen.khushu.ui.theme.PlusJakartaSans
-import com.kaizen.khushu.ui.theme.NotoSansArabic
+import com.imn.iman.R
+import com.imn.iman.data.model.ArabicBlock
+import com.imn.iman.data.model.AyahBlock
+import com.imn.iman.data.model.CalloutBlock
+import com.imn.iman.data.model.ContentBlock
+import com.imn.iman.data.model.ContentSource
+import com.imn.iman.data.model.DividerBlock
+import com.imn.iman.data.model.HadithBlock
+import com.imn.iman.data.model.HeadingBlock
+import com.imn.iman.data.model.ParagraphBlock
+import com.imn.iman.data.repository.CatalogRepository
+import com.imn.iman.data.repository.UserSettings
+import com.imn.iman.ui.components.AyahEndMarker
+import com.imn.iman.ui.theme.PlusJakartaSans
+import com.imn.iman.ui.theme.NotoSansArabic
 
 /**
  * Renders a single [ContentBlock] into Compose UI.
@@ -324,7 +324,7 @@ private fun AyahBlockView(
         // ── Translation ───────────────────────────────────────────────────────
         val translationText = when {
             !settings.showTranslation -> null
-            translationMap.isNotEmpty() -> com.kaizen.khushu.data.repository.TranslationRepository
+            translationMap.isNotEmpty() -> com.imn.iman.data.repository.TranslationRepository
                 .getTranslation(translationMap, block.surah, block.ayah) ?: block.translationEn
 
             else -> block.translationEn

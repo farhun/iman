@@ -1,8 +1,8 @@
-package com.kaizen.khushu.ui.screens.tasbeeh
+package com.imn.iman.ui.screens.tasbeeh
 
 import android.content.Context
 import android.media.MediaPlayer
-import com.kaizen.khushu.R
+import com.imn.iman.R
 
 data class TasbihSoundOption(
     val id: String,

@@ -1,10 +1,10 @@
-package com.kaizen.khushu.receiver
+package com.imn.iman.receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.kaizen.khushu.i18n.LocaleHelper
-import com.kaizen.khushu.notifications.PrayerNotificationScheduler
+import com.imn.iman.i18n.LocaleHelper
+import com.imn.iman.notifications.PrayerNotificationScheduler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

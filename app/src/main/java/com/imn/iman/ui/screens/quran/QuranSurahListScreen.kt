@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.screens.quran
+package com.imn.iman.ui.screens.quran
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,14 +32,14 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kaizen.khushu.R
-import com.kaizen.khushu.data.model.SurahMeta
-import com.kaizen.khushu.i18n.revelationPlaceLabel
-import com.kaizen.khushu.ui.theme.PlusJakartaSansBold
-import com.kaizen.khushu.ui.theme.PlusJakartaSans
-import com.kaizen.khushu.ui.theme.NotoSansArabic
-import com.kaizen.khushu.ui.theme.fontForText
-import com.kaizen.khushu.ui.screens.settings.SettingsViewModel
+import com.imn.iman.R
+import com.imn.iman.data.model.SurahMeta
+import com.imn.iman.i18n.revelationPlaceLabel
+import com.imn.iman.ui.theme.PlusJakartaSansBold
+import com.imn.iman.ui.theme.PlusJakartaSans
+import com.imn.iman.ui.theme.NotoSansArabic
+import com.imn.iman.ui.theme.fontForText
+import com.imn.iman.ui.screens.settings.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

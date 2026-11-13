@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.theme
+package com.imn.iman.ui.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontFamily

@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.screens.settings
+package com.imn.iman.ui.screens.settings
 
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
@@ -55,12 +55,12 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
-import com.kaizen.khushu.R
-import com.kaizen.khushu.ui.navigation.AppDestinations
+import com.imn.iman.R
+import com.imn.iman.ui.navigation.AppDestinations
 import androidx.compose.ui.text.font.FontWeight
-import com.kaizen.khushu.ui.theme.PlusJakartaSans
-import com.kaizen.khushu.ui.theme.LocalThemeTransitionController
-import com.kaizen.khushu.ui.theme.colorSeeds
+import com.imn.iman.ui.theme.PlusJakartaSans
+import com.imn.iman.ui.theme.LocalThemeTransitionController
+import com.imn.iman.ui.theme.colorSeeds
 
 private fun themeLabelRes(mode: String): Int = when (mode) {
     "System" -> R.string.settings_theme_system
@@ -112,7 +112,7 @@ fun AppearanceSettingsScreen(
 
             SettingsGroup(
                 title = stringResource(R.string.settings_theme),
-//                description = "Control the overall look and startup behavior of Khushu."
+//                description = "Control the overall look and startup behavior of Iman."
             ) {
                 Box(modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)) {
                     SingleChoiceSegmentedButtonRow(

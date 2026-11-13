@@ -1,4 +1,4 @@
-package com.kaizen.khushu.notifications
+package com.imn.iman.notifications
 
 import android.app.AlarmManager
 import android.app.Notification
@@ -15,15 +15,15 @@ import android.provider.Settings
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.kaizen.khushu.MainActivity
-import com.kaizen.khushu.R
-import com.kaizen.khushu.i18n.LocaleHelper
-import com.kaizen.khushu.data.repository.PrayerTimeRepository
-import com.kaizen.khushu.data.repository.SettingsRepository
-import com.kaizen.khushu.data.repository.UserSettings
-import com.kaizen.khushu.data.repository.EXTRA_PRAYER_TIMINGS
-import com.kaizen.khushu.receiver.PrayerAlarmReceiver
-import com.kaizen.khushu.receiver.PrayerRescheduleReceiver
+import com.imn.iman.MainActivity
+import com.imn.iman.R
+import com.imn.iman.i18n.LocaleHelper
+import com.imn.iman.data.repository.PrayerTimeRepository
+import com.imn.iman.data.repository.SettingsRepository
+import com.imn.iman.data.repository.UserSettings
+import com.imn.iman.data.repository.EXTRA_PRAYER_TIMINGS
+import com.imn.iman.receiver.PrayerAlarmReceiver
+import com.imn.iman.receiver.PrayerRescheduleReceiver
 import kotlinx.coroutines.flow.first
 import java.util.Calendar
 import java.util.Date
@@ -275,7 +275,7 @@ class PrayerNotificationScheduler(
         }.timeInMillis
         val intent = Intent(appContext, PrayerRescheduleReceiver::class.java).apply {
             action = ACTION_RESCHEDULE_AT_MIDNIGHT
-            data = Uri.parse("khushu://prayer-reminders/midnight")
+            data = Uri.parse("iman://prayer-reminders/midnight")
         }
         val pendingIntent = PendingIntent.getBroadcast(
             appContext,
@@ -321,7 +321,7 @@ class PrayerNotificationScheduler(
         if (type == PrayerAlarmType.PRAYER) {
             val showIntent = Intent(appContext, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                data = Uri.parse("khushu://prayer-alarm/$requestDay/$prayerName")
+                data = Uri.parse("iman://prayer-alarm/$requestDay/$prayerName")
             }
             val showPendingIntent = PendingIntent.getActivity(
                 appContext,
@@ -368,8 +368,8 @@ class PrayerNotificationScheduler(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val notification = NotificationCompat.Builder(appContext, EXACT_ALARM_PERMISSION_CHANNEL)
-            .setSmallIcon(com.kaizen.khushu.R.drawable.ic_notification_glyph)
-            .setColor(com.kaizen.khushu.R.color.notification_icon_background)
+            .setSmallIcon(com.imn.iman.R.drawable.ic_notification_glyph)
+            .setColor(com.imn.iman.R.color.notification_icon_background)
             .setContentTitle(appContext.getString(R.string.notif_enable_exact_alarms_title))
             .setContentText(appContext.getString(R.string.notif_enable_exact_alarms_text))
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -535,7 +535,7 @@ class PrayerNotificationScheduler(
         const val CHANNEL_PRAYER_SILENT = "prayer_silent"
         private const val EXACT_ALARM_PERMISSION_CHANNEL = "exact_alarm_permission_v1"
         private const val MIDNIGHT_RESCHEDULE_REQUEST_CODE = 0x4D49444E
-        private const val ACTION_RESCHEDULE_AT_MIDNIGHT = "com.kaizen.khushu.action.RESCHEDULE_AT_MIDNIGHT"
+        private const val ACTION_RESCHEDULE_AT_MIDNIGHT = "com.imn.iman.action.RESCHEDULE_AT_MIDNIGHT"
         private const val EXACT_ALARM_PERMISSION_NOTIFICATION_ID = 27104
         private const val TAG = "PrayerAlarmScheduler"
 
@@ -648,8 +648,8 @@ class PrayerNotificationScheduler(
         }
 
         fun soundUriForSelection(context: Context, sound: String): Uri? = when (sound) {
-            "ADHAN" -> Uri.parse("android.resource://${context.packageName}/${com.kaizen.khushu.R.raw.adhan}")
-            "TAKBIR" -> Uri.parse("android.resource://${context.packageName}/${com.kaizen.khushu.R.raw.takbir}")
+            "ADHAN" -> Uri.parse("android.resource://${context.packageName}/${com.imn.iman.R.raw.adhan}")
+            "TAKBIR" -> Uri.parse("android.resource://${context.packageName}/${com.imn.iman.R.raw.takbir}")
             "SILENT" -> null
             else -> RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         }

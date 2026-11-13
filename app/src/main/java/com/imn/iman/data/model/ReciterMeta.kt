@@ -1,4 +1,4 @@
-package com.kaizen.khushu.data.model
+package com.imn.iman.data.model
 
 data class ReciterMeta(
     val id: String,

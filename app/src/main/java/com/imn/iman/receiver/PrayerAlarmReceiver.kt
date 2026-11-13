@@ -1,13 +1,13 @@
-package com.kaizen.khushu.receiver
+package com.imn.iman.receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.kaizen.khushu.data.repository.SettingsRepository
-import com.kaizen.khushu.i18n.LocaleHelper
-import com.kaizen.khushu.notifications.PrayerAlarmType
-import com.kaizen.khushu.notifications.PrayerNotificationPublisher
-import com.kaizen.khushu.notifications.PrayerNotificationScheduler
+import com.imn.iman.data.repository.SettingsRepository
+import com.imn.iman.i18n.LocaleHelper
+import com.imn.iman.notifications.PrayerAlarmType
+import com.imn.iman.notifications.PrayerNotificationPublisher
+import com.imn.iman.notifications.PrayerNotificationScheduler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -59,7 +59,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
     }
 
     companion object {
-        const val ACTION_FIRE_PRAYER_NOTIFICATION = "com.kaizen.khushu.action.FIRE_PRAYER_NOTIFICATION"
+        const val ACTION_FIRE_PRAYER_NOTIFICATION = "com.imn.iman.action.FIRE_PRAYER_NOTIFICATION"
         const val EXTRA_PRAYER_NAME = "extra_prayer_name"
         const val EXTRA_NOTIFICATION_TYPE = "extra_notification_type"
         const val EXTRA_PRE_PRAYER_MINUTES = "extra_pre_prayer_minutes"

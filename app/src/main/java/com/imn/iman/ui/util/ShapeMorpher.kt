@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.util
+package com.imn.iman.ui.util
 
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.runtime.Composable

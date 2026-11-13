@@ -1,4 +1,4 @@
-package com.kaizen.khushu.widget
+package com.imn.iman.widget
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -14,14 +14,14 @@ import android.os.Build
 
 import android.util.Log
 import android.widget.RemoteViews
-import com.kaizen.khushu.MainActivity
-import com.kaizen.khushu.R
-import com.kaizen.khushu.data.repository.PrayerTimeRepository
-import com.kaizen.khushu.data.repository.SettingsRepository
-import com.kaizen.khushu.data.repository.UserSettings
-import com.kaizen.khushu.data.repository.WidgetVisibilityItems
-import com.kaizen.khushu.i18n.LocaleHelper
-import com.kaizen.khushu.i18n.prayerLabel
+import com.imn.iman.MainActivity
+import com.imn.iman.R
+import com.imn.iman.data.repository.PrayerTimeRepository
+import com.imn.iman.data.repository.SettingsRepository
+import com.imn.iman.data.repository.UserSettings
+import com.imn.iman.data.repository.WidgetVisibilityItems
+import com.imn.iman.i18n.LocaleHelper
+import com.imn.iman.i18n.prayerLabel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -70,7 +70,7 @@ class PrayerWidgetProvider : AppWidgetProvider() {
 
     companion object {
         private const val TAG = "PrayerWidgetProvider"
-        private const val ACTION_COUNTDOWN_REFRESH = "com.kaizen.khushu.widget.REFRESH_COUNTDOWN"
+        private const val ACTION_COUNTDOWN_REFRESH = "com.imn.iman.widget.REFRESH_COUNTDOWN"
 
         private data class PrayerItem(
             val name: String,

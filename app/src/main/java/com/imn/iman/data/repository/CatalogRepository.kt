@@ -1,7 +1,7 @@
-package com.kaizen.khushu.data.repository
+package com.imn.iman.data.repository
 
 import android.content.Context
-import com.kaizen.khushu.data.model.TranslationMeta
+import com.imn.iman.data.model.TranslationMeta
 import kotlinx.serialization.json.*
 
 object CatalogRepository {

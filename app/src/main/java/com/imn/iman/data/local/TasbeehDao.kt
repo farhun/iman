@@ -1,11 +1,11 @@
-package com.kaizen.khushu.data.local
+package com.imn.iman.data.local
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
-import com.kaizen.khushu.data.model.TasbeehCollection
+import com.imn.iman.data.model.TasbeehCollection
 
 @Dao
 interface TasbeehDao {

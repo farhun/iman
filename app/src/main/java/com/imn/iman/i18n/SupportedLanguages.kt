@@ -1,4 +1,4 @@
-package com.kaizen.khushu.i18n
+package com.imn.iman.i18n
 
 data class AppLanguage(val tag: String, val nativeName: String)
 

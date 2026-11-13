@@ -1,4 +1,4 @@
-package com.kaizen.khushu.ui.screens.tasbeeh
+package com.imn.iman.ui.screens.tasbeeh
 
 
 import androidx.compose.foundation.Canvas
@@ -32,9 +32,9 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-import com.kaizen.khushu.ui.theme.PlusJakartaSans
-import com.kaizen.khushu.ui.theme.containsArabic
-import com.kaizen.khushu.ui.theme.fontForText
+import com.imn.iman.ui.theme.PlusJakartaSans
+import com.imn.iman.ui.theme.containsArabic
+import com.imn.iman.ui.theme.fontForText
 import kotlin.math.abs
 import kotlin.math.exp
 
