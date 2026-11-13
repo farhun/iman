@@ -47,11 +47,6 @@ figma/
 .env.*
 docs/superpowers/
 
-# Repo-local archives and generated content pipeline artifacts
-docs/khushu-handoff.zip
-docs/khushu-handoff/
-# docs/images/screenshots/
-
 
 # Build output
 **/build/
