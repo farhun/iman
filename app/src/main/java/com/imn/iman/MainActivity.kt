@@ -1,6 +1,7 @@
 package com.imn.iman
 
 import android.app.Activity
+import android.app.AlarmManager
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.WindowManager
@@ -17,6 +18,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.enableEdgeToEdge
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
+import androidx.core.app.NotificationManagerCompat
 import com.imn.iman.service.PlaybackService
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
@@ -87,6 +89,8 @@ class MainActivity : ComponentActivity() {
         const val DEBUG_FORCE_ONBOARDING = false // SET TO FALSE FOR RELEASE
         const val LOCATION_PREFS = "location_permission_flow"
         const val LOCATION_REQUESTED = "location_requested"
+        const val NOTIFICATION_PREFS = "notification_permission_flow"
+        const val NOTIFICATION_REQUESTED = "notification_requested"
         const val FIRST_LOCATION_PROMPT_SHOWN = "first_location_prompt_shown_v2"
         const val PENDING_GPS_ENABLE = "pending_gps_enable"
     }
@@ -107,12 +111,16 @@ class MainActivity : ComponentActivity() {
 
     private var controllerFuture: ListenableFuture<MediaController>? = null
     private var hasPausedSinceResume = false
+    private var notificationPermissionRequestInFlight = false
     private val media3Controller: MediaController?
         get() = if (controllerFuture?.isDone == true) controllerFuture?.get() else null
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { _ -> }
+    ) { _ ->
+        notificationPermissionRequestInFlight = false
+        if (::settingsRepository.isInitialized) disableReminderNotificationsIfPermissionsMissing()
+    }
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.wrap(newBase))
@@ -131,6 +139,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (!::settingsRepository.isInitialized) return
+        if (!notificationPermissionRequestInFlight) disableReminderNotificationsIfPermissionsMissing()
         if (!hasPausedSinceResume || !::settingsViewModel.isInitialized) return
         hasPausedSinceResume = false
         val prefs = getSharedPreferences(LOCATION_PREFS, MODE_PRIVATE)
@@ -146,6 +156,15 @@ class MainActivity : ComponentActivity() {
             homeViewModel.refreshPrayerData()
         } else if (!hasLocationPermission && settingsViewModel.settings.value.useGpsLocation) {
             settingsViewModel.toggleUseGpsLocation(false)
+        }
+    }
+
+    private fun disableReminderNotificationsIfPermissionsMissing() {
+        val notificationsAllowed = NotificationManagerCompat.from(this).areNotificationsEnabled()
+        val exactAlarmsAllowed = Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+            getSystemService(AlarmManager::class.java)?.canScheduleExactAlarms() == true
+        if (!notificationsAllowed || !exactAlarmsAllowed) {
+            lifecycleScope.launch { settingsRepository.disableAllReminderNotifications() }
         }
     }
 
@@ -175,6 +194,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getSharedPreferences(NOTIFICATION_PREFS, MODE_PRIVATE).edit()
+                .putBoolean(NOTIFICATION_REQUESTED, true).apply()
+            notificationPermissionRequestInFlight = true
             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
 

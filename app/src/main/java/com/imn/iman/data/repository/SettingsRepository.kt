@@ -497,6 +497,22 @@ class SettingsRepository(private val context: Context) {
         context.dataStore.edit { it[PreferencesKeys.EXTRA_PRAYER_NOTIFICATIONS] = ids }
     }
 
+    suspend fun disableAllReminderNotifications() {
+        context.dataStore.edit {
+            it[PreferencesKeys.PRAYER_NOTIFICATION_FAJR] = false
+            it[PreferencesKeys.PRAYER_NOTIFICATION_DHUHR] = false
+            it[PreferencesKeys.PRAYER_NOTIFICATION_ASR] = false
+            it[PreferencesKeys.PRAYER_NOTIFICATION_MAGHRIB] = false
+            it[PreferencesKeys.PRAYER_NOTIFICATION_ISHA] = false
+            it[PreferencesKeys.PRE_PRAYER_NOTIFICATION_FAJR] = false
+            it[PreferencesKeys.PRE_PRAYER_NOTIFICATION_DHUHR] = false
+            it[PreferencesKeys.PRE_PRAYER_NOTIFICATION_ASR] = false
+            it[PreferencesKeys.PRE_PRAYER_NOTIFICATION_MAGHRIB] = false
+            it[PreferencesKeys.PRE_PRAYER_NOTIFICATION_ISHA] = false
+            it[PreferencesKeys.EXTRA_PRAYER_NOTIFICATIONS] = emptySet()
+        }
+    }
+
     suspend fun updateShowExtraPrayerTimingsOnHome(enabled: Boolean) {
         context.dataStore.edit { it[PreferencesKeys.SHOW_EXTRA_PRAYER_TIMINGS_ON_HOME] = enabled }
     }

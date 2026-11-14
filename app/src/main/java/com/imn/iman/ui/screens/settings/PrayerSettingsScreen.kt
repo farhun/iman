@@ -2,12 +2,14 @@ package com.imn.iman.ui.screens.settings
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlarmManager
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -37,6 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -58,6 +61,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.imn.iman.MainActivity
 import com.imn.iman.R
 import com.imn.iman.i18n.LocaleHelper
@@ -153,7 +159,15 @@ fun PrayerSettingsScreen(
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val noRingtonePickerMessage = stringResource(R.string.settings_no_ringtone_picker)
-    val notificationsAllowed = NotificationManagerCompat.from(context).areNotificationsEnabled()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var permissionRefresh by remember { mutableStateOf(0) }
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_RESUME) permissionRefresh++ }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+    val notificationsAllowed = remember(context, permissionRefresh) { NotificationManagerCompat.from(context).areNotificationsEnabled() }
+
     val lastRefreshed = if (settings.lastPrayerRefreshEpochMs > 0L) {
         SimpleDateFormat("d MMM, HH:mm", Locale.getDefault()).format(Date(settings.lastPrayerRefreshEpochMs))
     } else {
@@ -172,6 +186,9 @@ fun PrayerSettingsScreen(
     }
     val locationPrefs = remember(context) {
         context.getSharedPreferences(MainActivity.LOCATION_PREFS, Context.MODE_PRIVATE)
+    }
+    val notificationPrefs = remember(context) {
+        context.getSharedPreferences(MainActivity.NOTIFICATION_PREFS, Context.MODE_PRIVATE)
     }
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -211,9 +228,48 @@ fun PrayerSettingsScreen(
             }
         }
     }
+    var pendingReminderEnable by remember { mutableStateOf<(() -> Unit)?>(null) }
+    val hasExactAlarmAccess = {
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.S || context.getSystemService(AlarmManager::class.java)?.canScheduleExactAlarms() == true
+    }
+    val completePendingReminder = {
+        val action = pendingReminderEnable
+        pendingReminderEnable = null
+        if (hasExactAlarmAccess()) action?.invoke()
+    }
+    val exactAlarmSettingsLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { permissionRefresh++; completePendingReminder() }
+    val continueReminderSetup = {
+        permissionRefresh++
+        if (NotificationManagerCompat.from(context).areNotificationsEnabled()) {
+            if (hasExactAlarmAccess()) completePendingReminder()
+            else exactAlarmSettingsLauncher.launch(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:${context.packageName}")))
+        } else pendingReminderEnable = null
+    }
     val notificationsPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
-    ) { }
+    ) { granted -> if (granted) continueReminderSetup() else { permissionRefresh++; pendingReminderEnable = null } }
+    val notificationSettingsLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { continueReminderSetup() }
+    val withReminderPermissions: (Boolean, () -> Unit) -> Unit = { enabling, action ->
+        if (!enabling) action() else {
+            pendingReminderEnable = action
+            val permissionGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !permissionGranted) {
+                val alreadyRequested = notificationPrefs.getBoolean(MainActivity.NOTIFICATION_REQUESTED, false)
+                val canShowRationale = context.findActivity()?.shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) == true
+                if (alreadyRequested && !canShowRationale) notificationSettingsLauncher.launch(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName))
+                else {
+                    notificationPrefs.edit().putBoolean(MainActivity.NOTIFICATION_REQUESTED, true).apply()
+                    notificationsPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            } else if (!notificationsAllowed) {
+                notificationSettingsLauncher.launch(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName))
+            } else continueReminderSetup()
+        }
+    }
     val customSoundPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -489,18 +545,6 @@ fun PrayerSettingsScreen(
                 title = stringResource(R.string.settings_reminders),
 //                description = "Global alert style and per-prayer reminder controls."
             ) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !notificationsAllowed) {
-                    Box(modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)) {
-                        FilledTonalButton(
-                            onClick = {
-                                notificationsPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(stringResource(R.string.settings_allow_notifications), fontFamily = PlusJakartaSans)
-                        }
-                    }
-                }
 
                 Box(modifier = Modifier.padding(horizontal = 20.dp)) {
                     SettingsDropdown(
@@ -578,16 +622,14 @@ fun PrayerSettingsScreen(
                         PrayerReminderCard(
                             preference = preference,
                             onPrayerToggle = { enabled ->
-                                viewModel.setPrayerNotificationEnabled(
-                                    preference.prayerName,
-                                    enabled
-                                )
+                                withReminderPermissions(enabled) {
+                                    viewModel.setPrayerNotificationEnabled(preference.prayerName, enabled)
+                                }
                             },
                             onPrePrayerToggle = { enabled ->
-                                viewModel.setPrePrayerNotificationEnabled(
-                                    preference.prayerName,
-                                    enabled
-                                )
+                                withReminderPermissions(enabled) {
+                                    viewModel.setPrePrayerNotificationEnabled(preference.prayerName, enabled)
+                                }
                             },
                             onPrePrayerMinutesChange = { minutes ->
                                 viewModel.setPrePrayerMinutes(preference.prayerName, minutes)
@@ -610,10 +652,9 @@ fun PrayerSettingsScreen(
                             preference = preference,
                             onSelectedToggle = { enabled -> viewModel.toggleExtraPrayerTiming(preference.id, enabled) },
                             onNotificationToggle = { enabled ->
-                                viewModel.toggleExtraPrayerNotification(
-                                    preference.id,
-                                    enabled
-                                )
+                                withReminderPermissions(enabled) {
+                                    viewModel.toggleExtraPrayerNotification(preference.id, enabled)
+                                }
                             }
                         )
                     }

@@ -11,10 +11,10 @@ import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
-import android.provider.Settings
+
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
+
+
 import com.imn.iman.MainActivity
 import com.imn.iman.R
 import com.imn.iman.i18n.LocaleHelper
@@ -303,10 +303,7 @@ class PrayerNotificationScheduler(
         type: PrayerAlarmType,
         prePrayerMinutes: Int,
     ) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
-            showExactAlarmPermissionPrompt()
-            return
-        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) return
 
         val requestDay = dayStamp(triggerAtMillis)
         val pendingIntent = buildAlarmPendingIntent(
@@ -345,44 +342,6 @@ class PrayerNotificationScheduler(
         Log.d(TAG, "Scheduled ${type.name} reminder for $prayerName at ${Date(triggerAtMillis)} ($triggerAtMillis)")
     }
 
-    private fun showExactAlarmPermissionPrompt() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
-        val manager = appContext.getSystemService(NotificationManager::class.java)
-        if (manager.getNotificationChannel(EXACT_ALARM_PERMISSION_CHANNEL) == null) {
-            manager.createNotificationChannel(
-                NotificationChannel(
-                    EXACT_ALARM_PERMISSION_CHANNEL,
-                    appContext.getString(R.string.notif_channel_reminder_setup),
-                    NotificationManager.IMPORTANCE_HIGH
-                ).apply { lockscreenVisibility = Notification.VISIBILITY_PUBLIC }
-            )
-        }
-        val settingsIntent = Intent(
-            Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
-            Uri.parse("package:${appContext.packageName}")
-        ).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
-        val settingsPendingIntent = PendingIntent.getActivity(
-            appContext,
-            EXACT_ALARM_PERMISSION_NOTIFICATION_ID,
-            settingsIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        val notification = NotificationCompat.Builder(appContext, EXACT_ALARM_PERMISSION_CHANNEL)
-            .setSmallIcon(com.imn.iman.R.drawable.ic_notification_glyph)
-            .setColor(com.imn.iman.R.color.notification_icon_background)
-            .setContentTitle(appContext.getString(R.string.notif_enable_exact_alarms_title))
-            .setContentText(appContext.getString(R.string.notif_enable_exact_alarms_text))
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(true)
-            .setContentIntent(settingsPendingIntent)
-            .addAction(0, appContext.getString(R.string.common_open_settings), settingsPendingIntent)
-            .build()
-        runCatching {
-            NotificationManagerCompat.from(appContext)
-                .notify(EXACT_ALARM_PERMISSION_NOTIFICATION_ID, notification)
-        }
-    }
 
     private fun buildAlarmPendingIntent(
         prayerName: String,
@@ -533,10 +492,10 @@ class PrayerNotificationScheduler(
         const val CHANNEL_PRAYER_ADHAN = "prayer_adhan"
         const val CHANNEL_PRAYER_TAKBIR = "prayer_takbir"
         const val CHANNEL_PRAYER_SILENT = "prayer_silent"
-        private const val EXACT_ALARM_PERMISSION_CHANNEL = "exact_alarm_permission_v1"
+
         private const val MIDNIGHT_RESCHEDULE_REQUEST_CODE = 0x4D49444E
         private const val ACTION_RESCHEDULE_AT_MIDNIGHT = "com.imn.iman.action.RESCHEDULE_AT_MIDNIGHT"
-        private const val EXACT_ALARM_PERMISSION_NOTIFICATION_ID = 27104
+
         private const val TAG = "PrayerAlarmScheduler"
 
         fun createNotificationChannels(

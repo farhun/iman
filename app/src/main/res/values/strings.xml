@@ -201,7 +201,7 @@
     <string name="settings_update_coordinates">Update Coordinates</string>
 
     <string name="settings_reminders">Reminders</string>
-    <string name="settings_allow_notifications">Allow Notifications</string>
+
     <string name="settings_extra_timing_alert_style">Extra timing alert style</string>
     <string name="settings_extra_timing_alert_style_summary">Choose how extra timing notifications sound or behave.</string>
     <string name="settings_custom_sound">Custom Sound</string>
@@ -554,9 +554,7 @@
     <string name="notif_extra_reflection_first_third">The night has entered its first deep stretch.</string>
     <string name="notif_extra_reflection_midnight">The middle of the night has arrived.</string>
     <string name="notif_extra_reflection_last_third">The last third of the night is here.</string>
-    <string name="notif_channel_reminder_setup">Reminder setup</string>
-    <string name="notif_enable_exact_alarms_title">Enable exact alarms</string>
-    <string name="notif_enable_exact_alarms_text">Allow exact alarms to receive prayer reminders on time.</string>
+
     <string name="notif_channel_prayer_sound_default">Prayer Sound: Default</string>
     <string name="notif_channel_prayer_sound_adhan">Prayer Sound: Adhan</string>
     <string name="notif_channel_prayer_sound_takbir">Prayer Sound: Takbir</string>
