@@ -3,6 +3,11 @@ package com.imn.iman.ui.screens.quran
 import android.widget.Toast
 import android.os.Build
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,8 +27,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -59,6 +69,8 @@ import com.imn.iman.ui.theme.DefaultSeedColor
 import com.materialkolor.PaletteStyle
 import com.materialkolor.dynamicColorScheme
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -213,6 +225,36 @@ fun QuranReaderScreen(
     val haptic = LocalHapticFeedback.current
     val density = LocalDensity.current
     val listState = rememberLazyListState()
+    val scrollIndicatorScope = rememberCoroutineScope()
+    var showScrollIndicator by remember { mutableStateOf(false) }
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.isScrollInProgress }.collectLatest { scrolling ->
+            if (scrolling) showScrollIndicator = true else {
+                delay(750)
+                showScrollIndicator = false
+            }
+        }
+    }
+    val scrollIndicatorAlpha by animateFloatAsState(
+        targetValue = if (showScrollIndicator) 1f else 0f,
+        animationSpec = tween(180),
+        label = "quran_scroll_indicator_alpha"
+    )
+    val scrollMetrics by remember(listState) {
+        derivedStateOf {
+            val info = listState.layoutInfo
+            val visible = info.visibleItemsInfo
+            if (info.totalItemsCount == 0 || visible.isEmpty()) 0f to 1f else {
+                val averageSize = visible.sumOf { it.size }.toFloat() / visible.size
+                val contentSize = averageSize * info.totalItemsCount + with(density) { 32.dp.toPx() }
+                val viewport = info.viewportSize.height.toFloat()
+                val position = ((listState.firstVisibleItemIndex * averageSize + listState.firstVisibleItemScrollOffset) /
+                    (contentSize - viewport).coerceAtLeast(1f)).coerceIn(0f, 1f)
+                position to (viewport / contentSize).coerceIn(0f, 1f)
+            }
+        }
+    }
+    val latestScrollMetrics = rememberUpdatedState(scrollMetrics)
     val currentAyahIndex by remember(listState, ayahs.size) {
         derivedStateOf {
             if (ayahs.isEmpty()) 0
@@ -450,11 +492,12 @@ fun QuranReaderScreen(
                     } else {
                         var activeBlock by remember { mutableStateOf<Pair<ContentBlock, Int>?>(null) }
 
-                        LazyColumn(
-                            state = listState,
-                            contentPadding = PaddingValues(bottom = 32.dp),
-                            modifier = Modifier.fillMaxSize()
-                        ) {
+                        Box(Modifier.fillMaxSize()) {
+                            LazyColumn(
+                                state = listState,
+                                contentPadding = PaddingValues(bottom = 32.dp),
+                                modifier = Modifier.fillMaxSize()
+                            ) {
                             item {
                                 Column(
                                     modifier = Modifier
@@ -687,6 +730,41 @@ fun QuranReaderScreen(
                                                 fontWeight = FontWeight.Bold
                                             )
                                         }
+                                    }
+                                }
+                            }
+                            }
+                            Box(
+                                modifier = Modifier.align(Alignment.CenterEnd).width(24.dp).fillMaxHeight()
+                                    .padding(vertical = 8.dp)
+                                    .pointerInput(listState) {
+                                        detectVerticalDragGestures { change, dragAmount ->
+                                            change.consume()
+                                            val fraction = latestScrollMetrics.value.second
+                                            val viewport = listState.layoutInfo.viewportSize.height.toFloat()
+                                            if (fraction < 1f && fraction > 0f && viewport > 0f) {
+                                                val thumbHeight = (size.height * fraction).coerceIn(24.dp.toPx(), size.height.toFloat())
+                                                val contentRange = (viewport / fraction - viewport).coerceAtLeast(1f)
+                                                val trackRange = (size.height - thumbHeight).coerceAtLeast(1f)
+                                                scrollIndicatorScope.launch { listState.scrollBy(dragAmount * contentRange / trackRange) }
+                                            }
+                                        }
+                                    }
+                            ) {
+                                Canvas(
+                                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 5.dp)
+                                        .fillMaxHeight().width(2.dp)
+                                        .graphicsLayer { alpha = scrollIndicatorAlpha }
+                                ) {
+                                    val (position, fraction) = scrollMetrics
+                                    if (fraction < 1f && size.height > 0f) {
+                                        val thumbHeight = (size.height * fraction).coerceIn(24.dp.toPx(), size.height)
+                                        drawRoundRect(
+                                            color = fg.copy(alpha = 0.4f),
+                                            topLeft = Offset(0f, (size.height - thumbHeight) * position),
+                                            size = Size(size.width, thumbHeight),
+                                            cornerRadius = CornerRadius(size.width / 2f)
+                                        )
                                     }
                                 }
                             }
