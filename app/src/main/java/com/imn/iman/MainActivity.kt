@@ -66,7 +66,7 @@ import com.imn.iman.notifications.toPrayerNotificationScheduleConfig
 import com.imn.iman.ui.components.PillNavBar
 import com.imn.iman.ui.components.ReleaseNotesDialog
 import com.imn.iman.ui.navigation.*
-import com.imn.iman.ui.screens.onboarding.OnboardingScreen
+
 import com.imn.iman.ui.screens.home.HomeScreen
 import com.imn.iman.ui.screens.home.HomeViewModel
 import com.imn.iman.data.repository.PrayerTimeRepository
@@ -86,7 +86,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     companion object {
-        const val DEBUG_FORCE_ONBOARDING = false // SET TO FALSE FOR RELEASE
+
         const val LOCATION_PREFS = "location_permission_flow"
         const val LOCATION_REQUESTED = "location_requested"
         const val NOTIFICATION_PREFS = "notification_permission_flow"
@@ -437,8 +437,6 @@ private fun ImanApp(
     val currentDestination = AppDestinations.fromRoute(currentRoute) ?: AppDestinations.HOME
 
     LaunchedEffect(currentRoute, settings.lastSeenAppVersionCode) {
-        if (currentRoute == ONBOARDING_ROUTE) return@LaunchedEffect
-
         val currentVersionCode = BuildConfig.VERSION_CODE
         when {
             settings.lastSeenAppVersionCode == 0 -> {
@@ -484,22 +482,6 @@ private fun ImanApp(
                     startDestination = startRoute,
                     modifier = Modifier.fillMaxSize(),
                 ) {
-                    composable(
-                        route = ONBOARDING_ROUTE,
-                        enterTransition = { fadeIn(tween(M3Duration)) },
-                        exitTransition = { fadeOut(tween(M3Duration)) },
-                    ) {
-                        // We will create this screen next
-                        OnboardingScreen(
-                            settingsViewModel = settingsViewModel,
-                            onComplete = {
-                                settingsViewModel.setOnboardingCompleted(true)
-                                navController.navigate(AppDestinations.HOME.route) {
-                                    popUpTo(ONBOARDING_ROUTE) { inclusive = true }
-                                }
-                            }
-                        )
-                    }
 
                     composable(
                         route = AppDestinations.HOME.route,

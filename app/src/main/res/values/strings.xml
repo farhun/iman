@@ -373,22 +373,7 @@
     <string name="tasbih_sound_muted_bead">Muted Bead</string>
     <string name="tasbih_sound_light_chime">Light Chime</string>
     <string name="tasbih_sound_warm_knock">Warm Knock</string>
-    <string name="onboarding_begin">Begin</string>
-    <string name="onboarding_intro_description">A minimalist sanctuary for your daily devotion. Engineered for total focus.</string>
-    <string name="onboarding_ecosystem">The Ecosystem</string>
-    <string name="onboarding_salah_canvas">Salah Canvas</string>
-    <string name="onboarding_immersive_tracking">Immersive tracking</string>
-    <string name="onboarding_authentic_text">Authentic text</string>
-    <string name="onboarding_tasbeeh_engine">Tasbeeh Engine</string>
-    <string name="onboarding_haptic_precision_stealth">Haptic precision &amp; OLED stealth</string>
-    <string name="onboarding_your_presence">Your Presence</string>
-    <string name="onboarding_location_description">Accurate prayer times require your coordinates. Iman can find them automatically or you can set them later.</string>
-    <string name="onboarding_locate_me">Locate Me</string>
-    <string name="onboarding_coordinates_locked">Coordinates locked.</string>
-    <string name="onboarding_location_privacy_note">Privacy Note: Your location never leaves this device. It is used strictly for offline astronomical calculations.</string>
-    <string name="onboarding_your_sanctuary">Your Sanctuary</string>
-    <string name="onboarding_aesthetics">Aesthetics</string>
-    <string name="onboarding_enable_reminders">Enable Reminders</string>
+
     <string name="settings_location_access_title">Location access</string>
     <string name="settings_location_access_message">Allow location access to automatically calculate accurate prayer times based on your current location.</string>
     <string name="settings_location_permission_denied">Location permission not granted</string>

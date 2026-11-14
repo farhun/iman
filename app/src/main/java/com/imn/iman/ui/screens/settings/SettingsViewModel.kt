@@ -214,9 +214,6 @@ class SettingsViewModel(
         viewModelScope.launch { repository.setTasbihSoundId(id) }
     }
 
-    fun setOnboardingCompleted(completed: Boolean) {
-        viewModelScope.launch { repository.setOnboardingCompleted(completed) }
-    }
 
     fun setStudyNoteDismissed(dismissed: Boolean) {
         viewModelScope.launch { repository.setStudyNoteDismissed(dismissed) }

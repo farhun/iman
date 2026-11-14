@@ -100,7 +100,7 @@ class SettingsRepository(private val context: Context) {
         val TASBEEH_VOLUME_ANIMATION = booleanPreferencesKey("tasbeeh_volume_animation")
         val TASBIH_SOUND_ENABLED = booleanPreferencesKey("tasbih_sound_enabled")
         val TASBIH_SOUND_ID = stringPreferencesKey("tasbih_sound_id")
-        val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
+
         val DEVELOPER_WELCOME_DISMISSED = booleanPreferencesKey("developer_welcome_dismissed")
         val STUDY_NOTE_DISMISSED = booleanPreferencesKey("study_note_dismissed")
         val LAST_SEEN_APP_VERSION_CODE = intPreferencesKey("last_seen_app_version_code")
@@ -232,7 +232,7 @@ class SettingsRepository(private val context: Context) {
                 tasbeehVolumeAnimation = preferences[PreferencesKeys.TASBEEH_VOLUME_ANIMATION] ?: true,
                 tasbihSoundEnabled = preferences[PreferencesKeys.TASBIH_SOUND_ENABLED] ?: true,
                 tasbihSoundId = preferences[PreferencesKeys.TASBIH_SOUND_ID] ?: "1",
-                onboardingCompleted = preferences[PreferencesKeys.ONBOARDING_COMPLETED] ?: false,
+
                 studyNoteDismissed = preferences[PreferencesKeys.STUDY_NOTE_DISMISSED] ?: false,
                 lastSeenAppVersionCode = preferences[PreferencesKeys.LAST_SEEN_APP_VERSION_CODE] ?: 0,
                 prayerCalculationMethod = preferences[PreferencesKeys.PRAYER_CALCULATION_METHOD]
@@ -534,9 +534,6 @@ class SettingsRepository(private val context: Context) {
         context.dataStore.edit { it[PreferencesKeys.TASBIH_SOUND_ID] = id }
     }
 
-    suspend fun setOnboardingCompleted(completed: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.ONBOARDING_COMPLETED] = completed }
-    }
 
     suspend fun setStudyNoteDismissed(dismissed: Boolean) {
         context.dataStore.edit { it[PreferencesKeys.STUDY_NOTE_DISMISSED] = dismissed }
@@ -744,7 +741,7 @@ data class UserSettings(
     val tasbeehVolumeAnimation: Boolean = true,
     val tasbihSoundEnabled: Boolean = true,
     val tasbihSoundId: String = "1",
-    val onboardingCompleted: Boolean = false,
+
     val studyNoteDismissed: Boolean = false,
     val lastSeenAppVersionCode: Int = 0,
     val prayerCalculationMethod: String = "MUSLIM_WORLD_LEAGUE",
