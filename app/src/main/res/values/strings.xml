@@ -63,7 +63,7 @@
     <string name="about_credits_qpc_hafs" translatable="false">The Uthmani script uses the QPC Hafs text (Ayah by Ayah) and the KFGQPC Uthmanic Hafs font, published by the King Fahd Glorious Quran Printing Complex (KFGQPC) and obtained from the Quranic Universal Library (QUL). They are used unmodified, and only for Quran text.</string>
     <string name="about_credits_noto_sans_arabic" translatable="false">Noto Sans Arabic, © The Noto Project Authors, SIL Open Font License 1.1.</string>
     <string name="about_credits_plus_jakarta_sans" translatable="false">Plus Jakarta Sans, © The Plus Jakarta Sans Project Authors (Tokotype), SIL Open Font License 1.1.</string>
-    <string name="about_credits_adhan" translatable="false">The adhan and takbir sounds come from "Adhan Recordings from Doha, Qatar" on the Internet Archive, marked Public Domain Mark 1.0. The takbir is a shortened excerpt of the same recording.</string>
+    <string name="about_credits_adhan" translatable="false">The adhan and takbir sounds come from \"Adhan Recordings from Doha, Qatar\" on the Internet Archive, marked Public Domain Mark 1.0. The takbir is a shortened excerpt of the same recording.</string>
     <string name="about_credits_everyayah" translatable="false">Ayah-by-ayah recitation is streamed from EveryAyah (everyayah.com).</string>
     <string name="about_credits_prayer_times" translatable="false">Prayer times are calculated with the adhan2 library, with an optional AlAdhan API mode (aladhan.com).</string>
     <string name="about_credits_translations" translatable="false">Translations come from the Free Quran API by Fawaz Ahmed (github.com/fawazahmed0/quran-api). Each translation keeps its own translator\'s or publisher\'s copyright.</string>

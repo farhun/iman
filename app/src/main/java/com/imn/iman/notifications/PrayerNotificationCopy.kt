@@ -3,6 +3,7 @@ package com.imn.iman.notifications
 import android.content.Context
 import android.location.Geocoder
 import android.os.Build
+import android.util.Log
 import androidx.annotation.StringRes
 import com.imn.iman.R
 import com.imn.iman.i18n.LocaleHelper
@@ -11,7 +12,8 @@ import com.imn.iman.data.repository.UserSettings
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.math.abs
+import java.util.concurrent.TimeUnit
+
 
 data class PrayerNotificationContent(
     val title: String,
@@ -67,8 +69,9 @@ object PrayerNotificationCopy {
         triggerAtMillis: Long,
         prePrayerMinutes: Int,
     ): PrayerNotificationContent {
-        val localizedContext = LocaleHelper.wrap(context)
-        val locationLabel = resolveLocationLabel(localizedContext, settings)
+        val appContext = context.applicationContext
+        val localizedContext = LocaleHelper.wrap(appContext)
+        val locationLabel = resolveLocationLabel(appContext, localizedContext, settings)
         val prayerDisplayName = prayerLabel(localizedContext, prayerName)
         val prayerUtilityLine = localizedContext.getString(
             R.string.notif_prayer_at_time_in_location,
@@ -130,9 +133,13 @@ object PrayerNotificationCopy {
     }
 
     @Suppress("DEPRECATION")
-    private fun resolveLocationLabel(context: Context, settings: UserSettings): String {
-        return runCatching {
-            val geocoder = Geocoder(context, Locale.getDefault())
+    private fun resolveLocationLabel(
+        appContext: Context,
+        localizedContext: Context,
+        settings: UserSettings,
+    ): String {
+        val geocodedLabel = try {
+            val geocoder = Geocoder(appContext, Locale.getDefault())
             val addresses = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 val results = mutableListOf<android.location.Address>()
                 val latch = java.util.concurrent.CountDownLatch(1)
@@ -144,7 +151,9 @@ object PrayerNotificationCopy {
                     results += found
                     latch.countDown()
                 }
-                latch.await()
+                if (!latch.await(5, TimeUnit.SECONDS)) {
+                    throw IllegalStateException("Timed out resolving notification location")
+                }
                 results
             } else {
                 geocoder.getFromLocation(
@@ -160,13 +169,18 @@ object PrayerNotificationCopy {
                 best?.subAdminArea?.takeIf { it.isNotBlank() },
                 best?.adminArea?.takeIf { it.isNotBlank() }
             ).firstOrNull()
-        }.getOrNull() ?: context.getString(R.string.notif_location_your_area)
+        } catch (error: Exception) {
+            Log.e("ImanNotif", "Failed to resolve notification location; using localized fallback", error)
+            null
+        }
+        return geocodedLabel ?: localizedContext.getString(R.string.notif_location_your_area)
     }
 
     @StringRes
     private fun pick(options: List<Int>, seed: Int): Int? {
         if (options.isEmpty()) return null
-        return options[abs(seed) % options.size]
+        val index = (seed % options.size + options.size) % options.size
+        return options[index]
     }
 
     private fun dayStamp(triggerAtMillis: Long): String {

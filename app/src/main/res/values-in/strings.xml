@@ -1,0 +1,610 @@
+<resources>
+    <!--
+        Future localization rules:
+        - Use snake_case names prefixed by area: home_, settings_, quran_, tasbih_, widget_, notif_.
+        - Format arguments use %1$s; counts use <plurals>.
+        - Identifiers (prayer names compared by code, sound option names, DataStore keys, notification channel ids) stay in code.
+        - Quran text and Arabic name data are never translated.
+        - app_name is translatable="false".
+    -->
+    <string name="app_name" translatable="false">Iman</string>
+    <string name="common_close">Tutup</string>
+    <string name="common_apply">Terapkan</string>
+    <string name="common_reset">Atur Ulang</string>
+    <string name="common_settings">Pengaturan</string>
+    <string name="language_title">Bahasa</string>
+    <string name="language_system_default">Default sistem</string>
+    <string name="language_dialog_title">Pilih bahasa</string>
+    <string name="common_back">Kembali</string>
+    <string name="common_cancel">Batal</string>
+    <string name="common_retry">Coba Lagi</string>
+    <string name="common_yes">Ya</string>
+    <string name="common_no">Tidak</string>
+    <string name="common_play">Putar</string>
+    <string name="common_stop">Berhenti</string>
+
+    <string name="common_delete">Hapus</string>
+    <string name="common_got_it">Mengerti</string>
+    <string name="common_next">Lanjut</string>
+
+    <string name="about_title">Tentang Iman</string>
+    <string name="about_story">Kisah</string>
+    <string name="about_description">Iman adalah pendamping ibadah untuk waktu salat, membaca Al-Qur\'an, dan zikir.</string>
+    <string name="about_links">Tautan</string>
+    <string name="about_project_page">Halaman Proyek</string>
+    <string name="about_project_page_detail">Buka halaman proyek GitHub yang terbuka untuk umum</string>
+    <string name="about_support">Dukungan</string>
+    <string name="about_report_bug">Laporkan Bug / Masalah</string>
+    <string name="about_report_bug_detail">Buka GitHub Issues dan laporkan apa yang bermasalah</string>
+    <string name="about_version">Versi %1$s</string>
+    <string name="about_credits_title">Kredit</string>
+    <string name="about_credits_detail">Sumber, ucapan terima kasih, dan ketentuan lisensi</string>
+    <string name="about_credits_view_terms">Lihat ketentuan</string>
+    <string name="about_credits_view_license">Lihat lisensi</string>
+    <string name="about_credits_view_details">Lihat detail</string>
+    <string name="about_credits_indopak_title">Teks dan font Al-Qur\'an IndoPak (QuranWBW)</string>
+    <string name="about_credits_uthmani_title">Teks dan font Al-Qur\'an Utsmani (KFGQPC)</string>
+    <string name="about_credits_fonts_title">Font</string>
+    <string name="about_credits_audio_title">Audio</string>
+    <string name="about_credits_data_libraries_title">Data dan pustaka</string>
+    <string name="about_credits_quranwbw_link" translatable="false">QuranWBW.com</string>
+    <string name="about_credits_qul_text_link" translatable="false">QUL text</string>
+    <string name="about_credits_qul_font_link" translatable="false">QUL font</string>
+    <string name="about_credits_archive_link" translatable="false">Internet Archive</string>
+    <string name="about_credits_public_domain_link" translatable="false">Public Domain Mark 1.0</string>
+    <string name="about_credits_everyayah_link" translatable="false">EveryAyah</string>
+    <string name="about_credits_quranwbw_intro" translatable="false">The IndoPak (Hanafi) Quran text and the AlQuranNeo font come from QuranWBW.com, prepared by Ayman Siddiqui and R. Siddiqua exclusively for the service of the Noble Qur\'an as a Sadaqah Jariyah initiative.</string>
+    <string name="about_credits_quranwbw_permission" translatable="false">Prior written permission was obtained from QuranWBW.com to use the original, unmodified Quran text and font in this app. The permission is restricted to displaying the Quran text only.</string>
+    <string name="about_credits_quranwbw_copyright" translatable="false">Copyright holders and sources: © Ayman Siddiqui, © Al-Qalam and Ghandhara Software, © King Fahd Glorious Quran Printing Complex (KFGQPC).</string>
+    <string name="about_credits_quranwbw_text_sources" translatable="false">Quran text sources: King Fahd Glorious Quran Printing Complex (KFGQPC), TypeMyBook.com (Ata Rafi), InPage Quran Publishing Resources.</string>
+    <string name="about_credits_quranwbw_font_development" translatable="false">Font development: Ayman Siddiqui and R. Siddiqua, the Al-Qalam Font Project, Ghandhara Software, King Fahd Glorious Quran Printing Complex (KFGQPC).</string>
+    <string name="about_credits_quranwbw_verification" translatable="false">Verification and quality assurance: Hafiz Muhammad Zain Viqar, Content Lead at Deen App, and his team of Huffuz: Hafiz Muavia bin Muhammad Haneef, Hafiz Ali Ahmed bin Aftab Ahmed, and Hafiz Abdul Rehman bin Ramzan.</string>
+    <string name="about_credits_quranwbw_thanks" translatable="false">Special thanks: Abdul Majeed Khan, Arif Karim, Shakir-ul-Qadree, and Jawad (Al Qalam Quran Majeed font), and all contributors who directly or indirectly assisted in the digitization, preservation, verification, testing, and enhancement of Quranic text and typography.</string>
+    <string name="about_credits_qpc_hafs" translatable="false">The Uthmani script uses the QPC Hafs text (Ayah by Ayah) and the KFGQPC Uthmanic Hafs font, published by the King Fahd Glorious Quran Printing Complex (KFGQPC) and obtained from the Quranic Universal Library (QUL). They are used unmodified, and only for Quran text.</string>
+    <string name="about_credits_noto_sans_arabic" translatable="false">Noto Sans Arabic, © The Noto Project Authors, SIL Open Font License 1.1.</string>
+    <string name="about_credits_plus_jakarta_sans" translatable="false">Plus Jakarta Sans, © The Plus Jakarta Sans Project Authors (Tokotype), SIL Open Font License 1.1.</string>
+    <string name="about_credits_adhan" translatable="false">The adhan and takbir sounds come from \"Adhan Recordings from Doha, Qatar\" on the Internet Archive, marked Public Domain Mark 1.0. The takbir is a shortened excerpt of the same recording.</string>
+    <string name="about_credits_everyayah" translatable="false">Ayah-by-ayah recitation is streamed from EveryAyah (everyayah.com).</string>
+    <string name="about_credits_prayer_times" translatable="false">Prayer times are calculated with the adhan2 library, with an optional AlAdhan API mode (aladhan.com).</string>
+    <string name="about_credits_translations" translatable="false">Translations come from the Free Quran API by Fawaz Ahmed (github.com/fawazahmed0/quran-api). Each translation keeps its own translator\'s or publisher\'s copyright.</string>
+    <string name="about_credits_libraries" translatable="false">Iman is built with Android Jetpack and other open-source libraries, each under its own license.</string>
+
+    <string name="settings_preferences">Preferensi</string>
+    <string name="settings_prayer_times">Waktu Salat</string>
+    <string name="settings_prayer_times_summary">Perhitungan, pengingat, dan diagnostik</string>
+    <string name="settings_appearance">Tampilan</string>
+    <string name="settings_appearance_summary">Tema, warna, dan layar awal</string>
+    <string name="widget_title">Widget</string>
+    <string name="widget_settings_summary">Latar belakang kustom dan transparansi</string>
+
+    <string name="settings_tasbih_screen">Layar Tasbih</string>
+    <string name="settings_tasbih_screen_summary">Sesuaikan layar dan kanvas tasbih</string>
+    <string name="settings_about_summary">Kisah, tautan proyek, dan pelaporan</string>
+
+    <string name="settings_theme">Tema</string>
+    <string name="settings_theme_system">Sistem</string>
+    <string name="settings_theme_light">Terang</string>
+    <string name="settings_theme_dark">Gelap</string>
+    <string name="settings_show_continue_reading">Tampilkan Lanjutkan Membaca</string>
+    <string name="settings_show_continue_reading_summary">Tetap tampilkan topik belajar yang terakhir dibuka di halaman Belajar.</string>
+    <string name="settings_keep_screen_awake">Jaga Layar Tetap Menyala</string>
+    <string name="settings_keep_screen_awake_summary">Cegah layar mati saat Iman sedang dibuka.</string>
+    <string name="settings_show_quran_exit_reminder">Tampilkan pengingat saat keluar dari Al-Qur\'an tanpa penanda</string>
+    <string name="settings_startup_screen">Layar awal</string>
+    <string name="settings_startup_screen_summary">Pilih bagian yang pertama kali terbuka saat Iman dijalankan.</string>
+    <string name="settings_color">Warna</string>
+    <string name="settings_dynamic_color">Warna Dinamis</string>
+    <string name="settings_dynamic_color_summary">Selaraskan palet warna aksen dengan wallpaper Anda.</string>
+    <string name="settings_pure_amoled_black">Hitam AMOLED Murni</string>
+    <string name="settings_pure_amoled_black_summary">Gunakan latar belakang hitam pekat pada mode gelap.</string>
+
+
+    <string name="settings_haptic_feedback">Umpan Balik Getar</string>
+    <string name="settings_haptic_feedback_summary">Getar halus setiap kali hitungan bertambah.</string>
+
+
+    <string name="widget_designer">Perancang Widget</string>
+    <string name="widget_visible_items">Item yang Ditampilkan</string>
+    <string name="widget_gregorian_date">Tanggal Masehi</string>
+    <string name="widget_hijri_date">Tanggal Hijriah</string>
+
+    <string name="widget_countdown">Hitung mundur</string>
+    <string name="widget_next_prayer_label">Label salat berikutnya</string>
+    <string name="widget_background_layer">Lapisan Latar Belakang</string>
+
+    <string name="widget_prayer_panel_layer">Lapisan Panel Salat</string>
+    <string name="widget_current_prayer_indicator">Indikator Salat Saat Ini</string>
+    <string name="widget_indicator_color">Warna Indikator</string>
+    <string name="widget_typography">Tipografi</string>
+    <string name="widget_font_color">Warna Font</string>
+    <string name="widget_hex_code">Kode hex</string>
+    <string name="widget_select">Pilih</string>
+    <string name="widget_transparency">Transparansi (%1$d%%)</string>
+    <string name="widget_preview_fajr_time">03:48</string>
+    <string name="widget_preview_dhuhr_time">13:31</string>
+    <string name="widget_preview_asr_time">17:52</string>
+    <string name="widget_preview_maghrib_time">21:43</string>
+    <string name="widget_preview_isha_time">23:14</string>
+    <string name="widget_preview_countdown">02:15</string>
+
+    <string name="settings_calculation">Perhitungan</string>
+    <string name="settings_convention">Metode</string>
+    <string name="settings_convention_summary">Metode perhitungan yang digunakan untuk Subuh dan Isya.</string>
+    <string name="settings_madhab">Mazhab</string>
+    <string name="settings_madhab_summary">Aturan bayangan Asar yang digunakan dalam perhitungan.</string>
+    <string name="settings_source">Sumber</string>
+    <string name="settings_source_summary">Pilih rumus lokal atau AlAdhan yang memerlukan internet.</string>
+    <string name="settings_source_local">Rumus lokal</string>
+    <string name="settings_source_aladhan">AlAdhan (perlu internet)</string>
+    <string name="settings_method_algeria">Aljazair</string>
+    <string name="settings_method_portugal">Comunidade Islâmica de Lisboa (Portugal)</string>
+    <string name="settings_method_turkey">Diyanet İşleri Başkanlığı (Turki)</string>
+    <string name="settings_method_dubai">Dubai (UEA)</string>
+    <string name="settings_method_egyptian">Otoritas Survei Umum Mesir</string>
+    <string name="settings_method_france_15">Prancis (15°)</string>
+    <string name="settings_method_france_18">Prancis (18°) / Grande Mosquée de Paris</string>
+    <string name="settings_method_gulf_region">Kawasan Teluk</string>
+    <string name="settings_method_tehran">Institut Geofisika, Universitas Teheran</string>
+    <string name="settings_method_north_america">Islamic Society of North America (ISNA)</string>
+    <string name="settings_method_malaysia">Jabatan Kemajuan Islam Malaysia (JAKIM)</string>
+    <string name="settings_method_jordan">Yordania</string>
+    <string name="settings_method_indonesia">Kementerian Agama Republik Indonesia (KEMENAG)</string>
+    <string name="settings_method_kuwait">Kuwait</string>
+    <string name="settings_method_singapore">Majlis Ugama Islam Singapura, Singapura</string>
+    <string name="settings_method_moon_sighting_committee">Moonsighting Committee</string>
+    <string name="settings_method_morocco">Maroko</string>
+    <string name="settings_method_muslim_world_league">Liga Muslim Dunia</string>
+    <string name="settings_method_qatar">Qatar</string>
+    <string name="settings_method_shia_ithna_ashari">Syiah Itsna Asyariyah, Institut Leva, Qum</string>
+    <string name="settings_method_russia">Administrasi Spiritual Muslim Rusia</string>
+    <string name="settings_method_tunisia">Tunisia</string>
+    <string name="settings_method_umm_al_qura">Universitas Umm Al-Qura, Makkah</string>
+    <string name="settings_method_france_uoif">Union Organization Islamique de France</string>
+    <string name="settings_method_karachi">Universitas Ilmu Islam Karachi</string>
+    <string name="settings_method_local">Perhitungan Lokal (Offline)</string>
+    <string name="settings_method_api">API AlAdhan (Online)</string>
+    <string name="settings_madhab_standard">Standar (Syafi\'i, Maliki, Hanbali)</string>
+    <string name="settings_madhab_hanafi">Hanafi</string>
+    <string name="settings_alert_custom_sound">Suara kustom</string>
+    <string name="settings_alert_system_sound">Suara sistem</string>
+    <string name="settings_alert_vibration">Getar saja</string>
+    <string name="settings_option_silent">Senyap</string>
+    <string name="settings_sound_default">Default</string>
+    <string name="settings_sound_adhan">Azan</string>
+    <string name="settings_sound_takbir">Takbir</string>
+    <string name="settings_system_default_alarm">Alarm default sistem</string>
+    <string name="settings_selected_custom_sound">Suara kustom yang dipilih</string>
+    <string name="settings_not_refreshed_yet">Belum diperbarui</string>
+
+    <string name="settings_location">Lokasi</string>
+    <string name="settings_use_device_gps">Gunakan GPS Perangkat</string>
+    <string name="settings_gps_summary">Perbarui lokasi Anda secara otomatis agar waktu salat akurat.</string>
+    <string name="settings_gps_access">Akses GPS</string>
+    <string name="settings_refresh">Perbarui</string>
+    <string name="settings_current_coordinates">Saat ini: %1$s, %2$s</string>
+    <string name="settings_last_refreshed">Terakhir diperbarui: %1$s</string>
+    <string name="settings_enable_device_location">Aktifkan lokasi perangkat</string>
+    <string name="settings_enable_device_location_message">Aktifkan layanan lokasi perangkat untuk menemukan lokasi Anda saat ini guna menentukan waktu salat.</string>
+    <string name="settings_open_location_settings">Buka pengaturan lokasi</string>
+    <string name="settings_not_now">Nanti saja</string>
+    <string name="settings_location_providers_disabled">Tidak ada penyedia lokasi yang aktif. Silakan periksa pengaturan sistem Anda.</string>
+    <string name="settings_open_app_settings_for_location">Buka pengaturan aplikasi untuk mengizinkan akses lokasi.</string>
+    <string name="settings_latitude">Lintang</string>
+    <string name="settings_longitude">Bujur</string>
+    <string name="settings_update_coordinates">Perbarui Koordinat</string>
+
+    <string name="settings_reminders">Pengingat</string>
+
+    <string name="settings_extra_timing_alert_style">Gaya notifikasi waktu tambahan</string>
+    <string name="settings_extra_timing_alert_style_summary">Pilih bagaimana notifikasi waktu tambahan berbunyi atau berperilaku.</string>
+    <string name="settings_custom_sound">Suara Kustom</string>
+    <string name="settings_no_ringtone_picker">Pemilih nada dering tidak tersedia di perangkat ini.</string>
+    <string name="settings_choose_alarm_sound">Pilih Suara Alarm</string>
+    <string name="settings_use_system_default">Gunakan Default Sistem</string>
+    <string name="settings_pre_prayer_reminder_sound">Suara pengingat sebelum salat</string>
+    <string name="settings_pre_prayer_reminder_sound_summary">Dipakai bersama oleh semua pengingat sebelum salat.</string>
+
+    <string name="settings_prayer_on">Salat aktif</string>
+    <string name="settings_prayer_off">Salat nonaktif</string>
+    <string name="settings_pre_prayer_summary">Pra %1$d mnt</string>
+    <string name="settings_pre_off">Pra nonaktif</string>
+    <string name="settings_prayer_reminder_action_description">Pengingat salat %1$s</string>
+    <string name="settings_pre_prayer_reminder_action_description">Pengingat sebelum salat %1$s</string>
+    <string name="settings_prayer_notification">Notifikasi salat</string>
+    <string name="settings_prayer_notification_summary">Beri tahu saat waktu %1$s tiba.</string>
+    <string name="settings_prayer_reminder_sound">Suara pengingat salat</string>
+    <string name="settings_prayer_reminder_sound_summary">Suara yang digunakan untuk pengingat %1$s.</string>
+    <string name="settings_pre_prayer_notification">Notifikasi sebelum salat</string>
+    <string name="settings_remind_before_prayer">Ingatkan saya sebelum %1$s.</string>
+    <string name="settings_lead_time">Waktu pengingat</string>
+    <string name="settings_minutes_short">%1$d mnt</string>
+    <plurals name="settings_minutes_before">
+        <item quantity="other">%1$d menit sebelumnya</item>
+    </plurals>
+    <string name="settings_extra_timings">Waktu Tambahan</string>
+    <string name="settings_show_extra_timings_home">Tampilkan waktu tambahan di Beranda</string>
+    <string name="settings_show_extra_timings_home_summary">Sertakan waktu tambahan yang dipilih pada tampilan Beranda.</string>
+    <string name="settings_extra_timing_summary">%1$s · %2$s</string>
+    <string name="settings_shown">Ditampilkan</string>
+    <string name="settings_hidden">Disembunyikan</string>
+    <string name="settings_alert_on">Notifikasi aktif</string>
+    <string name="settings_alert_off">Notifikasi nonaktif</string>
+    <string name="settings_show_timing">Tampilkan %1$s</string>
+    <string name="settings_notify_for_timing">Beri notifikasi untuk %1$s</string>
+    <string name="settings_show_on_surfaces">Tampilkan di layar</string>
+    <string name="settings_keep_timing_visible">Tetap tampilkan %1$s di Iman.</string>
+    <string name="settings_notification_alert">Notifikasi</string>
+    <string name="settings_send_timing_reminder">Kirim pengingat saat waktu %1$s tiba.</string>
+    <string name="settings_localization_groundwork">Dasar lokalisasi sudah tersedia melalui katalog terjemahan. Lokalisasi penuh untuk seluruh teks aplikasi akan dikembangkan dari sini.</string>
+    <string name="settings_advanced">Lanjutan</string>
+    <string name="settings_prayer_offsets">Koreksi Waktu Salat</string>
+    <string name="settings_prayer_offsets_summary">Geser waktu hasil perhitungan secara manual.</string>
+    <string name="settings_shift_by_minutes">Geser dalam menit</string>
+    <string name="settings_offset_positive">+%1$d mnt</string>
+
+    <string name="settings_diagnostics">Diagnostik</string>
+    <string name="settings_diagnostics_summary">Pengaturan, koordinat, dan status notifikasi.</string>
+    <string name="settings_debug_controls">Kontrol Debug</string>
+    <string name="settings_notify">Beri notifikasi</string>
+    <string name="settings_pre_notify">Pra-notifikasi</string>
+    <string name="settings_offline_title">Tidak tersedia secara offline</string>
+    <string name="settings_offline_convention_message">%1$s tidak didukung oleh rumus lokal. Pilih metode lain untuk menggunakan rumus lokal, atau tetap gunakan AlAdhan (online).</string>
+    <string name="settings_choose_convention">Pilih metode</string>
+    <string name="settings_keep_aladhan">Tetap Gunakan AlAdhan</string>
+
+    <string name="settings_diagnostic_setup">Pengaturan</string>
+
+    <string name="settings_diagnostic_method">Metode</string>
+
+
+    <string name="settings_diagnostic_coordinates">Koordinat</string>
+    <string name="settings_diagnostic_coordinates_value">%1$s, %2$s</string>
+    <string name="settings_diagnostic_gps_status">Status GPS</string>
+    <string name="settings_diagnostic_last_refresh">Pembaruan Terakhir</string>
+    <string name="settings_diagnostic_status">Status</string>
+    <string name="settings_diagnostic_notifications">Notifikasi</string>
+    <string name="settings_status_enabled">Aktif</string>
+    <string name="settings_status_disabled">Nonaktif</string>
+    <string name="settings_status_allowed">Diizinkan</string>
+    <string name="settings_status_not_allowed">Tidak diizinkan</string>
+
+    <string name="settings_update_checking">Memeriksa Pembaruan</string>
+    <string name="settings_update_up_to_date">Sudah Terbaru</string>
+    <string name="settings_update_available">Pembaruan Tersedia</string>
+    <string name="settings_update_failed">Pemeriksaan Gagal</string>
+    <string name="settings_update_querying">Mengambil data rilis GitHub...</string>
+    <string name="settings_update_latest_version">Iman %1$s adalah versi terbaru.</string>
+    <string name="settings_update_version_available">Versi %1$s tersedia.</string>
+    <string name="settings_update_release_notes">Catatan Rilis</string>
+    <string name="settings_update_download_install">Unduh &amp; Pasang</string>
+    <string name="settings_update_downloading">Mengunduh...</string>
+    <string name="settings_update_progress">%1$d%%</string>
+    <string name="settings_update_installer_error">Tidak dapat membuka pemasang</string>
+    <string name="settings_update_install">Pasang Pembaruan</string>
+    <string name="settings_update_download_help">Periksa koneksi internet dan ruang penyimpanan Anda, lalu coba lagi.</string>
+    <string name="settings_update_later">Nanti</string>
+    <string name="settings_update_whats_new">Yang Baru</string>
+    <string name="settings_update_highlights">Sorotan</string>
+    <string name="settings_update_continue">Lanjutkan</string>
+    <string name="settings_update_unavailable_build">Pembaruan dalam aplikasi tidak tersedia pada build ini.</string>
+    <string name="settings_update_rate_limited">Dibatasi oleh GitHub. Coba lagi nanti.</string>
+    <string name="settings_update_endpoint_not_found">Endpoint rilis tidak ditemukan.</string>
+    <string name="settings_update_server_error">Kesalahan server GitHub (%1$d). Coba lagi nanti.</string>
+    <string name="settings_update_api_error">API GitHub mengembalikan %1$d</string>
+    <string name="settings_update_empty_response">Respons kosong dari GitHub</string>
+    <string name="settings_update_prerelease">Rilis terbaru adalah pra-rilis. Unduh secara manual dari GitHub.</string>
+    <string name="settings_update_installed_newer">Versi terpasang (%1$s) lebih baru daripada rilis terbaru (%2$s). Anda mungkin menggunakan build pengembangan.</string>
+    <string name="settings_update_no_apk">Tidak ada berkas APK pada rilis terbaru (ditemukan: %1$s)</string>
+    <string name="settings_update_timeout">Koneksi habis waktu. Periksa koneksi internet Anda.</string>
+    <string name="settings_update_no_internet">Tidak ada koneksi internet.</string>
+    <string name="settings_update_unknown_error">Kesalahan tidak diketahui saat memeriksa pembaruan.</string>
+    <string name="settings_update_download_failed_code">Unduhan gagal: %1$d</string>
+    <string name="settings_update_empty_body">Isi respons kosong</string>
+    <string name="settings_update_download_failed">Unduhan gagal</string>
+
+
+
+
+    <string name="widget_moon_phase_icon_desc">Ikon Fase Bulan</string>
+    <string name="widget_map_pin_icon_desc">Ikon Pin Peta</string>
+
+    <string name="prayer_fajr">Subuh</string>
+    <string name="prayer_dhuhr">Zuhur</string>
+    <string name="prayer_asr">Asar</string>
+    <string name="prayer_maghrib">Magrib</string>
+    <string name="prayer_isha">Isya</string>
+    <string name="prayer_imsak">Imsak</string>
+    <string name="prayer_sunrise">Terbit</string>
+    <string name="prayer_sunset">Terbenam</string>
+    <string name="prayer_first_third">Sepertiga Malam Pertama</string>
+    <string name="prayer_first_third_short">Sepertiga 1</string>
+    <string name="prayer_midnight">Tengah Malam</string>
+    <string name="prayer_last_third">Sepertiga Malam Terakhir</string>
+    <string name="prayer_zawal">Zawal</string>
+
+    <string name="nav_home">Beranda</string>
+    <string name="nav_tasbih">Tasbih</string>
+    <string name="nav_quran">Al-Qur\'an</string>
+    <string name="nav_grid_view">Tampilan kisi</string>
+    <string name="nav_list_view">Tampilan daftar</string>
+    <string name="nav_bookmarks">Penanda</string>
+
+    <string name="tasbih_search_description">Cari Tasbih</string>
+    <string name="tasbih_edit">Ubah</string>
+    <string name="tasbih_bead_style">Gaya Butir</string>
+    <string name="tasbih_bead_mode_summary">Pilih cara butir menghitung.</string>
+    <string name="tasbih_bead_mode_slide">Geser</string>
+    <string name="tasbih_bead_mode_press">Tekan</string>
+    <string name="tasbih_press_bead_description">Hitung dengan butir</string>
+    <string name="tasbih_collection_fallback">Koleksi</string>
+    <string name="tasbih_dhikr_list">DAFTAR ZIKIR</string>
+    <string name="tasbih_confirm_delete">Konfirmasi Hapus</string>
+    <string name="tasbih_start">Mulai Tasbih</string>
+    <string name="tasbih_exit">Keluar</string>
+    <string name="tasbih_out_of">dari %1$d</string>
+    <string name="tasbih_release_to_reset_hint">Lepas untuk Atur Ulang  ·  Geser ke Bawah untuk Batal</string>
+    <string name="tasbih_holding_to_reset_hint">Tahan untuk Atur Ulang...</string>
+    <string name="tasbih_new">Tasbih Baru</string>
+    <string name="tasbih_name_label">Nama tasbih</string>
+    <string name="tasbih_add_dhikr_item">Tambah Item Zikir</string>
+    <string name="tasbih_save">Simpan Tasbih</string>
+    <string name="tasbih_dhikr_name_placeholder">Nama zikir</string>
+    <string name="tasbih_settings_colors">Warna</string>
+    <string name="tasbih_background_color">Warna latar belakang</string>
+    <string name="tasbih_bead_color">Warna butir</string>
+    <string name="tasbih_text_color">Warna teks</string>
+    <string name="tasbih_reset_to_default">Kembalikan ke default</string>
+    <string name="tasbih_settings_behavior">Perilaku</string>
+    <string name="tasbih_settings_stealth_mode">Mode Senyap</string>
+    <string name="tasbih_settings_stealth_mode_summary">Izinkan menyembunyikan widget agar tampilan lebih bersih.</string>
+    <string name="tasbih_settings_volume_buttons">Tombol Volume</string>
+    <string name="tasbih_settings_volume_buttons_summary">Gunakan tombol volume fisik untuk menghitung.</string>
+    <string name="tasbih_settings_animate_volume_keys">Animasikan Tombol Volume</string>
+    <string name="tasbih_settings_animate_volume_keys_summary">Tampilkan pergerakan butir saat menghitung.</string>
+    <string name="tasbih_settings_sound">Suara</string>
+    <string name="tasbih_settings_sound_enabled">Suara Tasbih</string>
+    <string name="tasbih_settings_sound_enabled_summary">Putar suara lembut saat hitungan butir tercatat.</string>
+    <string name="tasbih_settings_sound_style">Gaya Suara</string>
+    <string name="tasbih_settings_sound_style_summary">Pilih suara Tasbih bawaan.</string>
+    <string name="tasbih_settings_preview_sound">Dengarkan Suara</string>
+    <string name="tasbih_sound_soft_click">Klik Lembut</string>
+    <string name="tasbih_sound_glass_tap">Ketukan Kaca</string>
+    <string name="tasbih_sound_muted_bead">Butir Teredam</string>
+    <string name="tasbih_sound_light_chime">Denting Ringan</string>
+    <string name="tasbih_sound_warm_knock">Ketukan Hangat</string>
+
+    <string name="settings_location_access_title">Akses lokasi</string>
+    <string name="settings_location_access_message">Izinkan akses lokasi agar waktu salat yang akurat dapat dihitung otomatis berdasarkan lokasi Anda saat ini.</string>
+    <string name="settings_location_permission_denied">Izin lokasi tidak diberikan</string>
+    <string name="settings_location_permission_denied_message">Waktu salat akan tetap menggunakan lokasi tersimpan Anda. Anda dapat mengaktifkan GPS perangkat nanti di Pengaturan.</string>
+    <string name="tasbih_create">Buat Tasbih</string>
+
+    <string name="home_sun_path">LINTASAN MATAHARI</string>
+    <string name="home_now">SEKARANG</string>
+    <string name="home_next_prayer">SALAT BERIKUTNYA</string>
+    <string name="home_todays_prayers">SALAT HARI INI</string>
+    <string name="home_extra_timings">WAKTU TAMBAHAN</string>
+    <string name="home_prayers_done_count">%1$d/5</string>
+    <string name="home_your_area">Area Anda</string>
+    <string name="home_local">Lokal</string>
+    <string name="home_next_prayer_fallback">Salat berikutnya</string>
+    <string name="home_night">Malam</string>
+    <string name="home_morning">Pagi</string>
+    <string name="home_qibla_direction">Arah Kiblat</string>
+    <string name="home_current_location">Lokasi saat ini</string>
+    <string name="home_hijri_date_fallback">Tanggal Hijriah</string>
+    <string name="home_bearing_to_makkah">%1$d° %2$s menuju Makkah</string>
+    <string name="home_facing_degrees_now">Menghadap %1$d° saat ini</string>
+    <string name="home_compass_sensor_unavailable">Sensor kompas tidak tersedia di perangkat ini</string>
+    <string name="home_compass_calibration">Kompas perlu dikalibrasi. Gerakkan ponsel Anda membentuk angka 8.</string>
+    <string name="home_coordinates">Koordinat: %1$s, %2$s</string>
+    <string name="home_compass_n">U</string>
+    <string name="home_compass_nne">UTL</string>
+    <string name="home_compass_ne">TL</string>
+    <string name="home_compass_ene">TTL</string>
+    <string name="home_compass_e">T</string>
+    <string name="home_compass_ese">TTG</string>
+    <string name="home_compass_se">TG</string>
+    <string name="home_compass_sse">STG</string>
+    <string name="home_compass_s">S</string>
+    <string name="home_compass_ssw">SBD</string>
+    <string name="home_compass_sw">BD</string>
+    <string name="home_compass_wsw">BBD</string>
+    <string name="home_compass_w">B</string>
+    <string name="home_compass_wnw">BBL</string>
+    <string name="home_compass_nw">BL</string>
+    <string name="home_compass_nnw">UBL</string>
+    <string name="home_makruh_now">%1$s SEKARANG</string>
+    <string name="home_makruh_badge">MAKRUH · %1$s</string>
+    <string name="home_makruh_tooltip">Makruh · %1$s</string>
+    <string name="home_makruh_sunrise_preview">Makruh salat hingga matahari naik setinggi tombak (±20 menit setelah terbit)</string>
+    <string name="home_makruh_zawal_preview">Matahari tepat di titik zenit — terlarang salat pada saat ini, sesaat sebelum Zuhur masuk</string>
+    <string name="home_makruh_sunset_preview">Makruh salat saat matahari terbenam hingga benar-benar hilang di bawah ufuk</string>
+    <string name="home_makruh_sunrise_detail">Makruh salat hingga matahari naik setinggi tombak (±20 menit). \"Barang siapa mendapati satu rakaat Subuh sebelum matahari terbit, maka ia telah mendapati Subuh.\" — Bukhari 579, Muslim 608</string>
+    <string name="home_makruh_zawal_detail">Matahari di titik zenit — salat terlarang pada saat ini. \"Nabi ﷺ melarang salat ketika matahari tepat di tengah langit (zawal) hingga ia tergelincir.\" — Muslim 831</string>
+    <string name="home_makruh_sunset_detail">Makruh salat saat matahari terbenam. \"Barang siapa mendapati satu rakaat Asar sebelum matahari terbenam, maka ia telah mendapati Asar.\" — Bukhari 556, Muslim 608</string>
+    <string name="home_qibla">Kiblat</string>
+    <string name="home_preview_time_active">Waktu pratinjau aktif</string>
+    <string name="home_preview_time_title">Pratinjau Waktu Salat</string>
+    <string name="home_preview_time_description">Atur jam 24 jam sementara untuk menguji peralihan salat berikutnya dan waktu makruh.</string>
+    <string name="home_hour_label">Jam (0-23)</string>
+    <string name="home_minute_label">Menit (0-59)</string>
+
+    <string name="widget_preview_gregorian_date">Jum, 5 Juni</string>
+    <string name="widget_preview_hijri_date" translatable="false">19 Dhul-Hijjah</string>
+    <string name="widget_preview_location">Düsseldorf</string>
+
+    <string name="widget_next_prayer_in">%1$s dalam</string>
+    <string name="widget_time_placeholder">--:--</string>
+    <string name="widget_date_unavailable">—</string>
+    <string name="widget_location_unavailable">Lokasi tidak tersedia</string>
+    <string name="widget_your_area">Area Anda</string>
+
+    <string name="notif_location_your_area">area Anda</string>
+    <string name="notif_prayer_at_time_in_location">%1$s pukul %2$s di %3$s</string>
+    <string name="notif_expanded_text">%1$s\n\n%2$s</string>
+    <string name="notif_pre_prayer_utility">%1$s dalam %2$d menit · %3$s</string>
+    <string name="notif_pre_prayer_utility_no_location">%1$s dalam %2$d menit</string>
+    <string name="notif_extra_timing_title">Waktu %1$s</string>
+    <string name="notif_pre_prayer_fallback_title">%1$s sebentar lagi. Yuk, bersiap.</string>
+    <string name="notif_pre_prayer_fallback_reflection">Tinggal beberapa menit lagi. Yuk, bersiap untuk salat.</string>
+    <string name="notif_prayer_fallback_title">Waktu %1$s. Yuk, salat.</string>
+    <string name="notif_prayer_fallback_reflection">Mari sambut panggilan salat.</string>
+    <string name="notif_extra_timing_fallback_reflection">Satu momen penting dalam hari ini telah tiba.</string>
+    <string name="notif_pre_reflection_1">Bersiap beberapa menit lebih awal akan membuat salat terasa lebih mudah.</string>
+    <string name="notif_pre_reflection_2">Bersiaplah lebih awal dan datanglah dengan hati yang lebih tenang.</string>
+    <string name="notif_pre_reflection_3">Anggap ini sebagai pengingat lembut dari seseorang yang menginginkan kebaikan untukmu.</string>
+    <string name="notif_extra_reflection_imsak">Batas yang tenang sebelum Subuh tiba.</string>
+    <string name="notif_extra_reflection_sunrise">Pagi kini telah terbuka sepenuhnya.</string>
+    <string name="notif_extra_reflection_sunset">Siang perlahan beralih menjadi petang.</string>
+    <string name="notif_extra_reflection_first_third">Malam telah memasuki sepertiga pertamanya yang dalam.</string>
+    <string name="notif_extra_reflection_midnight">Pertengahan malam telah tiba.</string>
+    <string name="notif_extra_reflection_last_third">Sepertiga malam terakhir telah tiba.</string>
+
+    <string name="notif_channel_prayer_sound_default">Suara Salat: Default</string>
+    <string name="notif_channel_prayer_sound_adhan">Suara Salat: Azan</string>
+    <string name="notif_channel_prayer_sound_takbir">Suara Salat: Takbir</string>
+    <string name="notif_channel_prayer_sound_silent">Suara Salat: Senyap</string>
+    <string name="notif_channel_prayer_reminders">Pengingat Salat</string>
+    <string name="notif_channel_prayer_reminders_custom">Pengingat Salat Kustom</string>
+    <string name="notif_channel_prayer_reminders_vibration">Pengingat Salat Getar</string>
+    <string name="notif_channel_prayer_reminders_silent">Pengingat Salat Senyap</string>
+    <string name="notif_channel_system_description">Pengingat salat dengan suara notifikasi sistem dan peringatan pop-up</string>
+    <string name="notif_channel_custom_description">Pengingat salat dengan nada bergaya alarm yang lebih kuat dan peringatan pop-up</string>
+    <string name="notif_channel_vibration_description">Pengingat salat dengan peringatan pop-up yang hanya bergetar</string>
+    <string name="notif_channel_silent_description">Pengingat salat tanpa suara maupun getar</string>
+
+    <string name="notif_title_fajr_1">Waktu %1$s tiba. Yuk, awali hari dengan baik.</string>
+    <string name="notif_title_fajr_2">Waktu %1$s. Awal hari yang tenang menantimu.</string>
+    <string name="notif_title_fajr_3">%1$s memanggil. Mari bangun untuk salat.</string>
+    <string name="notif_title_fajr_4">Waktu %1$s. Yuk, sambut pagi dengan salat.</string>
+    <string name="notif_title_dhuhr_1">Waktu %1$s tiba. Yuk, rehat sejenak dan salat.</string>
+    <string name="notif_title_dhuhr_2">Waktu %1$s. Ambil jeda yang lebih baik sekarang.</string>
+    <string name="notif_title_dhuhr_3">%1$s memanggil. Mari berhenti sejenak untuk salat.</string>
+    <string name="notif_title_dhuhr_4">Waktu %1$s. Jeda singkat, penyegaran yang sesungguhnya.</string>
+    <string name="notif_title_asr_1">Waktu %1$s tiba. Jangan biarkan hari berlalu begitu saja.</string>
+    <string name="notif_title_asr_2">Waktu %1$s. Yuk, tenangkan sore harimu.</string>
+    <string name="notif_title_asr_3">%1$s memanggil. Sedikit kekhusyukan sebelum hari terus berjalan.</string>
+    <string name="notif_title_asr_4">Waktu %1$s. Yuk, kembali sejenak dan salat.</string>
+    <string name="notif_title_maghrib_1">Waktu %1$s tiba. Yuk, awali malam dengan salat.</string>
+    <string name="notif_title_maghrib_2">Waktu %1$s. Siang telah mereda, mari salat.</string>
+    <string name="notif_title_maghrib_3">%1$s memanggil. Mari penuhi sebelum malam menjelang.</string>
+    <string name="notif_title_maghrib_4">Waktu %1$s. Malam yang penuh syukur dimulai dari sini.</string>
+    <string name="notif_title_isha_1">Waktu %1$s tiba. Yuk, akhiri hari dengan damai.</string>
+    <string name="notif_title_isha_2">Waktu %1$s. Mari istirahatkan hari ini dengan salat.</string>
+    <string name="notif_title_isha_3">%1$s memanggil. Satu pertemuan terakhir sebelum malam kian larut.</string>
+    <string name="notif_title_isha_4">Waktu %1$s. Yuk, tinggalkan hari ini dengan hati lebih ringan.</string>
+
+    <string name="notif_pre_title_fajr_1">%1$s sudah dekat. Yuk, bersiap.</string>
+    <string name="notif_pre_title_fajr_2">%1$s segera tiba. Awal yang lembut sudah dekat.</string>
+    <string name="notif_pre_title_fajr_3">%1$s sebentar lagi. Saatnya bersiap untuk salat.</string>
+    <string name="notif_pre_title_dhuhr_1">%1$s sudah dekat. Yuk, sisihkan waktu untuknya.</string>
+    <string name="notif_pre_title_dhuhr_2">%1$s segera tiba. Selesaikan urusanmu dan bersiaplah.</string>
+    <string name="notif_pre_title_dhuhr_3">%1$s sebentar lagi. Jeda yang baik hampir tiba.</string>
+    <string name="notif_pre_title_asr_1">%1$s sudah dekat. Jangan sampai terlewat.</string>
+    <string name="notif_pre_title_asr_2">%1$s segera tiba. Saatnya bersiap.</string>
+    <string name="notif_pre_title_asr_3">%1$s sebentar lagi. Jeda yang menenangkan sudah dekat.</string>
+    <string name="notif_pre_title_maghrib_1">%1$s sudah dekat. Yuk, bersiap untuk salat petang.</string>
+    <string name="notif_pre_title_maghrib_2">%1$s segera tiba. Salat saat matahari terbenam sudah dekat.</string>
+    <string name="notif_pre_title_maghrib_3">%1$s sebentar lagi. Mari bersiap sebelum waktunya tiba.</string>
+    <string name="notif_pre_title_isha_1">%1$s sudah dekat. Yuk, bersiap menutup hari dengan baik.</string>
+    <string name="notif_pre_title_isha_2">%1$s segera tiba. Penutup yang damai sudah dekat.</string>
+    <string name="notif_pre_title_isha_3">%1$s sebentar lagi. Saatnya bersiap untuk salat.</string>
+
+    <string name="notif_reflection_fajr_1">Awal yang tenang mengubah seluruh hari.</string>
+    <string name="notif_reflection_fajr_2">Mulailah bersama Allah sebelum dunia memintamu.</string>
+    <string name="notif_reflection_fajr_3">Pagi terasa berbeda ketika dimulai dengan salat.</string>
+    <string name="notif_reflection_dhuhr_1">Istirahat terbaik adalah yang membawamu kembali kepada Allah.</string>
+    <string name="notif_reflection_dhuhr_2">Beberapa menit salat dapat menjernihkan seluruh tengah harimu.</string>
+    <string name="notif_reflection_dhuhr_3">Menepilah dari kesibukan dan dahulukan yang terpenting.</string>
+    <string name="notif_reflection_asr_1">Jangan biarkan sore membawamu melewati hal yang terpenting.</string>
+    <string name="notif_reflection_asr_2">Kembali sejenak kepada salat dapat menenangkan sisa harimu.</string>
+    <string name="notif_reflection_asr_3">Ini saat yang tepat untuk menghimpun dirimu kembali.</string>
+    <string name="notif_reflection_maghrib_1">Mulailah malam dengan rasa syukur.</string>
+    <string name="notif_reflection_maghrib_2">Hari telah usai; salat adalah cara yang lembut untuk memasuki malam.</string>
+    <string name="notif_reflection_maghrib_3">Malam yang tenang dimulai dengan menjawab panggilan-Nya.</string>
+    <string name="notif_reflection_isha_1">Tinggalkan beban hari ini di atas sajadah.</string>
+    <string name="notif_reflection_isha_2">Malam yang damai dimulai dari salat yang damai.</string>
+    <string name="notif_reflection_isha_3">Tutup hari dengan kedekatan, bukan kebisingan.</string>
+
+    <string name="quran_search_content_description">Cari Al-Qur\'an</string>
+    <string name="quran_search_placeholder">Cari surah</string>
+    <string name="quran_bookmarks_sort_latest">Terbaru dahulu</string>
+    <string name="quran_bookmarks_sort_oldest">Terlama dahulu</string>
+    <string name="quran_bookmarks_empty">Belum ada penanda</string>
+    <string name="quran_bookmark_delete_content_description">Hapus penanda</string>
+    <string name="quran_bookmark_ayah">%1$s · Ayat %2$d</string>
+    <string name="quran_bookmark_delete_title">Hapus penanda ini?</string>
+    <string name="quran_revelation_makkah">Makkiyah</string>
+    <string name="quran_revelation_madinah">Madaniyah</string>
+    <string name="quran_juz_number">Juz %1$d</string>
+    <string name="quran_sajdah_obligatory">Sajdah Wajib</string>
+    <string name="quran_sajdah_mustahabb">Sajdah Sunah</string>
+    <string name="quran_bookmark_added">Penanda ditambahkan</string>
+    <string name="quran_bookmark_removed">Penanda dihapus</string>
+    <string name="quran_ayah_reference">%1$s, Ayat %2$d</string>
+    <string name="quran_end_of_surah">--- Akhir Surah ---</string>
+    <string name="quran_next_surah_release">Lepas untuk Surah Berikutnya</string>
+    <string name="quran_next_surah_swipe">Geser ke atas untuk Surah Berikutnya</string>
+    <string name="quran_exit_reminder_title">Belum diberi penanda</string>
+    <string name="quran_exit_reminder_message">Anda belum menandai apa pun. Yakin ingin keluar?</string>
+    <string name="quran_exit_reminder_checkbox">Jangan tampilkan lagi</string>
+    <string name="quran_exit_confirmation">Ya, keluar</string>
+    <string name="quran_exit_stay">Tetap di sini</string>
+    <string name="quran_mode_verse_by_verse">Ayat per Ayat</string>
+    <string name="quran_mode_reading">Membaca</string>
+    <string name="quran_audio_error">Tidak dapat memuat ayat ini.</string>
+    <string name="quran_reading_settings_title">Pengaturan Bacaan</string>
+    <string name="quran_settings_tab_display">Tampilan</string>
+    <string name="quran_settings_tab_text">Teks</string>
+    <string name="quran_settings_tab_audio">Audio</string>
+    <string name="quran_background_theme">Tema Latar Belakang</string>
+    <string name="quran_theme_auto">Otomatis</string>
+    <string name="quran_theme_paper">Kertas</string>
+    <string name="quran_keep_screen_on">Jaga Layar Tetap Menyala</string>
+    <string name="quran_active_translation">Terjemahan Aktif</string>
+    <string name="quran_translation_none">Tanpa terjemahan</string>
+    <string name="quran_translation_select">Pilih Terjemahan</string>
+    <string name="quran_script_style">Gaya Tulisan</string>
+    <string name="quran_script_uthmani">Utsmani</string>
+    <string name="quran_script_indopak">IndoPak</string>
+    <string name="quran_arabic_text_size">Ukuran Teks Arab: %1$dsp</string>
+    <string name="quran_translation_size">Ukuran Terjemahan: %1$dsp</string>
+    <string name="quran_show_translation">Tampilkan Terjemahan</string>
+    <string name="quran_select_reciter">Pilih Qari</string>
+    <string name="quran_translation_other">Lainnya</string>
+    <string name="quran_translation_downloaded_section">Terunduh</string>
+    <string name="quran_translation_title">Terjemahan</string>
+    <string name="quran_translation_search_language">Cari bahasa</string>
+    <string name="quran_translation_downloaded_status">%1$s • Terunduh</string>
+    <string name="quran_translation_tap_to_download">%1$s • Ketuk untuk mengunduh</string>
+    <string name="quran_action_ayah_title">Aksi Ayat</string>
+    <string name="quran_action_hadith_title">Aksi Hadis</string>
+    <string name="quran_action_section_title">Aksi Bagian</string>
+    <string name="quran_action_arabic_title">Aksi Teks Arab</string>
+    <string name="quran_action_title">Aksi</string>
+    <string name="quran_play_ayah">Putar Ayat</string>
+    <string name="quran_play_from_here">Putar dari sini</string>
+    <string name="quran_remove_bookmark">Hapus Penanda</string>
+    <string name="quran_add_bookmark">Tambah Penanda</string>
+    <string name="quran_share">Bagikan</string>
+    <string name="quran_copy_text">Salin Teks</string>
+    <string name="quran_copy_reference">Salin Referensi</string>
+    <string name="quran_share_via">Bagikan melalui</string>
+    <string name="quran_text_copied">Teks disalin ke papan klip</string>
+    <string name="quran_reference_copied">Referensi disalin: %1$s</string>
+    <string name="quran_bookmark_content_description">Penanda</string>
+    <string name="quran_bookmark_remove_content_description">Hapus penanda</string>
+    <string name="quran_more_content_description">Lainnya</string>
+
+    <plurals name="quran_verse_count">
+        <item quantity="other">%1$d ayat</item>
+    </plurals>
+
+    <plurals name="tasbih_dhikr_item_count">
+        <item quantity="other">%1$d item zikir</item>
+    </plurals>
+    <plurals name="tasbih_dhikr_count">
+        <item quantity="other">%1$d zikir</item>
+    </plurals>
+</resources>

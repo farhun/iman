@@ -31,10 +31,7 @@ import com.imn.iman.i18n.LocaleHelper
 import com.imn.iman.i18n.SUPPORTED_LANGUAGES
 import com.imn.iman.notifications.PrayerNotificationScheduler
 import com.imn.iman.widget.PrayerWidgetProvider
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,9 +65,7 @@ fun SettingsScreen(
         activity?.let { LocaleHelper.apply(it, tag) }
         val appContext = context.applicationContext
         PrayerWidgetProvider.forceWidgetRefresh(appContext)
-        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
-            PrayerNotificationScheduler(appContext).syncNotifications()
-        }
+        PrayerNotificationScheduler.syncInApplicationScope(appContext)
     }
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()

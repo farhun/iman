@@ -24,7 +24,11 @@ import com.imn.iman.data.repository.UserSettings
 import com.imn.iman.data.repository.EXTRA_PRAYER_TIMINGS
 import com.imn.iman.receiver.PrayerAlarmReceiver
 import com.imn.iman.receiver.PrayerRescheduleReceiver
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
 
@@ -105,9 +109,9 @@ fun UserSettings.toPrayerNotificationScheduleConfig(): PrayerNotificationSchedul
 }
 
 class PrayerNotificationScheduler(
-    private val context: Context
+    context: Context
 ) {
-    private val appContext = LocaleHelper.wrap(context.applicationContext)
+    private val appContext = context.applicationContext
     private val settingsRepository = SettingsRepository(appContext)
     private val prayerTimeRepository = PrayerTimeRepository(settingsRepository)
     private val alarmManager = appContext.getSystemService(AlarmManager::class.java)
@@ -497,6 +501,41 @@ class PrayerNotificationScheduler(
         private const val ACTION_RESCHEDULE_AT_MIDNIGHT = "com.imn.iman.action.RESCHEDULE_AT_MIDNIGHT"
 
         private const val TAG = "PrayerAlarmScheduler"
+        private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+        fun syncInApplicationScope(context: Context) {
+            val appContext = context.applicationContext
+            applicationScope.launch {
+                try {
+                    PrayerNotificationScheduler(appContext).syncNotifications()
+                } catch (error: Exception) {
+                    Log.e("ImanNotif", "Failed to resync prayer notifications after language change", error)
+                }
+            }
+        }
+
+        fun createFallbackNotificationChannel(context: Context) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+            try {
+                val appContext = context.applicationContext
+                val attributes = AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .build()
+                val channel = NotificationChannel(
+                    CHANNEL_PRAYER_DEFAULT,
+                    "Prayer reminders",
+                    NotificationManager.IMPORTANCE_HIGH
+                ).apply {
+                    setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), attributes)
+                    enableVibration(true)
+                    lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                }
+                appContext.getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+            } catch (error: Exception) {
+                Log.e("ImanNotif", "Failed to create fallback prayer notification channel", error)
+            }
+        }
 
         fun createNotificationChannels(
             context: Context,
@@ -504,9 +543,11 @@ class PrayerNotificationScheduler(
         ) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
 
-            val localizedContext = LocaleHelper.wrap(context)
-            val notificationManager = context.getSystemService(NotificationManager::class.java)
-            val audioAttributes = AudioAttributes.Builder()
+            val appContext = context.applicationContext
+            try {
+                val localizedContext = LocaleHelper.wrap(appContext)
+                val notificationManager = appContext.getSystemService(NotificationManager::class.java)
+                val audioAttributes = AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                 .build()
@@ -529,7 +570,7 @@ class PrayerNotificationScheduler(
                     localizedContext.getString(R.string.notif_channel_prayer_sound_adhan),
                     NotificationManager.IMPORTANCE_HIGH
                 ).apply {
-                    setSound(soundUriForSelection(context, "ADHAN"), audioAttributes)
+                    setSound(soundUriForSelection(appContext, "ADHAN"), audioAttributes)
                     enableVibration(true)
                     lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                 },
@@ -538,7 +579,7 @@ class PrayerNotificationScheduler(
                     localizedContext.getString(R.string.notif_channel_prayer_sound_takbir),
                     NotificationManager.IMPORTANCE_HIGH
                 ).apply {
-                    setSound(soundUriForSelection(context, "TAKBIR"), audioAttributes)
+                    setSound(soundUriForSelection(appContext, "TAKBIR"), audioAttributes)
                     enableVibration(true)
                     lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                 },
@@ -596,6 +637,10 @@ class PrayerNotificationScheduler(
             )
             channels.forEach { channel ->
                 notificationManager.createNotificationChannel(channel)
+            }
+            } catch (error: Exception) {
+                Log.e("ImanNotif", "Failed to build or create prayer notification channels", error)
+                createFallbackNotificationChannel(appContext)
             }
         }
 

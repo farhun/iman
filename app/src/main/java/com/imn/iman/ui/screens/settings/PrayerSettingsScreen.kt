@@ -10,6 +10,7 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -733,8 +734,10 @@ fun PrayerSettingsScreen(
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         FilledTonalButton(
                             onClick = {
-                                context.sendBroadcast(
-                                    Intent(context, PrayerAlarmReceiver::class.java).apply {
+                                Log.d("ImanNotif", "Notify debug button pressed")
+                                val appContext = context.applicationContext
+                                appContext.sendBroadcast(
+                                    Intent(appContext, PrayerAlarmReceiver::class.java).apply {
                                         action = PrayerAlarmReceiver.ACTION_FIRE_PRAYER_NOTIFICATION
                                         putExtra(PrayerAlarmReceiver.EXTRA_PRAYER_NAME, "Dhuhr")
                                         putExtra(PrayerAlarmReceiver.EXTRA_NOTIFICATION_TYPE, "PRAYER")
@@ -759,8 +762,10 @@ fun PrayerSettingsScreen(
                         }
                         OutlinedButton(
                             onClick = {
-                                context.sendBroadcast(
-                                    Intent(context, PrayerAlarmReceiver::class.java).apply {
+                                Log.d("ImanNotif", "Pre-notify debug button pressed")
+                                val appContext = context.applicationContext
+                                appContext.sendBroadcast(
+                                    Intent(appContext, PrayerAlarmReceiver::class.java).apply {
                                         action = PrayerAlarmReceiver.ACTION_FIRE_PRAYER_NOTIFICATION
                                         putExtra(PrayerAlarmReceiver.EXTRA_PRAYER_NAME, "Dhuhr")
                                         putExtra(PrayerAlarmReceiver.EXTRA_NOTIFICATION_TYPE, "PRE_PRAYER")

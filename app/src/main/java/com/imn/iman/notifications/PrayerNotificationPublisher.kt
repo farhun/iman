@@ -1,9 +1,11 @@
 package com.imn.iman.notifications
 
 import android.app.PendingIntent
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -23,19 +25,23 @@ object PrayerNotificationPublisher {
         prePrayerMinutes: Int,
         alertStyle: String,
     ) {
-        val localizedContext = LocaleHelper.wrap(context)
-        val notificationManager = NotificationManagerCompat.from(localizedContext)
-        if (!notificationManager.areNotificationsEnabled()) return
+        val appContext = context.applicationContext
+        val notificationManager = NotificationManagerCompat.from(appContext)
 
-        val launchIntent = Intent(localizedContext, MainActivity::class.java).apply {
+        val launchIntent = Intent(appContext, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
-        val contentIntent = PendingIntent.getActivity(
-            localizedContext,
-            "$prayerName-${type.name}".hashCode(),
-            launchIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val contentIntent = try {
+            PendingIntent.getActivity(
+                appContext,
+                "$prayerName-${type.name}".hashCode(),
+                launchIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        } catch (error: Exception) {
+            Log.e("ImanNotif", "Failed to build notification content intent", error)
+            null
+        }
 
         val selectedSound = when {
             type == PrayerAlarmType.PRE_PRAYER -> settings.prePrayerNotificationSound
@@ -49,25 +55,73 @@ object PrayerNotificationPublisher {
             }
         }
 
-        val content = PrayerNotificationCopy.build(
-            context = localizedContext,
-            settings = settings,
-            prayerName = prayerName,
-            type = type,
-            triggerAtMillis = triggerAtMillis,
-            prePrayerMinutes = prePrayerMinutes
-        )
+        val content = try {
+            PrayerNotificationCopy.build(
+                context = appContext,
+                settings = settings,
+                prayerName = prayerName,
+                type = type,
+                triggerAtMillis = triggerAtMillis,
+                prePrayerMinutes = prePrayerMinutes
+            )
+        } catch (error: Exception) {
+            Log.e("ImanNotif", "Failed to resolve notification text", error)
+            PrayerNotificationContent("Prayer reminder", "Prayer reminder", "Prayer reminder")
+        }
+        val localeTag = try {
+            val savedTag = LocaleHelper.savedTag(appContext)
+            if (savedTag == "system") {
+                appContext.resources.configuration.locales[0]?.toLanguageTag()
+                    ?: java.util.Locale.getDefault().toLanguageTag()
+            } else savedTag
+        } catch (error: Exception) {
+            Log.e("ImanNotif", "Failed to read notification locale", error)
+            java.util.Locale.getDefault().toLanguageTag()
+        }
+        Log.d("ImanNotif", "Resolved notification locale=$localeTag title=${content.title} body=${content.utilityLine}")
 
+        val requestedChannelId = selectedSound?.let(PrayerNotificationScheduler::channelIdForSound)
+            ?: PrayerNotificationScheduler.channelIdForStyle(
+                style = alertStyle,
+                customSoundUriString = settings.prayerNotificationCustomSoundUri
+            )
+        var channelId = requestedChannelId
+        val notificationsEnabled = try {
+            notificationManager.areNotificationsEnabled()
+        } catch (error: Exception) {
+            Log.e("ImanNotif", "Failed to check notification permission", error)
+            false
+        }
+        val platformNotificationManager = appContext.getSystemService(NotificationManager::class.java)
+        var channelImportance = try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                platformNotificationManager?.getNotificationChannel(channelId)?.importance
+            } else null
+        } catch (error: Exception) {
+            Log.e("ImanNotif", "Failed to read notification channel importance for $channelId", error)
+            null
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && channelImportance == null) {
+            Log.e("ImanNotif", "Notification channel $channelId is missing", IllegalStateException("Channel not found"))
+            PrayerNotificationScheduler.createFallbackNotificationChannel(appContext)
+            channelId = PrayerNotificationScheduler.CHANNEL_PRAYER_DEFAULT
+            channelImportance = try {
+                platformNotificationManager?.getNotificationChannel(channelId)?.importance
+            } catch (error: Exception) {
+                Log.e("ImanNotif", "Failed to read fallback channel importance", error)
+                null
+            }
+        }
+        Log.d("ImanNotif", "areNotificationsEnabled=$notificationsEnabled channelId=$channelId importance=$channelImportance")
+        Log.d("ImanNotif", "Using notification channel id=$channelId")
+
+        try {
         val builder = NotificationCompat.Builder(
-            localizedContext,
-            selectedSound?.let(PrayerNotificationScheduler::channelIdForSound)
-                ?: PrayerNotificationScheduler.channelIdForStyle(
-                    style = alertStyle,
-                    customSoundUriString = settings.prayerNotificationCustomSoundUri
-                )
+            appContext,
+            channelId
         )
             .setSmallIcon(R.drawable.ic_notification_glyph)
-            .setColor(ContextCompat.getColor(localizedContext, R.color.notification_icon_background))
+            .setColor(ContextCompat.getColor(appContext, R.color.notification_icon_background))
             .setContentTitle(content.title)
             .setContentText(content.utilityLine)
             .setStyle(NotificationCompat.BigTextStyle().bigText(content.expandedText))
@@ -81,13 +135,13 @@ object PrayerNotificationPublisher {
                 }
             )
             .setAutoCancel(true)
-            .setContentIntent(contentIntent)
+        contentIntent?.let(builder::setContentIntent)
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O && selectedSound != null) {
             if (selectedSound == "SILENT") {
                 builder.setSilent(true)
             } else {
-                PrayerNotificationScheduler.soundUriForSelection(localizedContext, selectedSound)?.let(builder::setSound)
+                PrayerNotificationScheduler.soundUriForSelection(appContext, selectedSound)?.let(builder::setSound)
                 builder.setDefaults(NotificationCompat.DEFAULT_LIGHTS)
                 builder.setVibrate(longArrayOf(0L, 180L, 120L, 180L))
             }
@@ -112,6 +166,26 @@ object PrayerNotificationPublisher {
             builder.setSilent(true)
         }
 
-        notificationManager.notify("$prayerName-${type.name}".hashCode(), builder.build())
+        val notificationId = "$prayerName-${type.name}".hashCode()
+        Log.d("ImanNotif", "Calling notify() for $prayerName ${type.name}")
+        notificationManager.notify(notificationId, builder.build())
+        Log.d("ImanNotif", "notify() completed for $prayerName ${type.name}")
+        } catch (error: Exception) {
+            Log.e("ImanNotif", "Failed to build or post notification; retrying with fallback text", error)
+            try {
+                PrayerNotificationScheduler.createFallbackNotificationChannel(appContext)
+                val fallbackNotification = NotificationCompat.Builder(appContext, channelId)
+                    .setSmallIcon(R.drawable.ic_notification_glyph)
+                    .setContentTitle("Prayer reminder")
+                    .setContentText("Prayer reminder")
+                    .setStyle(NotificationCompat.BigTextStyle().bigText("Prayer reminder"))
+                    .setAutoCancel(true)
+                    .build()
+                Log.d("ImanNotif", "Calling notify() with fallback text for $prayerName ${type.name}")
+                notificationManager.notify("$prayerName-${type.name}".hashCode(), fallbackNotification)
+            } catch (fallbackError: Exception) {
+                Log.e("ImanNotif", "Failed to post fallback prayer notification", fallbackError)
+            }
+        }
     }
 }
