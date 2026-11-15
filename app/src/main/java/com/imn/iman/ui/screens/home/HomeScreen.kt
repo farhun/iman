@@ -328,7 +328,7 @@ private fun QiblaCompassDialog(
                             drawLine(
                                 color = northTickColor,
                                 start = center.copy(y = center.y - radius),
-                                end = center.copy(y = center.y - radius + 22.dp.toPx()),
+                                end = center.copy(y = center.y - radius + 10.dp.toPx()),
                                 strokeWidth = 3.dp.toPx(),
                                 cap = StrokeCap.Round
                             )
