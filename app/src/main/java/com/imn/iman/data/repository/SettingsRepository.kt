@@ -27,7 +27,7 @@ object WidgetVisibilityItems {
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 const val DEFAULT_TASBIH_BACKGROUND_COLOR = "#000000"
-const val DEFAULT_TASBIH_BEAD_COLOR = "#D4850A"
+const val DEFAULT_TASBIH_BEAD_COLOR = "#3192F5"
 const val DEFAULT_TASBIH_TEXT_COLOR = "#FFFFFF"
 const val DEFAULT_TASBIH_BEAD_MODE = "slide"
 private val PRAYER_SOUND_OPTIONS = setOf("DEFAULT", "ADHAN", "TAKBIR", "SILENT")

@@ -2,13 +2,6 @@
 
 Iman is an Android app for prayer times, Quran reading, and Tasbih. It focuses on reliable daily-prayer reminders, a customizable widget, and a simple Quran-first experience.
 
-- **Repository:** https://github.com/farhun/iman
-- **App ID:** `io.github.farhun.iman`
-
-## Origin
-
-Iman is a modified version of [Khushu](https://github.com/greykaizen/khushu), whose source code is licensed under GPLv3. This version was modified in 2026. Iman is an independent project. It is not affiliated with or endorsed by the Khushu project, and the Khushu name and logo are not used.
-
 ## Features
 
 - **Prayer times:** the five daily prayers with the current and next prayer and the Hijri date. About 25 calculation conventions, the Asr school (Standard or Hanafi), per-prayer adjustments of up to 15 minutes, GPS or manual location, and optional extra timings (Imsak, Sunrise, Sunset, Midnight, night thirds). Pull down on Home to refresh.
@@ -32,6 +25,10 @@ Iman has no accounts, no ads, and no analytics or tracking libraries. Your locat
 ## Credits
 
 The same credits are in the app under Settings > About > Credits. Full terms for every asset are in [`third_party/NOTICES.md`](third_party/NOTICES.md).
+
+### Origin
+
+Iman is a modified version of [Khushu](https://github.com/greykaizen/khushu), whose source code is licensed under GPLv3. This version was modified in 2026. Iman is an independent project. It is not affiliated with or endorsed by the Khushu project, and the Khushu name and logo are not used.
 
 ### IndoPak Quran text and font: QuranWBW
 
