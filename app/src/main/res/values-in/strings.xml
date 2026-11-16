@@ -115,6 +115,7 @@
     <string name="widget_prayer_panel_layer">Lapisan Panel Salat</string>
     <string name="widget_current_prayer_indicator">Indikator Salat Saat Ini</string>
     <string name="widget_indicator_color">Warna Indikator</string>
+    <string name="widget_corner_radius">Radius sudut: %1$d dp</string>
     <string name="widget_typography">Tipografi</string>
     <string name="widget_font_color">Warna Font</string>
     <string name="widget_hex_code">Kode hex</string>

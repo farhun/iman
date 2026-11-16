@@ -407,6 +407,13 @@ class SettingsViewModel(
         }
     }
 
+    fun updateWidgetCornerRadii(background: Float, panel: Float, indicator: Float) {
+        viewModelScope.launch {
+            repository.updateWidgetCornerRadii(background, panel, indicator)
+            PrayerWidgetProvider.forceWidgetRefresh(appContext)
+        }
+    }
+
     fun isLocationServicesEnabled(): Boolean {
         val locationManager = appContext.getSystemService(LocationManager::class.java) ?: return false
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {

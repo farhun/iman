@@ -156,6 +156,9 @@ class SettingsRepository(private val context: Context) {
         val WIDGET_FONT_COLOR = stringPreferencesKey("widget_font_color")
         val WIDGET_HIDDEN_ITEMS = stringSetPreferencesKey("widget_hidden_items")
         val WIDGET_INDICATOR_COLOR = stringPreferencesKey("widget_indicator_color")
+        val WIDGET_BACKGROUND_CORNER_RADIUS = floatPreferencesKey("widget_background_corner_radius")
+        val WIDGET_PANEL_CORNER_RADIUS = floatPreferencesKey("widget_panel_corner_radius")
+        val WIDGET_INDICATOR_CORNER_RADIUS = floatPreferencesKey("widget_indicator_corner_radius")
     }
 
     val settingsFlow: Flow<UserSettings> = context.dataStore.data
@@ -279,13 +282,16 @@ class SettingsRepository(private val context: Context) {
                 showExtraPrayerTimingsOnHome = preferences[PreferencesKeys.SHOW_EXTRA_PRAYER_TIMINGS_ON_HOME] ?: false,
 
                 locationLabel = preferences[PreferencesKeys.LOCATION_LABEL] ?: "",
-                widgetBackgroundColor = preferences[PreferencesKeys.WIDGET_BACKGROUND_COLOR] ?: "#0D1D0F",
+                widgetBackgroundColor = preferences[PreferencesKeys.WIDGET_BACKGROUND_COLOR] ?: "#293041",
                 widgetBackgroundOpacity = preferences[PreferencesKeys.WIDGET_BACKGROUND_OPACITY] ?: 0.8f,
                 widgetPanelColor = preferences[PreferencesKeys.WIDGET_PANEL_COLOR] ?: "#000000",
                 widgetPanelOpacity = preferences[PreferencesKeys.WIDGET_PANEL_OPACITY] ?: 0.3f,
                 widgetFontColor = preferences[PreferencesKeys.WIDGET_FONT_COLOR] ?: "#FFFFFF",
                 hiddenWidgetItems = preferences[PreferencesKeys.WIDGET_HIDDEN_ITEMS] ?: emptySet(),
-                widgetIndicatorColor = preferences[PreferencesKeys.WIDGET_INDICATOR_COLOR] ?: "#7ED957"
+                widgetIndicatorColor = preferences[PreferencesKeys.WIDGET_INDICATOR_COLOR] ?: "#B0C6FE",
+                widgetBackgroundCornerRadius = preferences[PreferencesKeys.WIDGET_BACKGROUND_CORNER_RADIUS] ?: 24f,
+                widgetPanelCornerRadius = preferences[PreferencesKeys.WIDGET_PANEL_CORNER_RADIUS] ?: 24f,
+                widgetIndicatorCornerRadius = preferences[PreferencesKeys.WIDGET_INDICATOR_CORNER_RADIUS] ?: 6f
             )
         }
 
@@ -316,6 +322,14 @@ class SettingsRepository(private val context: Context) {
             it[PreferencesKeys.WIDGET_BACKGROUND_OPACITY] = backgroundOpacity
             it[PreferencesKeys.WIDGET_PANEL_COLOR] = panelColor
             it[PreferencesKeys.WIDGET_PANEL_OPACITY] = panelOpacity
+        }
+    }
+
+    suspend fun updateWidgetCornerRadii(background: Float, panel: Float, indicator: Float) {
+        context.dataStore.edit {
+            it[PreferencesKeys.WIDGET_BACKGROUND_CORNER_RADIUS] = background
+            it[PreferencesKeys.WIDGET_PANEL_CORNER_RADIUS] = panel
+            it[PreferencesKeys.WIDGET_INDICATOR_CORNER_RADIUS] = indicator
         }
     }
 
@@ -785,11 +799,14 @@ data class UserSettings(
     val showExtraPrayerTimingsOnHome: Boolean = false,
 
     val locationLabel: String = "",
-    val widgetBackgroundColor: String = "#0D1D0F",
+    val widgetBackgroundColor: String = "#293041",
     val widgetBackgroundOpacity: Float = 0.8f,
     val widgetPanelColor: String = "#000000",
     val widgetPanelOpacity: Float = 0.3f,
     val widgetFontColor: String = "#FFFFFF",
     val hiddenWidgetItems: Set<String> = emptySet(),
-    val widgetIndicatorColor: String = "#7ED957"
+    val widgetIndicatorColor: String = "#B0C6FE",
+    val widgetBackgroundCornerRadius: Float = 24f,
+    val widgetPanelCornerRadius: Float = 24f,
+    val widgetIndicatorCornerRadius: Float = 6f
 )

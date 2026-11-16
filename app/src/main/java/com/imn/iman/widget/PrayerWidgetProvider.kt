@@ -7,7 +7,11 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.RectF
 
 import android.location.Geocoder
 import android.os.Build
@@ -204,9 +208,17 @@ class PrayerWidgetProvider : AppWidgetProvider() {
                 )
 
                 applyVisibility(views, settings)
-                applyCustomization(views, settings)
+                val widgetOptions = appWidgetManager.getAppWidgetOptions(appWidgetId)
+                val widgetWidthDp = widgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 240)
+                applyCustomization(
+                    views,
+                    settings,
+                    localizedContext,
+                    widgetWidthDp,
+                    widgetContentHeightDp(settings)
+                )
                 resetPrayerStyles(views, settings)
-                currentPrayer?.let { highlightActivePrayer(views, it, settings) }
+                currentPrayer?.let { highlightActivePrayer(views, it, settings, localizedContext) }
                 appWidgetManager.updateAppWidget(appWidgetId, views)
             } catch (e: Exception) {
                 Log.e(TAG, "Error updating app widget", e)
@@ -267,6 +279,15 @@ class PrayerWidgetProvider : AppWidgetProvider() {
             }
         }
 
+        private fun widgetContentHeightDp(settings: UserSettings): Int {
+            val hidden = settings.hiddenWidgetItems
+            val showDates = WidgetVisibilityItems.GREGORIAN_DATE !in hidden || WidgetVisibilityItems.HIJRI_DATE !in hidden
+            val showDetails = WidgetVisibilityItems.LOCATION !in hidden ||
+                    WidgetVisibilityItems.COUNTDOWN !in hidden || WidgetVisibilityItems.NEXT_PRAYER !in hidden
+            val showPrayers = prayerItems.any { it.visibilityKey !in hidden }
+            return 16 + (if (showDates) 18 else 0) + (if (showDetails) 18 else 0) + (if (showPrayers) 48 else 0)
+        }
+
         private fun scheduleNextCountdownRefresh(context: Context) {
             val widgetManager = AppWidgetManager.getInstance(context)
             val widgetIds = widgetManager.getAppWidgetIds(ComponentName(context, PrayerWidgetProvider::class.java))
@@ -285,16 +306,35 @@ class PrayerWidgetProvider : AppWidgetProvider() {
             alarmManager.setAndAllowWhileIdle(AlarmManager.RTC, nextMinute, pendingIntent)
         }
 
-        private fun applyCustomization(views: RemoteViews, settings: UserSettings) {
-            // Layer 1: Total background
-            val bgColor = Color.parseColor(settings.widgetBackgroundColor)
-            views.setInt(R.id.img_widget_bg, "setColorFilter", bgColor)
-            views.setInt(R.id.img_widget_bg, "setImageAlpha", (settings.widgetBackgroundOpacity * 255).toInt())
-
-            // Layer 2: Inner panel background
-            val panelColor = Color.parseColor(settings.widgetPanelColor)
-            views.setInt(R.id.img_panel_bg, "setColorFilter", panelColor)
-            views.setInt(R.id.img_panel_bg, "setImageAlpha", (settings.widgetPanelOpacity * 255).toInt())
+        private fun applyCustomization(
+            views: RemoteViews,
+            settings: UserSettings,
+            context: Context,
+            widgetWidthDp: Int,
+            widgetHeightDp: Int
+        ) {
+            views.setImageViewBitmap(
+                R.id.img_widget_bg,
+                roundedRectangleBitmap(
+                    context,
+                    widgetWidthDp,
+                    widgetHeightDp,
+                    settings.widgetBackgroundCornerRadius,
+                    Color.parseColor(settings.widgetBackgroundColor),
+                    settings.widgetBackgroundOpacity
+                )
+            )
+            views.setImageViewBitmap(
+                R.id.img_panel_bg,
+                roundedRectangleBitmap(
+                    context,
+                    widgetWidthDp - 16,
+                    42,
+                    settings.widgetPanelCornerRadius,
+                    Color.parseColor(settings.widgetPanelColor),
+                    settings.widgetPanelOpacity
+                )
+            )
 
             // Apply font color to static texts and icons
             val fontColor = Color.parseColor(settings.widgetFontColor)
@@ -320,13 +360,42 @@ class PrayerWidgetProvider : AppWidgetProvider() {
             }
         }
 
-        private fun highlightActivePrayer(views: RemoteViews, prayer: String, settings: UserSettings) {
+        private fun highlightActivePrayer(views: RemoteViews, prayer: String, settings: UserSettings, context: Context) {
             val item = prayerItems.firstOrNull { it.name == prayer } ?: return
             val fontColor = Color.parseColor(settings.widgetFontColor)
+            views.setImageViewBitmap(
+                item.pillId,
+                roundedRectangleBitmap(context, 48, 18, settings.widgetIndicatorCornerRadius)
+            )
             views.setTextColor(item.labelId, fontColor)
             views.setInt(item.pillId, "setColorFilter", Color.parseColor(settings.widgetIndicatorColor))
             views.setViewVisibility(item.pillId, android.view.View.VISIBLE)
             views.setTextColor(item.timeId, Color.BLACK)
+        }
+
+        private fun roundedRectangleBitmap(
+            context: Context,
+            widthDp: Int,
+            heightDp: Int,
+            radiusDp: Float,
+            color: Int = Color.WHITE,
+            opacity: Float = 1f
+        ): Bitmap {
+            val density = context.resources.displayMetrics.density
+            val width = (widthDp.coerceAtLeast(1) * density).toInt().coerceAtLeast(1)
+            val height = (heightDp.coerceAtLeast(1) * density).toInt().coerceAtLeast(1)
+            val radius = (radiusDp.coerceAtLeast(0f) * density).coerceAtMost(minOf(width, height) / 2f)
+            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            Canvas(bitmap).drawRoundRect(
+                RectF(0f, 0f, width.toFloat(), height.toFloat()),
+                radius,
+                radius,
+                Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    this.color = color
+                    alpha = (opacity.coerceIn(0f, 1f) * 255).toInt()
+                }
+            )
+            return bitmap
         }
 
         @Suppress("DEPRECATION")

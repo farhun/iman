@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -131,6 +132,15 @@ fun WidgetSettingsScreen(
                 WidgetVisibilityToggle(stringResource(R.string.settings_location), WidgetVisibilityItems.LOCATION !in settings.hiddenWidgetItems) {
                     setWidgetItemVisibility(WidgetVisibilityItems.LOCATION, it)
                 }
+                WidgetVisibilityToggle(stringResource(R.string.widget_countdown), WidgetVisibilityItems.COUNTDOWN !in settings.hiddenWidgetItems) {
+                    setWidgetItemVisibility(WidgetVisibilityItems.COUNTDOWN, it)
+                }
+                WidgetVisibilityToggle(
+                    stringResource(R.string.widget_next_prayer_label),
+                    WidgetVisibilityItems.NEXT_PRAYER !in settings.hiddenWidgetItems
+                ) {
+                    setWidgetItemVisibility(WidgetVisibilityItems.NEXT_PRAYER, it)
+                }
                 WidgetVisibilityToggle(prayerLabel("Fajr"), WidgetVisibilityItems.FAJR !in settings.hiddenWidgetItems) {
                     setWidgetItemVisibility(WidgetVisibilityItems.FAJR, it)
                 }
@@ -146,15 +156,6 @@ fun WidgetSettingsScreen(
                 WidgetVisibilityToggle(prayerLabel("Isha"), WidgetVisibilityItems.ISHA !in settings.hiddenWidgetItems) {
                     setWidgetItemVisibility(WidgetVisibilityItems.ISHA, it)
                 }
-                WidgetVisibilityToggle(stringResource(R.string.widget_countdown), WidgetVisibilityItems.COUNTDOWN !in settings.hiddenWidgetItems) {
-                    setWidgetItemVisibility(WidgetVisibilityItems.COUNTDOWN, it)
-                }
-                WidgetVisibilityToggle(
-                    stringResource(R.string.widget_next_prayer_label),
-                    WidgetVisibilityItems.NEXT_PRAYER !in settings.hiddenWidgetItems
-                ) {
-                    setWidgetItemVisibility(WidgetVisibilityItems.NEXT_PRAYER, it)
-                }
             }
 
             Spacer(Modifier.height(8.dp))
@@ -165,6 +166,7 @@ fun WidgetSettingsScreen(
                     title = stringResource(R.string.settings_color),
                     selectedColor = settings.widgetBackgroundColor,
                     opacity = settings.widgetBackgroundOpacity,
+                    opacityRange = 0f..1.0f,
                     onColorChange = {
                         viewModel.updateWidgetCustomization(
                             backgroundColor = it,
@@ -185,6 +187,13 @@ fun WidgetSettingsScreen(
                     },
                     onCustomClick = { showColorPickerFor = "bg" }
                 )
+                WidgetCornerRadiusSlider(settings.widgetBackgroundCornerRadius) { radius ->
+                    viewModel.updateWidgetCornerRadii(
+                        radius,
+                        settings.widgetPanelCornerRadius,
+                        settings.widgetIndicatorCornerRadius
+                    )
+                }
             }
 
             // --- PANEL CONTROLS ---
@@ -214,6 +223,13 @@ fun WidgetSettingsScreen(
                     },
                     onCustomClick = { showColorPickerFor = "panel" }
                 )
+                WidgetCornerRadiusSlider(settings.widgetPanelCornerRadius) { radius ->
+                    viewModel.updateWidgetCornerRadii(
+                        settings.widgetBackgroundCornerRadius,
+                        radius,
+                        settings.widgetIndicatorCornerRadius
+                    )
+                }
             }
 
             SettingsGroup(title = stringResource(R.string.widget_current_prayer_indicator)) {
@@ -234,18 +250,36 @@ fun WidgetSettingsScreen(
                             Icon(Icons.Default.Palette, null, tint = MaterialTheme.colorScheme.primary)
                         }
                     }
-                    FlowRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        extendedColorPalette.forEach { hex ->
-                            ColorCircle(
-                                hex = hex,
-                                isSelected = settings.widgetIndicatorColor == hex,
-                                onClick = { setWidgetIndicatorColor(hex) }
-                            )
+                    Spacer(Modifier.height(12.dp))
+                    Box(modifier = Modifier.height(110.dp)) {
+                        LazyVerticalGrid(
+                            columns = GridCells.Adaptive(40.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            items(extendedColorPalette) { hex ->
+                                ColorCircle(
+                                    hex = hex,
+                                    isSelected = settings.widgetIndicatorColor == hex,
+                                    onClick = { setWidgetIndicatorColor(hex) }
+                                )
+                            }
                         }
+                    }
+                    Spacer(Modifier.height(20.dp))
+                    WidgetCornerRadiusSlider(
+                        radius = settings.widgetIndicatorCornerRadius,
+                        defaultRadius = 6f,
+                        maxRadius = 9f,
+                        steps = 8,
+                        modifier = Modifier
+                    ) { radius ->
+                        viewModel.updateWidgetCornerRadii(
+                            settings.widgetBackgroundCornerRadius,
+                            settings.widgetPanelCornerRadius,
+                            radius
+                        )
                     }
                 }
             }
@@ -653,6 +687,43 @@ private fun ColorCircle(
 }
 
 @Composable
+private fun WidgetCornerRadiusSlider(
+    radius: Float,
+    defaultRadius: Float = 24f,
+    maxRadius: Float = 24f,
+    steps: Int = 11,
+    modifier: Modifier = Modifier.padding(horizontal = 20.dp),
+    onRadiusChange: (Float) -> Unit
+) {
+    Column(modifier = modifier) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.widget_corner_radius, radius.toInt()),
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.SemiBold
+                )
+            )
+            IconButton(
+                onClick = { onRadiusChange(defaultRadius) },
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    Icons.Default.Refresh,
+                    contentDescription = stringResource(R.string.common_reset),
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+        }
+        Slider(value = radius, onValueChange = onRadiusChange, valueRange = 0f..maxRadius, steps = steps)
+    }
+}
+
+@Composable
 private fun WidgetPreview(settings: UserSettings) {
     val bgColor =
         Color(android.graphics.Color.parseColor(settings.widgetBackgroundColor)).copy(alpha = settings.widgetBackgroundOpacity)
@@ -667,6 +738,8 @@ private fun WidgetPreview(settings: UserSettings) {
     val showLocation = WidgetVisibilityItems.LOCATION !in hidden
     val showNextPrayer = WidgetVisibilityItems.NEXT_PRAYER !in hidden
     val showCountdown = WidgetVisibilityItems.COUNTDOWN !in hidden
+    val showDateRow = showGregorian || showHijri
+    val showDetailsRow = showLocation || showNextPrayer || showCountdown
     val prayers = listOf(
         Triple(WidgetVisibilityItems.FAJR, prayerLabel("Fajr"), stringResource(R.string.widget_preview_fajr_time)),
         Triple(WidgetVisibilityItems.DHUHR, prayerLabel("Dhuhr"), stringResource(R.string.widget_preview_dhuhr_time)),
@@ -678,12 +751,12 @@ private fun WidgetPreview(settings: UserSettings) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(settings.widgetBackgroundCornerRadius.dp))
             .background(bgColor)
-            .padding(12.dp)
+            .padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
-        if (showGregorian || showHijri) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        if (showDateRow) {
+            Row(modifier = Modifier.fillMaxWidth()) {
                 if (showGregorian) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Star, null, tint = fontColor, modifier = Modifier.size(12.dp))
@@ -691,16 +764,17 @@ private fun WidgetPreview(settings: UserSettings) {
                         Text(stringResource(R.string.widget_preview_gregorian_date), color = fontColor, fontSize = 11.sp, fontFamily = PlusJakartaSans)
                     }
                 }
+                Spacer(Modifier.weight(1f))
                 if (showHijri) Text(stringResource(R.string.widget_preview_hijri_date), color = fontColor, fontSize = 11.sp, fontFamily = PlusJakartaSans)
             }
         }
 
-        if ((showGregorian || showHijri) && (showLocation || showNextPrayer || showCountdown)) {
-            Spacer(Modifier.height(8.dp))
+        if (showDateRow && showDetailsRow) {
+            Spacer(Modifier.height(2.dp))
         }
 
-        if (showLocation || showNextPrayer || showCountdown) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        if (showDetailsRow) {
+            Row(modifier = Modifier.fillMaxWidth()) {
                 if (showLocation) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.MyLocation, null, tint = subFontColor, modifier = Modifier.size(12.dp))
@@ -708,6 +782,7 @@ private fun WidgetPreview(settings: UserSettings) {
                         Text(stringResource(R.string.widget_preview_location), color = subFontColor, fontSize = 10.sp, fontFamily = PlusJakartaSans)
                     }
                 }
+                Spacer(Modifier.weight(1f))
                 if (showNextPrayer || showCountdown) {
                     Row {
                         if (showNextPrayer) Text(
@@ -726,19 +801,20 @@ private fun WidgetPreview(settings: UserSettings) {
         }
 
         if (prayers.isNotEmpty()) {
-            if (showGregorian || showHijri || showLocation || showNextPrayer || showCountdown) {
-                Spacer(Modifier.height(8.dp))
+            when {
+                showDetailsRow -> Spacer(Modifier.height(4.dp))
+                showDateRow -> Spacer(Modifier.height(2.dp))
             }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(24.dp))
+                    .clip(RoundedCornerShape(settings.widgetPanelCornerRadius.dp))
                     .background(panelColor)
                     .padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                prayers.forEach { (_, label, time) ->
-                    val isActive = label == "Fajr"
+                prayers.forEach { (item, label, time) ->
+                    val isActive = item == WidgetVisibilityItems.FAJR
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             label,
@@ -750,12 +826,13 @@ private fun WidgetPreview(settings: UserSettings) {
                             modifier = Modifier
                                 .padding(top = 2.dp)
                                 .size(width = 48.dp, height = 18.dp)
-                                .clip(RoundedCornerShape(6.dp))
+                                .clip(RoundedCornerShape(settings.widgetIndicatorCornerRadius.dp))
                                 .background(if (isActive) indicatorColor else Color.Transparent),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 time,
+                                modifier = if (isActive) Modifier.offset(y = (-1).dp) else Modifier,
                                 color = if (isActive) Color.Black else fontColor,
                                 fontSize = 9.sp,
                                 fontFamily = PlusJakartaSans
@@ -763,6 +840,11 @@ private fun WidgetPreview(settings: UserSettings) {
                         }
                     }
                 }
+            }
+        } else {
+            when {
+                showDetailsRow -> Spacer(Modifier.height(4.dp))
+                showDateRow -> Spacer(Modifier.height(2.dp))
             }
         }
     }

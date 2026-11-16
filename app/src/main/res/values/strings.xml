@@ -115,6 +115,7 @@
     <string name="widget_prayer_panel_layer">Prayer Panel Layer</string>
     <string name="widget_current_prayer_indicator">Current Prayer Indicator</string>
     <string name="widget_indicator_color">Indicator Color</string>
+    <string name="widget_corner_radius">Corner radius: %1$d dp</string>
     <string name="widget_typography">Typography</string>
     <string name="widget_font_color">Font Color</string>
     <string name="widget_hex_code">Hex code</string>
