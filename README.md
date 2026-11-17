@@ -85,3 +85,18 @@ Before building, place the two Quran fonts in `app/src/main/res/font/`: `quran_n
 ## License
 
 This project's source code is licensed under the GNU General Public License v3.0 (GPLv3). See [LICENSE](LICENSE). Third-party fonts, text, audio, and other assets have their own terms and are not covered by it. See [Credits](#credits).
+
+### Trademark & Brand Policy
+
+**The Iman name, logo, and original brand identity are not included in the software license.**
+
+The source code is released under the GNU General Public License v3.0 (GPLv3). This license grants permission to use, modify, and redistribute the code under its terms. However, it does not grant permission to use the Iman name, logo, or other brand assets.
+
+- **Name and Logo:** The Iman name, logo, and original branding assets may not be used in a way that suggests endorsement, affiliation, or that a modified version is an official Iman release without prior written permission.
+- **Forks and Derivative Projects:** If you distribute a modified version, please use a different project name, logo, and visual identity to distinguish your version from the official Iman project.
+- **Attribution:** You may make factual references to Iman when identifying the original project or acknowledging its source, provided that such references do not imply official affiliation or endorsement.
+- **Third-Party Assets:** Assets belonging to third parties remain subject to their respective copyright and license terms.
+
+All rights in the Iman branding and original assets remain with their respective rights holders. No trademark or branding rights are granted by the software license.
+
+This policy does not modify or restrict the rights granted under the GPLv3 for the software source code.
