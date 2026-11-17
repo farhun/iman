@@ -1845,6 +1845,7 @@ fun NextPrayerCard(
         when (source) {
             CalculationSource.LOCAL -> stringResource(R.string.home_local)
             CalculationSource.API -> "API"
+            CalculationSource.OFFLINE_ESTIMATE -> stringResource(R.string.home_offline_estimate)
         }
 
     LaunchedEffect(Unit) {
@@ -2228,6 +2229,7 @@ fun PrayerSlab(
     val sourceLabel = when (source) {
         CalculationSource.LOCAL -> stringResource(R.string.home_local)
         CalculationSource.API -> "API"
+        CalculationSource.OFFLINE_ESTIMATE -> stringResource(R.string.home_local)
     }
 
     Surface(
@@ -2290,6 +2292,14 @@ fun PrayerSlab(
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                         )
                     }
+                }
+                if (source == CalculationSource.OFFLINE_ESTIMATE) {
+                    Text(
+                        text = stringResource(R.string.home_offline_estimate),
+                        modifier = Modifier.padding(start = 19.dp, top = 2.dp),
+                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                        color = MaterialTheme.colorScheme.secondary
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))

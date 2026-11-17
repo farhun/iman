@@ -9,6 +9,7 @@ import com.imn.iman.data.repository.UserSettings
 import com.imn.iman.notifications.PrayerAlarmType
 import com.imn.iman.notifications.PrayerNotificationPublisher
 import com.imn.iman.notifications.PrayerNotificationScheduler
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -45,6 +46,8 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
             try {
                 val settings = try {
                     SettingsRepository(appContext).settingsFlow.first()
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
                 } catch (error: Exception) {
                     Log.e("ImanNotif", "Failed to load notification settings; using defaults", error)
                     UserSettings(
@@ -56,6 +59,8 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                 }
                 try {
                     PrayerNotificationScheduler(appContext).syncNotifications(settings)
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
                 } catch (error: Exception) {
                     Log.e("ImanNotif", "Failed to resync prayer alarms before notification", error)
                 }
@@ -77,6 +82,8 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                         prePrayerMinutes = prePrayerMinutes,
                         alertStyle = settings.prayerNotificationAlertStyle
                     )
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
                 } catch (error: Exception) {
                     Log.e("ImanNotif", "Unexpected failure while publishing prayer notification", error)
                     return@launch
@@ -85,6 +92,8 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                     SettingsRepository(appContext).updateLastDeliveredPrayerNotificationEventId(
                         PrayerNotificationScheduler.eventIdFor(prayerName, type, triggerAtMillis)
                     )
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
                 } catch (error: Exception) {
                     Log.e("ImanNotif", "Failed to persist delivered prayer notification id", error)
                 }

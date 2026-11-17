@@ -75,6 +75,8 @@ import com.imn.iman.i18n.prayerLabel
 import com.imn.iman.i18n.soundOptionLabelRes
 import com.imn.iman.i18n.sourceTypeLabelRes
 import com.imn.iman.data.repository.EXTRA_PRAYER_TIMINGS
+import com.imn.iman.data.repository.conventionsForCountry
+import com.imn.iman.data.repository.isRecognizedCountryCode
 import com.imn.iman.receiver.PrayerAlarmReceiver
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -157,7 +159,23 @@ fun PrayerSettingsScreen(
     onBack: () -> Unit
 ) {
     val settings by viewModel.settings.collectAsState()
+    val latestTimesStatus by viewModel.prayerTimeRepository.latestStatus.collectAsState()
+    val lastOnlineUpdateMillis by viewModel.prayerTimeRepository.lastOnlineUpdate.collectAsState(initial = null)
+    val persistedPrayerError by viewModel.prayerTimeRepository.lastError.collectAsState(initial = null)
     val context = LocalContext.current
+    val calculationSourceLabel = stringResource(
+        when (latestTimesStatus.source) {
+            com.imn.iman.data.repository.TimesSource.ONLINE -> R.string.settings_diagnostic_source_online
+            com.imn.iman.data.repository.TimesSource.LOCAL -> R.string.settings_diagnostic_source_local
+            com.imn.iman.data.repository.TimesSource.OFFLINE_ESTIMATE -> R.string.settings_diagnostic_source_offline_estimate
+        }
+    )
+    val lastOnlineUpdateLabel = lastOnlineUpdateMillis?.let {
+        SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(it))
+    } ?: stringResource(R.string.settings_diagnostic_never)
+    val lastPrayerErrorLabel = persistedPrayerError?.takeIf { it.isNotBlank() }
+        ?: latestTimesStatus.message?.takeIf { it.isNotBlank() }
+        ?: stringResource(R.string.settings_diagnostic_none)
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val noRingtonePickerMessage = stringResource(R.string.settings_no_ringtone_picker)
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -286,13 +304,20 @@ fun PrayerSettingsScreen(
         viewModel.setPrayerNotificationCustomSoundUri(pickedUri?.toString().orEmpty())
     }
 
-    val calculationMethods = listOf(
-        "SHIA_ITHNA_ASHARI", "KARACHI", "NORTH_AMERICA", "MUSLIM_WORLD_LEAGUE",
-        "UMM_AL_QURA", "EGYPTIAN", "TEHRAN", "GULF_REGION", "KUWAIT", "QATAR",
-        "SINGAPORE", "FRANCE_UOIF", "TURKEY", "RUSSIA", "MOON_SIGHTING_COMMITTEE",
-        "DUBAI", "MALAYSIA", "TUNISIA", "ALGERIA", "INDONESIA", "MOROCCO",
-        "PORTUGAL", "JORDAN", "FRANCE_15", "FRANCE_18"
-    )
+    val pickerCountryCode = settings.locationCountryCode?.trim()?.uppercase(Locale.ROOT)
+    val countryName = pickerCountryCode
+        ?.takeIf { isRecognizedCountryCode(it) }
+        ?.let { Locale("", it).getDisplayCountry(Locale.getDefault()) }
+        ?.takeIf { it.isNotBlank() }
+    val conventionPickerHeader = if (countryName == null) null else {
+        stringResource(R.string.settings_conventions_for_country, countryName)
+    }
+    val countryMethods = conventionsForCountry(pickerCountryCode)
+    val calculationMethods = if (settings.prayerCalculationMethod in countryMethods) {
+        countryMethods
+    } else {
+        listOf("MUSLIM_WORLD_LEAGUE", settings.prayerCalculationMethod) + countryMethods.drop(1)
+    }
     val madhabs = listOf("SHAFI", "HANAFI")
     val sources = listOf("LOCAL", "API")
     val alertStyleOptions = listOf("CUSTOM_SOUND", "SYSTEM_SOUND", "VIBRATION", "SILENT")
@@ -419,6 +444,7 @@ fun PrayerSettingsScreen(
                         subtitle = stringResource(R.string.settings_convention_summary),
                         options = calculationMethods,
                         selectedOption = settings.prayerCalculationMethod,
+                        dropdownHeader = conventionPickerHeader,
                         optionLabel = { prayerSettingLabel(context, it, methodLabelRes(it)) },
                         onOptionSelected = { method ->
                             val switchToLocal = pendingLocalSwitch
@@ -712,6 +738,9 @@ fun PrayerSettingsScreen(
                 ) {
                     PrayerDiagnosticsCard(
                         source = prayerSettingLabel(context, settings.prayerSourceType, sourceTypeLabelRes(settings.prayerSourceType)),
+                        calculationSource = calculationSourceLabel,
+                        lastOnlineUpdate = lastOnlineUpdateLabel,
+                        lastError = lastPrayerErrorLabel,
                         method = prayerSettingLabel(context, settings.prayerCalculationMethod, methodLabelRes(settings.prayerCalculationMethod)),
                         madhab = prayerSettingLabel(context, settings.prayerMadhab, madhabLabelRes(settings.prayerMadhab)),
                         latitude = settings.locationLat,
@@ -990,6 +1019,9 @@ private fun PrayerReminderCard(
 @Composable
 private fun PrayerDiagnosticsCard(
     source: String,
+    calculationSource: String,
+    lastOnlineUpdate: String,
+    lastError: String,
     method: String,
     madhab: String,
     latitude: Float,
@@ -1000,7 +1032,10 @@ private fun PrayerDiagnosticsCard(
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(stringResource(R.string.settings_diagnostic_setup), style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.primary))
-        DiagnosticRow(stringResource(R.string.settings_source), source)
+        DiagnosticRow(stringResource(R.string.settings_diagnostic_selected_source), source)
+        DiagnosticRow(stringResource(R.string.settings_diagnostic_source), calculationSource)
+        DiagnosticRow(stringResource(R.string.settings_diagnostic_last_online_update), lastOnlineUpdate)
+        DiagnosticRow(stringResource(R.string.settings_diagnostic_last_error), lastError)
         DiagnosticRow(stringResource(R.string.settings_diagnostic_method), method)
         DiagnosticRow(stringResource(R.string.settings_madhab), madhab)
 

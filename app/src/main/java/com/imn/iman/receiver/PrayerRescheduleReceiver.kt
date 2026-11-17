@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.imn.iman.notifications.PrayerNotificationScheduler
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -17,7 +18,9 @@ class PrayerRescheduleReceiver : BroadcastReceiver() {
         val pendingResult = goAsync()
         CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             try {
-                PrayerNotificationScheduler(appContext).syncNotifications()
+                PrayerNotificationScheduler(appContext).syncNotifications(retryNow = true)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
             } catch (error: Exception) {
                 Log.e("ImanNotif", "Failed to reschedule prayer notifications", error)
             } finally {

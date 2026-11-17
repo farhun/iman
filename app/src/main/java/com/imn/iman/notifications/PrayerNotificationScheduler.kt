@@ -24,6 +24,7 @@ import com.imn.iman.data.repository.UserSettings
 import com.imn.iman.data.repository.EXTRA_PRAYER_TIMINGS
 import com.imn.iman.receiver.PrayerAlarmReceiver
 import com.imn.iman.receiver.PrayerRescheduleReceiver
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -109,18 +110,33 @@ fun UserSettings.toPrayerNotificationScheduleConfig(): PrayerNotificationSchedul
 }
 
 class PrayerNotificationScheduler(
-    context: Context
+    context: Context,
+    injectedPrayerTimeRepository: PrayerTimeRepository? = null
 ) {
     private val appContext = context.applicationContext
     private val settingsRepository = SettingsRepository(appContext)
-    private val prayerTimeRepository = PrayerTimeRepository(settingsRepository)
+    private val prayerTimeRepository = injectedPrayerTimeRepository ?: PrayerTimeRepository(settingsRepository)
     private val alarmManager = appContext.getSystemService(AlarmManager::class.java)
 
-    suspend fun syncNotifications(settings: UserSettings? = null) {
+    suspend fun syncNotifications(settings: UserSettings? = null, retryNow: Boolean = false) {
+        try {
+            syncNotificationsSafely(settings, retryNow)
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (error: Exception) {
+            Log.w("ImanTimes", "Prayer reminder sync failed safely", error)
+        }
+    }
+
+    private suspend fun syncNotificationsSafely(settings: UserSettings?, retryNow: Boolean) {
         val currentSettings = settings ?: settingsRepository.settingsFlow.first()
         createNotificationChannels(appContext, currentSettings.prayerNotificationCustomSoundUri)
         cancelAllScheduledNotifications()
         scheduleMidnightReschedule()
+        val todayDate = DateAnchor.Today.resolve()
+        val todayPrayerTimes = prayerTimeRepository.getPrayerDateTimesForScheduling(
+            todayDate, currentSettings, retryNow
+        )
         if (!hasAnyNotificationEnabled(currentSettings)) return
 
         val now = System.currentTimeMillis()
@@ -131,10 +147,15 @@ class PrayerNotificationScheduler(
 
         for (anchor in datesToSchedule) {
             val targetDate = anchor.resolve()
-            val prayerTimes = prayerTimeRepository.getPrayerDateTimesForScheduling(
-                date = targetDate,
-                settings = currentSettings
-            )
+            val prayerTimes = if (anchor == DateAnchor.Today) {
+                todayPrayerTimes
+            } else {
+                prayerTimeRepository.getPrayerDateTimesForScheduling(
+                    date = targetDate,
+                    settings = currentSettings,
+                    retryNow = false
+                )
+            }
             val extraPrayerTimes = prayerTimeRepository.getExtraPrayerDateTimes(
                 date = targetDate,
                 settings = currentSettings
@@ -508,6 +529,8 @@ class PrayerNotificationScheduler(
             applicationScope.launch {
                 try {
                     PrayerNotificationScheduler(appContext).syncNotifications()
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
                 } catch (error: Exception) {
                     Log.e("ImanNotif", "Failed to resync prayer notifications after language change", error)
                 }

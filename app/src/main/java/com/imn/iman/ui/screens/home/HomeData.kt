@@ -8,7 +8,7 @@ import com.imn.iman.R
 import kotlinx.datetime.Instant
 
 // ── Placeholder data — to be replaced by HomeViewModel + real prayer times ──
-enum class CalculationSource { LOCAL, API }
+enum class CalculationSource { LOCAL, API, OFFLINE_ESTIMATE }
 
 enum class HomeQuickAction {
     QIBLA,

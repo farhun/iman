@@ -16,6 +16,7 @@ import com.imn.iman.R
 import com.imn.iman.i18n.LocaleHelper
 
 import com.imn.iman.data.repository.QuranScriptFontRepository
+import com.imn.iman.data.repository.PrayerTimeRepository
 import com.imn.iman.data.repository.SettingsRepository
 import com.imn.iman.data.repository.UserSettings
 
@@ -40,6 +41,7 @@ import java.util.concurrent.CountDownLatch
 class SettingsViewModel(
     private val repository: SettingsRepository,
     private val appContext: Context,
+    val prayerTimeRepository: PrayerTimeRepository = PrayerTimeRepository(repository),
 ) : ViewModel() {
     private var hasAttemptedGpsRefresh = false
     private val _unsupportedLocalSourceEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
@@ -103,7 +105,7 @@ class SettingsViewModel(
 
     private fun resolveAndSaveLocationLabel(lat: Float, lng: Float) {
         viewModelScope.launch(Dispatchers.IO) {
-            val label = runCatching {
+            val resolvedLocation = runCatching {
                 val geocoder = Geocoder(appContext, Locale.getDefault())
                 val addresses = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     val results = mutableListOf<android.location.Address>()
@@ -118,16 +120,18 @@ class SettingsViewModel(
                     @Suppress("DEPRECATION")
                     geocoder.getFromLocation(lat.toDouble(), lng.toDouble(), 1).orEmpty()
                 }
-
                 val best = addresses.firstOrNull()
-                listOfNotNull(
+                val label = listOfNotNull(
                     best?.locality?.takeIf { it.isNotBlank() },
                     best?.subAdminArea?.takeIf { it.isNotBlank() },
                     best?.adminArea?.takeIf { it.isNotBlank() }
                 ).firstOrNull()
-            }.getOrNull() ?: LocaleHelper.wrap(appContext).getString(R.string.home_your_area)
+                label to best?.countryCode?.takeIf { it.isNotBlank() }
+            }.getOrNull()
 
-            repository.updateLocationLabel(label)
+            val label = resolvedLocation?.first?.takeIf { it.isNotBlank() }
+                ?: LocaleHelper.wrap(appContext).getString(R.string.home_your_area)
+            repository.updateResolvedLocation(lat, lng, label, resolvedLocation?.second)
         }
     }
 

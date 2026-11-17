@@ -7,9 +7,11 @@ import androidx.datastore.preferences.preferencesDataStore
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 import java.io.IOException
+import java.util.Locale
 
 object WidgetVisibilityItems {
     const val GREGORIAN_DATE = "gregorian_date"
@@ -149,6 +151,7 @@ class SettingsRepository(private val context: Context) {
         val SHOW_EXTRA_PRAYER_TIMINGS_ON_HOME = booleanPreferencesKey("show_extra_prayer_timings_on_home")
 
         val LOCATION_LABEL = stringPreferencesKey("location_label")
+        val LOCATION_COUNTRY_CODE = stringPreferencesKey("location_country_code")
         val WIDGET_BACKGROUND_COLOR = stringPreferencesKey("widget_background_color")
         val WIDGET_BACKGROUND_OPACITY = floatPreferencesKey("widget_background_opacity")
         val WIDGET_PANEL_COLOR = stringPreferencesKey("widget_panel_color")
@@ -160,6 +163,25 @@ class SettingsRepository(private val context: Context) {
         val WIDGET_PANEL_CORNER_RADIUS = floatPreferencesKey("widget_panel_corner_radius")
         val WIDGET_INDICATOR_CORNER_RADIUS = floatPreferencesKey("widget_indicator_corner_radius")
     }
+
+    private fun normalizeCountryCode(code: String?): String? = code
+        ?.trim()
+        ?.uppercase(Locale.ROOT)
+        ?.takeIf { normalized ->
+            normalized.length == 2 && Locale.getISOCountries().any { country -> country == normalized }
+        }
+
+    private fun locationCountryCode(preferences: Preferences): String? {
+        normalizeCountryCode(preferences[PreferencesKeys.LOCATION_COUNTRY_CODE])?.let { return it }
+        val latitude = preferences[PreferencesKeys.LOCATION_LAT] ?: 21.4225f
+        val longitude = preferences[PreferencesKeys.LOCATION_LNG] ?: 39.8262f
+        return if (kotlin.math.abs(latitude - 21.4225f) < 0.00001f &&
+            kotlin.math.abs(longitude - 39.8262f) < 0.00001f
+        ) "SA" else null
+    }
+
+    suspend fun getLocationCountryCode(): String? =
+        locationCountryCode(context.dataStore.data.first())
 
     val settingsFlow: Flow<UserSettings> = context.dataStore.data
         .catch { exception ->
@@ -243,6 +265,7 @@ class SettingsRepository(private val context: Context) {
                 prayerMadhab = preferences[PreferencesKeys.PRAYER_MADHAB] ?: "SHAFI",
                 locationLat = preferences[PreferencesKeys.LOCATION_LAT] ?: 21.4225f,
                 locationLng = preferences[PreferencesKeys.LOCATION_LNG] ?: 39.8262f,
+                locationCountryCode = locationCountryCode(preferences),
                 useGpsLocation = preferences[PreferencesKeys.USE_GPS_LOCATION] ?: false,
                 prayerSourceType = preferences[PreferencesKeys.PRAYER_SOURCE_TYPE] ?: "LOCAL",
                 fajrOffsetMinutes = preferences[PreferencesKeys.PRAYER_OFFSET_FAJR] ?: 0,
@@ -335,6 +358,28 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun updateLocationLabel(label: String) {
         context.dataStore.edit { it[PreferencesKeys.LOCATION_LABEL] = label }
+    }
+
+    suspend fun updateLocationCountryCode(code: String) {
+        val normalized = normalizeCountryCode(code) ?: return
+        context.dataStore.edit { it[PreferencesKeys.LOCATION_COUNTRY_CODE] = normalized }
+    }
+
+    suspend fun updateResolvedLocation(
+        latitude: Float,
+        longitude: Float,
+        label: String,
+        countryCode: String?
+    ) {
+        val normalizedCountryCode = normalizeCountryCode(countryCode)
+        context.dataStore.edit { preferences ->
+            val savedLatitude = preferences[PreferencesKeys.LOCATION_LAT] ?: 21.4225f
+            val savedLongitude = preferences[PreferencesKeys.LOCATION_LNG] ?: 39.8262f
+            if (savedLatitude == latitude && savedLongitude == longitude) {
+                preferences[PreferencesKeys.LOCATION_LABEL] = label
+                normalizedCountryCode?.let { preferences[PreferencesKeys.LOCATION_COUNTRY_CODE] = it }
+            }
+        }
     }
 
     suspend fun updateTasbeehStealthModeAllowed(enabled: Boolean) {
@@ -762,6 +807,7 @@ data class UserSettings(
     val prayerMadhab: String = "SHAFI",
     val locationLat: Float = 21.4225f,
     val locationLng: Float = 39.8262f,
+    val locationCountryCode: String? = null,
     val useGpsLocation: Boolean = false,
     val prayerSourceType: String = "LOCAL",
     val fajrOffsetMinutes: Int = 0,

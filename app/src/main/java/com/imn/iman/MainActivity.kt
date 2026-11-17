@@ -201,10 +201,10 @@ class MainActivity : ComponentActivity() {
         }
 
         settingsRepository = SettingsRepository(applicationContext)
-        settingsViewModel = SettingsViewModel(settingsRepository, applicationContext)
         prayerTimeRepository = PrayerTimeRepository(settingsRepository)
+        settingsViewModel = SettingsViewModel(settingsRepository, applicationContext, prayerTimeRepository)
 
-        val prayerNotificationScheduler = PrayerNotificationScheduler(applicationContext)
+        val prayerNotificationScheduler = PrayerNotificationScheduler(applicationContext, prayerTimeRepository)
         val prayerManager = com.imn.iman.logic.PrayerManager(settingsRepository, prayerTimeRepository)
 
         homeViewModel = ViewModelProvider(
@@ -232,7 +232,7 @@ class MainActivity : ComponentActivity() {
                 .map { settings -> settings.toPrayerNotificationScheduleConfig() to settings }
                 .distinctUntilChanged { old, new -> old.first == new.first }
                 .collect { (_, settings) ->
-                    prayerNotificationScheduler.syncNotifications(settings)
+                    prayerNotificationScheduler.syncNotifications(settings, retryNow = true)
                 }
         }
 

@@ -3,6 +3,7 @@
 package com.imn.iman.ui.screens.home
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,6 +13,7 @@ import com.imn.iman.R
 
 import com.imn.iman.data.repository.PrayerTimeRepository
 import com.imn.iman.data.repository.SettingsRepository
+import com.imn.iman.data.repository.TimesSource
 import com.imn.iman.logic.PrayerManager
 import com.imn.iman.notifications.PrayerNotificationScheduler
 import com.imn.iman.ui.screens.settings.SettingsViewModel
@@ -57,17 +59,22 @@ class HomeViewModel(
         if (remaining > 0L) delay(remaining)
     }
 
+    private fun toHomeCalculationSource(source: TimesSource): CalculationSource = when (source) {
+        TimesSource.ONLINE -> CalculationSource.API
+        TimesSource.LOCAL -> CalculationSource.LOCAL
+        TimesSource.OFFLINE_ESTIMATE -> CalculationSource.OFFLINE_ESTIMATE
+    }
+
     val uiState: StateFlow<HomeUiState> = combine(
         settingsRepository.settingsFlow,
         prayerManager.prayerState,
         _previewTimeMillis,
-        _isRefreshing
-    ) { settings, prayerState, previewTimeMillis, isRefreshing ->
+        _isRefreshing,
+        prayerTimeRepository.latestStatus
+    ) { settings, prayerState, previewTimeMillis, isRefreshing, latestStatus ->
         val usingPreviewTime = previewTimeMillis != null
         val previewTime = previewTimeMillis?.let { kotlinx.datetime.Instant.fromEpochMilliseconds(it) }
         val effectiveDate = Date(previewTimeMillis ?: System.currentTimeMillis())
-        val isApiSource = prayerTimeRepository.usesApiSource(settings)
-
         if (prayerState == null) {
             return@combine HomeUiState(
                 isRefreshing = isRefreshing,
@@ -76,14 +83,27 @@ class HomeViewModel(
                 lastPrayerRefreshEpochMs = settings.lastPrayerRefreshEpochMs,
                 locationLat = settings.locationLat,
                 locationLng = settings.locationLng,
-                calculationSource = if (isApiSource) CalculationSource.API else CalculationSource.LOCAL
+                calculationSource = toHomeCalculationSource(latestStatus.source)
             )
         }
 
-        val effectivePrayerTimes = prayerTimeRepository.getEffectivePrayerDateTimes(
-            date = effectiveDate,
-            settings = settings
-        ).mapValues { (_, value) -> kotlinx.datetime.Instant.fromEpochMilliseconds(value.time) }
+        val timesResult = prayerTimeRepository.getTimesResult(date = effectiveDate, settings = settings)
+        val effectivePrayerTimes = timesResult.times.mapValues { (_, value) ->
+            kotlinx.datetime.Instant.fromEpochMilliseconds(value.time)
+        }
+        if (effectivePrayerTimes.size != 5) {
+            return@combine HomeUiState(
+                isRefreshing = isRefreshing,
+                usingPreviewTime = usingPreviewTime,
+                previewTime = previewTime,
+                lastPrayerRefreshEpochMs = settings.lastPrayerRefreshEpochMs,
+                locationLat = settings.locationLat,
+                locationLng = settings.locationLng,
+                locationLabel = settings.locationLabel,
+                calculationSource = toHomeCalculationSource(timesResult.source),
+                showExtraPrayerTimingsOnHome = settings.showExtraPrayerTimingsOnHome
+            )
+        }
 
         fun applyOffset(instant: kotlinx.datetime.Instant, minutes: Int): kotlinx.datetime.Instant {
             return kotlinx.datetime.Instant.fromEpochMilliseconds(instant.toEpochMilliseconds() + minutes * 60_000L)
@@ -95,12 +115,14 @@ class HomeViewModel(
         val adjustedMaghrib = effectivePrayerTimes["Maghrib"] ?: prayerState.allPrayers.maghrib
         val adjustedIsha = effectivePrayerTimes["Isha"] ?: prayerState.allPrayers.isha
 
-        val extraPrayerTimes = runCatching {
-            prayerTimeRepository.getExtraPrayerDateTimes(
-                date = effectiveDate,
-                settings = settings
-            )
-        }.getOrDefault(emptyMap())
+        val extraPrayerTimes = try {
+            prayerTimeRepository.getExtraPrayerDateTimes(date = effectiveDate, settings = settings)
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (error: Exception) {
+            Log.w("ImanTimes", "Home extra timings unavailable", error)
+            emptyMap()
+        }
 
         val sunriseInstant =
             extraPrayerTimes["SUNRISE"]?.let { kotlinx.datetime.Instant.fromEpochMilliseconds(it.time) }
@@ -272,7 +294,7 @@ class HomeViewModel(
             locationLat = settings.locationLat,
             locationLng = settings.locationLng,
             locationLabel = settings.locationLabel,
-            calculationSource = if (isApiSource) CalculationSource.API else CalculationSource.LOCAL,
+            calculationSource = toHomeCalculationSource(timesResult.source),
             showExtraPrayerTimingsOnHome = settings.showExtraPrayerTimingsOnHome
         )
     }.stateIn(
@@ -306,10 +328,18 @@ class HomeViewModel(
                     // Continue with the last saved coordinates if GPS lookup fails.
                 }
                 settingsRepository.updateLocationAndPrayerRefresh(System.currentTimeMillis(), location)
-                PrayerNotificationScheduler(appContext).syncNotifications()
+                PrayerNotificationScheduler(appContext, prayerTimeRepository).syncNotifications(retryNow = true)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                Log.w("ImanTimes", "Prayer data refresh failed safely", error)
             } finally {
                 try {
                     PrayerWidgetProvider.forceWidgetRefresh(appContext)
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (error: Exception) {
+                    Log.w("ImanTimes", "Could not refresh prayer widget", error)
                 } finally {
                     try {
                         waitForMinimumRefreshDuration()

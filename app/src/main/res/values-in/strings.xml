@@ -131,6 +131,7 @@
     <string name="settings_calculation">Perhitungan</string>
     <string name="settings_convention">Metode</string>
     <string name="settings_convention_summary">Metode perhitungan yang digunakan untuk Subuh dan Isya.</string>
+    <string name="settings_conventions_for_country">Konvensi untuk %1$s</string>
     <string name="settings_madhab">Mazhab</string>
     <string name="settings_madhab_summary">Aturan bayangan Asar yang digunakan dalam perhitungan.</string>
     <string name="settings_source">Sumber</string>
@@ -256,7 +257,15 @@
     <string name="settings_diagnostic_setup">Pengaturan</string>
 
     <string name="settings_diagnostic_method">Metode</string>
-
+    <string name="settings_diagnostic_selected_source">Sumber yang dipilih</string>
+    <string name="settings_diagnostic_source">Sumber</string>
+    <string name="settings_diagnostic_source_online">Online (AlAdhan)</string>
+    <string name="settings_diagnostic_source_local">Rumus lokal</string>
+    <string name="settings_diagnostic_source_offline_estimate">Perkiraan offline</string>
+    <string name="settings_diagnostic_last_online_update">Pembaruan online terakhir</string>
+    <string name="settings_diagnostic_last_error">Kesalahan terakhir</string>
+    <string name="settings_diagnostic_never">Belum pernah</string>
+    <string name="settings_diagnostic_none">Tidak ada</string>
 
     <string name="settings_diagnostic_coordinates">Koordinat</string>
     <string name="settings_diagnostic_coordinates_value">%1$s, %2$s</string>
@@ -388,6 +397,7 @@
     <string name="home_prayers_done_count">%1$d/5</string>
     <string name="home_your_area">Area Anda</string>
     <string name="home_local">Lokal</string>
+    <string name="home_offline_estimate">Perkiraan offline</string>
     <string name="home_next_prayer_fallback">Salat berikutnya</string>
     <string name="home_night">Malam</string>
     <string name="home_morning">Pagi</string>

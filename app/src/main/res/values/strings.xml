@@ -131,6 +131,7 @@
     <string name="settings_calculation">Calculation</string>
     <string name="settings_convention">Convention</string>
     <string name="settings_convention_summary">The calculation convention used for Fajr and Isha.</string>
+    <string name="settings_conventions_for_country">Conventions for %1$s</string>
     <string name="settings_madhab">Madhab</string>
     <string name="settings_madhab_summary">The Asr shadow rule used in the calculation.</string>
     <string name="settings_source">Source</string>
@@ -257,7 +258,15 @@
     <string name="settings_diagnostic_setup">Setup</string>
 
     <string name="settings_diagnostic_method">Method</string>
-
+    <string name="settings_diagnostic_selected_source">Selected source</string>
+    <string name="settings_diagnostic_source">Source</string>
+    <string name="settings_diagnostic_source_online">Online (AlAdhan)</string>
+    <string name="settings_diagnostic_source_local">Local formula</string>
+    <string name="settings_diagnostic_source_offline_estimate">Offline estimate</string>
+    <string name="settings_diagnostic_last_online_update">Last online update</string>
+    <string name="settings_diagnostic_last_error">Last error</string>
+    <string name="settings_diagnostic_never">Never</string>
+    <string name="settings_diagnostic_none">None</string>
 
     <string name="settings_diagnostic_coordinates">Coordinates</string>
     <string name="settings_diagnostic_coordinates_value">%1$s, %2$s</string>
@@ -389,6 +398,7 @@
     <string name="home_prayers_done_count">%1$d/5</string>
     <string name="home_your_area">Your area</string>
     <string name="home_local">Local</string>
+    <string name="home_offline_estimate">Offline estimate</string>
     <string name="home_next_prayer_fallback">Next prayer</string>
     <string name="home_night">Night</string>
     <string name="home_morning">Morning</string>

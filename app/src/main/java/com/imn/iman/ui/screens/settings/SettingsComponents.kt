@@ -496,6 +496,7 @@ fun SettingsDropdown(
     subtitle: String,
     options: List<String>,
     selectedOption: String,
+    dropdownHeader: String? = null,
     optionLabel: (String) -> String = { it },
     openDropdown: Boolean = false,
     onDismiss: () -> Unit = {},
@@ -548,6 +549,14 @@ fun SettingsDropdown(
                 onDismiss()
             }
         ) {
+            dropdownHeader?.let { header ->
+                Text(
+                    text = header,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    style = MaterialTheme.typography.labelSmall.copy(fontFamily = PlusJakartaSans),
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
             options.forEach { option ->
                 DropdownMenuItem(
                     contentPadding = PaddingValues(14.dp),

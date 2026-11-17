@@ -220,12 +220,22 @@ class PrayerWidgetProvider : AppWidgetProvider() {
                 resetPrayerStyles(views, settings)
                 currentPrayer?.let { highlightActivePrayer(views, it, settings, localizedContext) }
                 appWidgetManager.updateAppWidget(appWidgetId, views)
-            } catch (e: Exception) {
-                Log.e(TAG, "Error updating app widget", e)
-                setUnavailableContent(views, localizedContext)
-                appWidgetManager.updateAppWidget(appWidgetId, views)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                Log.e(TAG, "Error updating app widget", error)
+                try {
+                    setUnavailableContent(views, localizedContext)
+                    appWidgetManager.updateAppWidget(appWidgetId, views)
+                } catch (fallbackError: Exception) {
+                    Log.w(TAG, "Could not render unavailable widget state", fallbackError)
+                }
             } finally {
-                scheduleNextCountdownRefresh(localizedContext)
+                try {
+                    scheduleNextCountdownRefresh(localizedContext)
+                } catch (error: Exception) {
+                    Log.w(TAG, "Could not schedule widget countdown refresh", error)
+                }
             }
         }
 
