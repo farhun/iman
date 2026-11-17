@@ -253,6 +253,12 @@ class MainActivity : ComponentActivity() {
             }
 
             val settings by settingsViewModel.settings.collectAsState()
+            val darkTheme =
+                when (settings.themeMode) {
+                    "Light" -> false
+                    "Dark" -> true
+                    else -> isSystemInDarkTheme()
+                }
             var showFirstLocationExplanation by remember { mutableStateOf(false) }
             var showFirstLocationDeniedDialog by remember { mutableStateOf(false) }
             var showLocationServicesDialog by remember { mutableStateOf(false) }
@@ -284,6 +290,12 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+            ImanTheme(
+                darkTheme = darkTheme,
+                dynamicColor = settings.dynamicColor,
+                pureBlack = settings.pureBlack,
+                colorSeed = settings.colorSeed
+            ) {
             if (showFirstLocationExplanation) {
                 AlertDialog(
                     onDismissRequest = {
@@ -337,12 +349,7 @@ class MainActivity : ComponentActivity() {
                     }
                 )
             }
-            val darkTheme =
-                when (settings.themeMode) {
-                    "Light" -> false
-                    "Dark" -> true
-                    else -> isSystemInDarkTheme()
-                }
+            }
 
             val view = LocalView.current
             if (!view.isInEditMode) {
