@@ -55,8 +55,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -99,6 +101,15 @@ fun CreateCollectionSheet(
     val lazyListState = rememberLazyListState()
 
     val canSave = dhikrRows.any { it.name.trim().isNotBlank() && it.count.toIntOrNull() != null }
+    var showValidation by remember { mutableStateOf(false) }
+    val saveButtonColors = if (canSave) {
+        ButtonDefaults.buttonColors()
+    } else {
+        ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+            contentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+        )
+    }
 
     val transparentColors = TextFieldDefaults.colors(
         focusedContainerColor = Color.Transparent,
@@ -188,6 +199,8 @@ fun CreateCollectionSheet(
                         index = index,
                         color = selectedColor,
                         autoFocus = viewModel.pendingFocusId == row.id,
+                        nameInvalid = showValidation && row.name.isBlank(),
+                        countInvalid = showValidation && row.count.toIntOrNull() == null,
                         transparentColors = transparentColors,
                         onNameChange = { viewModel.updateDhikrName(row.id, it) },
                         onCountChange = { viewModel.updateDhikrCount(row.id, it) },
@@ -227,22 +240,26 @@ fun CreateCollectionSheet(
                 )
                 Button(
                     onClick = {
-                        val items = dhikrRows
-                            .filter { it.name.isNotBlank() && it.count.toIntOrNull() != null }
-                            .map { DhikrItem(name = it.name.trim(), targetCount = it.count.toInt()) }
-                        val collection = TasbeehCollection(
-                            title = viewModel.createTitle.trim().ifBlank { null },
-                            colorInt = selectedColor.toArgb(),
-                            items = items,
-                        )
-                        scope.launch {
-                            viewModel.insert(collection)
-                            viewModel.resetCreateState()
-                            sheetState.hide()
-                            onDismiss()
+                        if (!canSave) {
+                            showValidation = true
+                        } else {
+                            val items = dhikrRows
+                                .filter { it.name.isNotBlank() && it.count.toIntOrNull() != null }
+                                .map { DhikrItem(name = it.name.trim(), targetCount = it.count.toInt()) }
+                            val collection = TasbeehCollection(
+                                title = viewModel.createTitle.trim().ifBlank { null },
+                                colorInt = selectedColor.toArgb(),
+                                items = items,
+                            )
+                            scope.launch {
+                                viewModel.saveCollection(collection)
+                                viewModel.resetCreateState()
+                                sheetState.hide()
+                                onDismiss()
+                            }
                         }
                     },
-                    enabled = canSave,
+                    colors = saveButtonColors,
                     shape = RoundedCornerShape(14.dp),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -260,6 +277,8 @@ private fun DhikrRowItem(
     index: Int,
     color: Color,
     autoFocus: Boolean,
+    nameInvalid: Boolean,
+    countInvalid: Boolean,
     transparentColors: androidx.compose.material3.TextFieldColors,
     onNameChange: (String) -> Unit,
     onCountChange: (String) -> Unit,
@@ -289,11 +308,17 @@ private fun DhikrRowItem(
                 textStyle = MaterialTheme.typography.bodyLarge.copy(
                     fontFamily = fontForText(row.name, PlusJakartaSans)
                 ),
-                placeholder = { Text(stringResource(R.string.tasbih_dhikr_name_placeholder)) },
+                placeholder = {
+                    Text(
+                        stringResource(R.string.tasbih_dhikr_name_placeholder),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    )
+                },
                 modifier = Modifier
                     .weight(1f)
                     .focusRequester(nameFocusRequester),
                 colors = transparentColors,
+                isError = nameInvalid,
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
@@ -304,9 +329,12 @@ private fun DhikrRowItem(
             TextField(
                 value = row.count,
                 onValueChange = onCountChange,
-                placeholder = { Text("33") },
+                placeholder = {
+                    Text("33", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f))
+                },
                 modifier = Modifier.width(72.dp),
                 colors = transparentColors,
+                isError = countInvalid,
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,

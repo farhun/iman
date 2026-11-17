@@ -351,6 +351,9 @@
     <string name="tasbih_confirm_delete">Konfirmasi Hapus</string>
     <string name="tasbih_start">Mulai Tasbih</string>
     <string name="tasbih_exit">Keluar</string>
+    <string name="tasbih_completion_title">MasyaAllah</string>
+    <string name="tasbih_completion_message">Semoga zikir ini membawa ketenangan hati dan semakin mendekatkanmu kepada Allah.</string>
+    <string name="tasbih_completion_ok">Selesai</string>
     <string name="tasbih_out_of">dari %1$d</string>
     <string name="tasbih_release_to_reset_hint">Lepas untuk Atur Ulang  ·  Geser ke Bawah untuk Batal</string>
     <string name="tasbih_holding_to_reset_hint">Tahan untuk Atur Ulang...</string>

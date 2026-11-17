@@ -30,6 +30,7 @@ class TasbeehViewModel(private val dao: TasbeehDao) : ViewModel() {
     // --- Creation State ---
     var createTitle by mutableStateOf("")
     var createColorIndex by mutableIntStateOf(0)
+    private var editingCollectionId: Long? = null
     val createDhikrRows = mutableStateListOf(CreateDhikrRow(id = 0))
     private var nextId = 1
     var pendingFocusId by mutableStateOf<Int?>(null)
@@ -75,6 +76,7 @@ class TasbeehViewModel(private val dao: TasbeehDao) : ViewModel() {
     }
 
     fun resetCreateState() {
+        editingCollectionId = null
         createTitle = ""
         createColorIndex = 0
         createDhikrRows.clear()
@@ -84,6 +86,7 @@ class TasbeehViewModel(private val dao: TasbeehDao) : ViewModel() {
     }
 
     fun loadCollectionForEdit(collection: TasbeehCollection) {
+        editingCollectionId = collection.id
         createTitle = collection.title ?: ""
         createColorIndex = ImanColors.Palette.indexOfFirst { it.toArgb() == collection.colorInt }.coerceAtLeast(0)
         createDhikrRows.clear()
@@ -118,6 +121,12 @@ class TasbeehViewModel(private val dao: TasbeehDao) : ViewModel() {
     }
 
     suspend fun insert(collection: TasbeehCollection) = dao.insert(collection)
+
+    suspend fun saveCollection(collection: TasbeehCollection) {
+        val editingId = editingCollectionId
+        if (editingId == null) dao.insert(collection)
+        else dao.update(collection.copy(id = editingId))
+    }
 
     fun delete(collection: TasbeehCollection) {
         viewModelScope.launch { dao.delete(collection) }

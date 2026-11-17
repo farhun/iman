@@ -352,6 +352,9 @@
     <string name="tasbih_confirm_delete">Confirm Delete</string>
     <string name="tasbih_start">Start Tasbih</string>
     <string name="tasbih_exit">Exit</string>
+    <string name="tasbih_completion_title">Well done!</string>
+    <string name="tasbih_completion_message">May this remembrance bring peace to your heart and keep you close to Allah.</string>
+    <string name="tasbih_completion_ok">Done</string>
     <string name="tasbih_out_of">out of %1$d</string>
     <string name="tasbih_release_to_reset_hint">Release to Reset  ·  Swipe Down to Abort</string>
     <string name="tasbih_holding_to_reset_hint">Holding to Reset...</string>

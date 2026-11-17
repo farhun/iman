@@ -512,7 +512,13 @@ private fun ImanApp(
                         route = AppDestinations.TASBEEH.route,
                         enterTransition = { tabEnter() },
                         exitTransition = { tabExit() },
-                        popEnterTransition = { tabEnter() },
+                        popEnterTransition = {
+                            if (initialState.destination.route == TASBEEH_IMMERSIVE_ROUTE) {
+                                EnterTransition.None
+                            } else {
+                                tabEnter()
+                            }
+                        },
                         popExitTransition = { tabExit() },
                     ) {
                         TasbeehScreen(
@@ -702,7 +708,7 @@ private fun ImanApp(
                         enterTransition = { subScreenEnter() },
                         exitTransition = { subScreenExit() },
                         popEnterTransition = { subScreenPopEnter() },
-                        popExitTransition = { subScreenPopExit() },
+                        popExitTransition = { ExitTransition.None },
                     ) { backStackEntry ->
                         val collectionId = backStackEntry.arguments?.getString("collectionId") ?: ""
                         val collections by tasbeehViewModel.collections.collectAsStateWithLifecycle()

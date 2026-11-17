@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import com.imn.iman.data.model.TasbeehCollection
 
@@ -14,6 +15,9 @@ interface TasbeehDao {
 
     @Insert
     suspend fun insert(collection: TasbeehCollection)
+
+    @Update
+    suspend fun update(collection: TasbeehCollection)
 
     @Delete
     suspend fun delete(collection: TasbeehCollection)

@@ -38,12 +38,14 @@ import androidx.compose.foundation.layout.statusBars
 
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -114,8 +116,6 @@ fun TasbeehImmersiveScreen(
     val pressBeadDescription = stringResource(R.string.tasbih_press_bead_description)
     val soundPlayer = remember { TasbihSoundPlayer(context) }
 
-    BackHandler(onBack = onExit)
-
     DisposableEffect(Unit) {
         val controller = window?.let { WindowCompat.getInsetsController(it, it.decorView) }
         controller?.hide(WindowInsetsCompat.Type.systemBars())
@@ -131,6 +131,19 @@ fun TasbeehImmersiveScreen(
     val items = collection.items
     val currentItem = items.getOrNull(currentItemIndex)
     val currentTarget = currentItem?.targetCount ?: 33
+    val totalRequiredCount = items.sumOf { it.targetCount.coerceAtLeast(0) }
+    var sessionCompleted by remember { mutableStateOf(false) }
+    var hasExited by remember { mutableStateOf(false) }
+
+    fun exitToList() {
+        if (!hasExited) {
+            hasExited = true
+            onExit()
+        }
+    }
+
+    BackHandler(onBack = { exitToList() })
+
     val topInset = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() +
         WindowInsets.displayCutout.asPaddingValues().calculateTopPadding()
     val navigationBottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
@@ -176,6 +189,7 @@ fun TasbeehImmersiveScreen(
     }
 
     fun registerIncrement(playSound: Boolean = true) {
+        if (sessionCompleted || hasExited) return
         haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         currentCount++
         if (playSound) {
@@ -186,11 +200,18 @@ fun TasbeehImmersiveScreen(
             if (currentItemIndex < items.lastIndex) {
                 currentItemIndex++
                 currentCount = 0
+            } else {
+                val completedCount = items.take(currentItemIndex)
+                    .sumOf { it.targetCount.coerceAtLeast(0) } + currentCount
+                if (items.isNotEmpty() && completedCount >= totalRequiredCount) {
+                    sessionCompleted = true
+                }
             }
         }
     }
 
     fun registerDecrement() {
+        if (sessionCompleted || hasExited) return
         if (currentCount > 0 || currentItemIndex > 0) {
             haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
             if (currentCount > 0) currentCount--
@@ -278,6 +299,7 @@ fun TasbeehImmersiveScreen(
     }
 
     suspend fun handleVolumeCount(increment: Boolean, animate: Boolean) {
+        if (sessionCompleted || hasExited) return
         if (!animate) {
             if (increment) registerIncrement() else registerDecrement()
         } else if (isPressMode) {
@@ -513,8 +535,10 @@ fun TasbeehImmersiveScreen(
                             } else if (!hasMoved && !isOnPressBead) {
                                 when {
                                     localResetArmed -> {
-                                        currentCount = 0
-                                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        if (!sessionCompleted && !hasExited) {
+                                            currentCount = 0
+                                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        }
                                     }
                                     showResetOverlay -> {
                                         haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
@@ -692,7 +716,7 @@ fun TasbeehImmersiveScreen(
             modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(bottom = 48.dp)
         ) {
             OutlinedButton(
-                onClick = onExit,
+                onClick = { exitToList() },
                 contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White.copy(alpha = 0.2f))
@@ -700,5 +724,18 @@ fun TasbeehImmersiveScreen(
                 Text(text = stringResource(R.string.tasbih_exit), style = MaterialTheme.typography.bodyLarge)
             }
         }
+    }
+
+    if (sessionCompleted) {
+        AlertDialog(
+            onDismissRequest = { exitToList() },
+            title = { Text(stringResource(R.string.tasbih_completion_title)) },
+            text = { Text(stringResource(R.string.tasbih_completion_message)) },
+            confirmButton = {
+                TextButton(onClick = { exitToList() }) {
+                    Text(stringResource(R.string.tasbih_completion_ok))
+                }
+            },
+        )
     }
 }
