@@ -27,6 +27,7 @@ import com.imn.iman.receiver.PrayerRescheduleReceiver
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -523,6 +524,8 @@ class PrayerNotificationScheduler(
 
         private const val TAG = "PrayerAlarmScheduler"
         private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+        fun launchInApplicationScope(block: suspend () -> Unit): Job = applicationScope.launch { block() }
 
         fun syncInApplicationScope(context: Context) {
             val appContext = context.applicationContext

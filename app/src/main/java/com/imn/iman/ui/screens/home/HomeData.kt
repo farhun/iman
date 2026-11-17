@@ -55,6 +55,8 @@ data class HomeUiState(
     val locationLat: Float = 0f,
     val locationLng: Float = 0f,
     val locationLabel: String = "",
+    val locationLabelLat: Float? = null,
+    val locationLabelLng: Float? = null,
     val calculationSource: CalculationSource = CalculationSource.LOCAL,
     val showExtraPrayerTimingsOnHome: Boolean = false,
 

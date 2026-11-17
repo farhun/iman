@@ -41,7 +41,8 @@ fun SettingsScreen(
     onNavigatePrayer: () -> Unit,
     onNavigateTasbeeh: () -> Unit,
     onNavigateAbout: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onLanguageChanged: () -> Unit = {}
 ) {
 
     val context = LocalContext.current
@@ -63,6 +64,7 @@ fun SettingsScreen(
         selectedLanguageTag.value = tag
         showLanguageDialog.value = false
         activity?.let { LocaleHelper.apply(it, tag) }
+        onLanguageChanged()
         val appContext = context.applicationContext
         PrayerWidgetProvider.forceWidgetRefresh(appContext)
         PrayerNotificationScheduler.syncInApplicationScope(appContext)

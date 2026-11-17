@@ -1,9 +1,14 @@
 package com.imn.iman.data.repository
 
 import android.content.Context
+import android.content.res.Configuration
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
+import com.imn.iman.R
+import com.imn.iman.i18n.LocaleHelper
+import com.imn.iman.i18n.SUPPORTED_LANGUAGES
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -152,6 +157,9 @@ class SettingsRepository(private val context: Context) {
 
         val LOCATION_LABEL = stringPreferencesKey("location_label")
         val LOCATION_COUNTRY_CODE = stringPreferencesKey("location_country_code")
+        val LOCATION_LABEL_LAT = floatPreferencesKey("location_label_lat")
+        val LOCATION_LABEL_LNG = floatPreferencesKey("location_label_lng")
+        val LOCATION_LABEL_LANG = stringPreferencesKey("location_label_lang")
         val WIDGET_BACKGROUND_COLOR = stringPreferencesKey("widget_background_color")
         val WIDGET_BACKGROUND_OPACITY = floatPreferencesKey("widget_background_opacity")
         val WIDGET_PANEL_COLOR = stringPreferencesKey("widget_panel_color")
@@ -183,6 +191,37 @@ class SettingsRepository(private val context: Context) {
     suspend fun getLocationCountryCode(): String? =
         locationCountryCode(context.dataStore.data.first())
 
+    private fun defaultLocationLabel(): String =
+        LocaleHelper.wrap(context.applicationContext).getString(R.string.quran_revelation_makkah)
+
+    private fun fallbackLocationLabels(): Set<String> {
+        val appContext = context.applicationContext
+        return buildSet {
+            add(LocaleHelper.wrap(appContext).getString(R.string.home_your_area))
+            SUPPORTED_LANGUAGES.forEach { language ->
+                val configuration = Configuration(appContext.resources.configuration).apply {
+                    setLocale(Locale.forLanguageTag(language.tag))
+                }
+                add(appContext.createConfigurationContext(configuration).getString(R.string.home_your_area))
+            }
+        }
+    }
+
+    suspend fun cleanupLegacyLocationLabel() {
+        val fallbackLabels = fallbackLocationLabels()
+        val defaultLabel = defaultLocationLabel()
+        context.dataStore.edit { preferences ->
+            val storedLabel = preferences[PreferencesKeys.LOCATION_LABEL]
+            if (storedLabel != null && storedLabel in fallbackLabels && storedLabel != defaultLabel) {
+                preferences.remove(PreferencesKeys.LOCATION_LABEL)
+                preferences.remove(PreferencesKeys.LOCATION_LABEL_LAT)
+                preferences.remove(PreferencesKeys.LOCATION_LABEL_LNG)
+                preferences.remove(PreferencesKeys.LOCATION_LABEL_LANG)
+            }
+        }
+        Log.d("ImanLocation", "One-time cleanup done")
+    }
+
     val settingsFlow: Flow<UserSettings> = context.dataStore.data
         .catch { exception ->
             if (exception is IOException) {
@@ -191,6 +230,10 @@ class SettingsRepository(private val context: Context) {
                 throw exception
             }
         }.map { preferences ->
+            val locationLat = preferences[PreferencesKeys.LOCATION_LAT] ?: 21.4225f
+            val locationLng = preferences[PreferencesKeys.LOCATION_LNG] ?: 39.8262f
+            val locationLabel = preferences[PreferencesKeys.LOCATION_LABEL]
+                ?: if (isDefaultLocation(locationLat.toDouble(), locationLng.toDouble())) defaultLocationLabel() else ""
 
             UserSettings(
                 hapticsEnabled = preferences[PreferencesKeys.HAPTICS_ENABLED] ?: true,
@@ -263,8 +306,8 @@ class SettingsRepository(private val context: Context) {
                 prayerCalculationMethod = preferences[PreferencesKeys.PRAYER_CALCULATION_METHOD]
                     ?: "MUSLIM_WORLD_LEAGUE",
                 prayerMadhab = preferences[PreferencesKeys.PRAYER_MADHAB] ?: "SHAFI",
-                locationLat = preferences[PreferencesKeys.LOCATION_LAT] ?: 21.4225f,
-                locationLng = preferences[PreferencesKeys.LOCATION_LNG] ?: 39.8262f,
+                locationLat = locationLat,
+                locationLng = locationLng,
                 locationCountryCode = locationCountryCode(preferences),
                 useGpsLocation = preferences[PreferencesKeys.USE_GPS_LOCATION] ?: false,
                 prayerSourceType = preferences[PreferencesKeys.PRAYER_SOURCE_TYPE] ?: "LOCAL",
@@ -304,7 +347,10 @@ class SettingsRepository(private val context: Context) {
                 extraPrayerNotifications = preferences[PreferencesKeys.EXTRA_PRAYER_NOTIFICATIONS] ?: emptySet(),
                 showExtraPrayerTimingsOnHome = preferences[PreferencesKeys.SHOW_EXTRA_PRAYER_TIMINGS_ON_HOME] ?: false,
 
-                locationLabel = preferences[PreferencesKeys.LOCATION_LABEL] ?: "",
+                locationLabel = locationLabel,
+                locationLabelLat = preferences[PreferencesKeys.LOCATION_LABEL_LAT],
+                locationLabelLng = preferences[PreferencesKeys.LOCATION_LABEL_LNG],
+                locationLabelLang = preferences[PreferencesKeys.LOCATION_LABEL_LANG],
                 widgetBackgroundColor = preferences[PreferencesKeys.WIDGET_BACKGROUND_COLOR] ?: "#293041",
                 widgetBackgroundOpacity = preferences[PreferencesKeys.WIDGET_BACKGROUND_OPACITY] ?: 0.8f,
                 widgetPanelColor = preferences[PreferencesKeys.WIDGET_PANEL_COLOR] ?: "#000000",
@@ -356,28 +402,26 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
-    suspend fun updateLocationLabel(label: String) {
-        context.dataStore.edit { it[PreferencesKeys.LOCATION_LABEL] = label }
-    }
-
-    suspend fun updateLocationCountryCode(code: String) {
-        val normalized = normalizeCountryCode(code) ?: return
-        context.dataStore.edit { it[PreferencesKeys.LOCATION_COUNTRY_CODE] = normalized }
-    }
 
     suspend fun updateResolvedLocation(
         latitude: Float,
         longitude: Float,
-        label: String,
-        countryCode: String?
+        place: ResolvedPlace,
+        languageTag: String
     ) {
-        val normalizedCountryCode = normalizeCountryCode(countryCode)
+        if (place.name.isBlank() || place.name in fallbackLocationLabels() || languageTag.isBlank()) return
+        val normalizedCountryCode = normalizeCountryCode(place.countryCode) ?: return
         context.dataStore.edit { preferences ->
             val savedLatitude = preferences[PreferencesKeys.LOCATION_LAT] ?: 21.4225f
             val savedLongitude = preferences[PreferencesKeys.LOCATION_LNG] ?: 39.8262f
-            if (savedLatitude == latitude && savedLongitude == longitude) {
-                preferences[PreferencesKeys.LOCATION_LABEL] = label
-                normalizedCountryCode?.let { preferences[PreferencesKeys.LOCATION_COUNTRY_CODE] = it }
+            if (kotlin.math.abs(savedLatitude - latitude) <= 0.0001f &&
+                kotlin.math.abs(savedLongitude - longitude) <= 0.0001f
+            ) {
+                preferences[PreferencesKeys.LOCATION_LABEL] = place.name
+                preferences[PreferencesKeys.LOCATION_COUNTRY_CODE] = normalizedCountryCode
+                preferences[PreferencesKeys.LOCATION_LABEL_LAT] = latitude
+                preferences[PreferencesKeys.LOCATION_LABEL_LNG] = longitude
+                preferences[PreferencesKeys.LOCATION_LABEL_LANG] = languageTag
             }
         }
     }
@@ -845,6 +889,9 @@ data class UserSettings(
     val showExtraPrayerTimingsOnHome: Boolean = false,
 
     val locationLabel: String = "",
+    val locationLabelLat: Float? = null,
+    val locationLabelLng: Float? = null,
+    val locationLabelLang: String? = null,
     val widgetBackgroundColor: String = "#293041",
     val widgetBackgroundOpacity: Float = 0.8f,
     val widgetPanelColor: String = "#000000",

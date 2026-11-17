@@ -8,9 +8,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.location.Geocoder
 import android.net.Uri
-import android.os.Build
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -92,14 +90,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.imn.iman.R
+import com.imn.iman.data.repository.displayLocationName
 import com.imn.iman.ui.components.ImanAppBar
 import com.imn.iman.ui.theme.PlusJakartaSans
 import dev.chrisbanes.haze.HazeState
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
+
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.roundToInt
@@ -644,7 +642,14 @@ fun HomeScreen(
     }
 
 
-    val locationLabel = uiState.locationLabel.ifBlank { stringResource(R.string.home_your_area) }
+    val locationLabel = displayLocationName(
+        latitude = uiState.locationLat.toDouble(),
+        longitude = uiState.locationLng.toDouble(),
+        label = uiState.locationLabel,
+        labelLatitude = uiState.locationLabelLat?.toDouble(),
+        labelLongitude = uiState.locationLabelLng?.toDouble(),
+        defaultLabel = stringResource(R.string.quran_revelation_makkah)
+    )
     val pullProgress = (pullOffsetPx / refreshThresholdPx).coerceIn(0f, 1f)
 
 
@@ -804,7 +809,7 @@ fun HomeScreen(
                                         activePrayerName = currentPrayer?.name,
                                         ayahRef = uiState.ayahRef,
                                         darkTheme = darkTheme,
-                                        locationLabel = uiState.locationLabel,
+                                        locationLabel = locationLabel,
                                         source = uiState.calculationSource,
                                         modifier = Modifier.fillMaxWidth(),
                                     )

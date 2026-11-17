@@ -612,7 +612,8 @@ private fun ImanApp(
                             },
                             onBack = {
                                 navController.popBackStack()
-                            }
+                            },
+                            onLanguageChanged = settingsViewModel::ensureLocationName
                         )
                     }
 

@@ -83,6 +83,9 @@ class HomeViewModel(
                 lastPrayerRefreshEpochMs = settings.lastPrayerRefreshEpochMs,
                 locationLat = settings.locationLat,
                 locationLng = settings.locationLng,
+                locationLabel = settings.locationLabel,
+                locationLabelLat = settings.locationLabelLat,
+                locationLabelLng = settings.locationLabelLng,
                 calculationSource = toHomeCalculationSource(latestStatus.source)
             )
         }
@@ -100,6 +103,8 @@ class HomeViewModel(
                 locationLat = settings.locationLat,
                 locationLng = settings.locationLng,
                 locationLabel = settings.locationLabel,
+                locationLabelLat = settings.locationLabelLat,
+                locationLabelLng = settings.locationLabelLng,
                 calculationSource = toHomeCalculationSource(timesResult.source),
                 showExtraPrayerTimingsOnHome = settings.showExtraPrayerTimingsOnHome
             )
@@ -294,6 +299,8 @@ class HomeViewModel(
             locationLat = settings.locationLat,
             locationLng = settings.locationLng,
             locationLabel = settings.locationLabel,
+            locationLabelLat = settings.locationLabelLat,
+            locationLabelLng = settings.locationLabelLng,
             calculationSource = toHomeCalculationSource(timesResult.source),
             showExtraPrayerTimingsOnHome = settings.showExtraPrayerTimingsOnHome
         )
@@ -334,6 +341,7 @@ class HomeViewModel(
             } catch (error: Exception) {
                 Log.w("ImanTimes", "Prayer data refresh failed safely", error)
             } finally {
+                settingsViewModel.ensureLocationName()
                 try {
                     PrayerWidgetProvider.forceWidgetRefresh(appContext)
                 } catch (cancelled: CancellationException) {

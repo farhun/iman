@@ -3,10 +3,10 @@ package com.imn.iman.ui.screens.settings
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
@@ -16,12 +16,15 @@ import com.imn.iman.R
 import com.imn.iman.i18n.LocaleHelper
 
 import com.imn.iman.data.repository.QuranScriptFontRepository
+import com.imn.iman.data.repository.LocationNameResolver
+import com.imn.iman.data.repository.distanceMeters
+import com.imn.iman.data.repository.isDefaultLocation
 import com.imn.iman.data.repository.PrayerTimeRepository
 import com.imn.iman.data.repository.SettingsRepository
 import com.imn.iman.data.repository.UserSettings
 
 import com.imn.iman.widget.PrayerWidgetProvider
-import kotlinx.coroutines.Dispatchers
+import com.imn.iman.notifications.PrayerNotificationScheduler
 import kotlinx.coroutines.Job
 
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -29,20 +32,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.Locale
-import java.util.concurrent.CountDownLatch
+
+private const val LOCATION_TAG = "ImanLocation"
 
 class SettingsViewModel(
     private val repository: SettingsRepository,
     private val appContext: Context,
     val prayerTimeRepository: PrayerTimeRepository = PrayerTimeRepository(repository),
 ) : ViewModel() {
+    private val locationNameResolver = LocationNameResolver(appContext)
     private var hasAttemptedGpsRefresh = false
     private val _unsupportedLocalSourceEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val unsupportedLocalSourceEvents = _unsupportedLocalSourceEvents.asSharedFlow()
@@ -94,44 +96,67 @@ class SettingsViewModel(
             }
         }
 
-        viewModelScope.launch {
-            settings.map { it.locationLat to it.locationLng }
-                .distinctUntilChanged()
-                .collect { (lat, lng) ->
-                    resolveAndSaveLocationLabel(lat, lng)
-                }
+        PrayerNotificationScheduler.launchInApplicationScope {
+            repository.cleanupLegacyLocationLabel()
+            repository.settingsFlow.first()
+            ensureLocationName()
         }
     }
 
-    private fun resolveAndSaveLocationLabel(lat: Float, lng: Float) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val resolvedLocation = runCatching {
-                val geocoder = Geocoder(appContext, Locale.getDefault())
-                val addresses = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    val results = mutableListOf<android.location.Address>()
-                    val latch = CountDownLatch(1)
-                    geocoder.getFromLocation(lat.toDouble(), lng.toDouble(), 1) { found ->
-                        results += found
-                        latch.countDown()
-                    }
-                    latch.await(2, java.util.concurrent.TimeUnit.SECONDS)
-                    results
-                } else {
-                    @Suppress("DEPRECATION")
-                    geocoder.getFromLocation(lat.toDouble(), lng.toDouble(), 1).orEmpty()
-                }
-                val best = addresses.firstOrNull()
-                val label = listOfNotNull(
-                    best?.locality?.takeIf { it.isNotBlank() },
-                    best?.subAdminArea?.takeIf { it.isNotBlank() },
-                    best?.adminArea?.takeIf { it.isNotBlank() }
-                ).firstOrNull()
-                label to best?.countryCode?.takeIf { it.isNotBlank() }
-            }.getOrNull()
+    fun ensureLocationName() {
+        synchronized(locationNameJobLock) {
+            locationNameJob?.cancel()
+            locationNameJob = PrayerNotificationScheduler.launchInApplicationScope {
+                val current = repository.settingsFlow.first()
+                val latitude = current.locationLat.toDouble()
+                val longitude = current.locationLng.toDouble()
+                val languageTag = locationNameResolver.currentLanguageTag()
 
-            val label = resolvedLocation?.first?.takeIf { it.isNotBlank() }
-                ?: LocaleHelper.wrap(appContext).getString(R.string.home_your_area)
-            repository.updateResolvedLocation(lat, lng, label, resolvedLocation?.second)
+                if (isDefaultLocation(latitude, longitude) && current.locationLabel.isNotBlank()) {
+                    Log.d(LOCATION_TAG, "Lookup skipped: default Makkah coordinates have a valid label")
+                    return@launchInApplicationScope
+                }
+
+                val skipReason = when {
+                    current.locationLabel.isBlank() -> "label is blank"
+                    current.locationCountryCode.isNullOrBlank() -> "country code is blank"
+                    current.locationLabelLat == null || current.locationLabelLng == null -> "label was never resolved"
+                    distanceMeters(
+                        latitude,
+                        longitude,
+                        current.locationLabelLat.toDouble(),
+                        current.locationLabelLng.toDouble()
+                    ) > 500.0 -> "saved coordinates moved more than 500 m"
+                    current.locationLabelLang != languageTag -> "app language changed"
+                    else -> "label is current"
+                }
+                if (skipReason == "label is current") {
+                    Log.d(LOCATION_TAG, "Lookup skipped: $skipReason")
+                    return@launchInApplicationScope
+                }
+
+                Log.d(LOCATION_TAG, "Lookup requested for $latitude, $longitude ($skipReason)")
+                val place = locationNameResolver.resolve(latitude, longitude)
+                if (place == null) {
+                    Log.w(LOCATION_TAG, "Lookup failed for $latitude, $longitude")
+                    return@launchInApplicationScope
+                }
+
+                val latest = repository.settingsFlow.first()
+                if (kotlin.math.abs(latest.locationLat - current.locationLat) > 0.0001f ||
+                    kotlin.math.abs(latest.locationLng - current.locationLng) > 0.0001f
+                ) {
+                    Log.d(LOCATION_TAG, "Result discarded as stale for $latitude, $longitude")
+                    return@launchInApplicationScope
+                }
+                repository.updateResolvedLocation(
+                    current.locationLat,
+                    current.locationLng,
+                    place,
+                    languageTag
+                )
+                PrayerWidgetProvider.forceWidgetRefresh(appContext)
+            }
         }
     }
 
@@ -328,7 +353,10 @@ class SettingsViewModel(
     }
 
     fun setLocation(lat: Float, lng: Float) {
-        viewModelScope.launch { repository.updateLocation(lat, lng) }
+        viewModelScope.launch {
+            repository.updateLocation(lat, lng)
+            ensureLocationName()
+        }
     }
 
     fun toggleUseGpsLocation(enabled: Boolean) {
@@ -503,6 +531,9 @@ class SettingsViewModel(
     }
 
     companion object {
+        private val locationNameJobLock = Any()
+        private var locationNameJob: Job? = null
+
         fun factory(repository: SettingsRepository, appContext: Context) =
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {

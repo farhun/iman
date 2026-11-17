@@ -13,8 +13,6 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 
-import android.location.Geocoder
-import android.os.Build
 
 import android.util.Log
 import android.widget.RemoteViews
@@ -24,6 +22,7 @@ import com.imn.iman.data.repository.PrayerTimeRepository
 import com.imn.iman.data.repository.SettingsRepository
 import com.imn.iman.data.repository.UserSettings
 import com.imn.iman.data.repository.WidgetVisibilityItems
+import com.imn.iman.data.repository.displayLocationName
 import com.imn.iman.i18n.LocaleHelper
 import com.imn.iman.i18n.prayerLabel
 import kotlinx.coroutines.CancellationException
@@ -34,7 +33,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.CountDownLatch
+
 
 class PrayerWidgetProvider : AppWidgetProvider() {
 
@@ -145,7 +144,14 @@ class PrayerWidgetProvider : AppWidgetProvider() {
                 views.setTextViewText(R.id.text_hijri_date, hijriDate)
 
                 val locationName = if (validLocation) {
-                    settings.locationLabel.ifBlank { resolveLocationLabel(localizedContext, settings) }
+                    displayLocationName(
+                        latitude = settings.locationLat.toDouble(),
+                        longitude = settings.locationLng.toDouble(),
+                        label = settings.locationLabel,
+                        labelLatitude = settings.locationLabelLat?.toDouble(),
+                        labelLongitude = settings.locationLabelLng?.toDouble(),
+                        defaultLabel = localizedContext.getString(R.string.quran_revelation_makkah)
+                    )
                 } else {
                     localizedContext.getString(R.string.widget_location_unavailable)
                 }
@@ -408,40 +414,6 @@ class PrayerWidgetProvider : AppWidgetProvider() {
             return bitmap
         }
 
-        @Suppress("DEPRECATION")
-        private fun resolveLocationLabel(context: Context, settings: UserSettings): String {
-            return runCatching {
-                val geocoder = Geocoder(context, Locale.getDefault())
-                val addresses = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    val results = mutableListOf<android.location.Address>()
-                    val latch = CountDownLatch(1)
-                    geocoder.getFromLocation(
-                        settings.locationLat.toDouble(),
-                        settings.locationLng.toDouble(),
-                        1
-                    ) { found ->
-                        results += found
-                        latch.countDown()
-                    }
-                    latch.await(2, java.util.concurrent.TimeUnit.SECONDS)
-                    results
-                } else {
-                    @Suppress("DEPRECATION")
-                    geocoder.getFromLocation(
-                        settings.locationLat.toDouble(),
-                        settings.locationLng.toDouble(),
-                        1
-                    ).orEmpty()
-                }
-
-                val best = addresses.firstOrNull()
-                listOfNotNull(
-                    best?.locality?.takeIf { it.isNotBlank() },
-                    best?.subAdminArea?.takeIf { it.isNotBlank() },
-                    best?.adminArea?.takeIf { it.isNotBlank() }
-                ).firstOrNull()
-            }.getOrNull() ?: context.getString(R.string.widget_your_area)
-        }
 
         fun forceWidgetRefresh(context: Context) {
             val intent = Intent(context, PrayerWidgetProvider::class.java).apply {
