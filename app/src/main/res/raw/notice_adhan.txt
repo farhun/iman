@@ -1,45 +1,9 @@
-ADHAN AND TAKBIR SOUNDS: SOURCE AND TERMS
-=========================================
+Adhan and takbir sounds
 
-Files in the app
-  app/src/main/res/raw/adhan.mp3
-  app/src/main/res/raw/takbir.mp3
+Source: "Adhan Recordings from Doha, Qatar" on the Internet Archive.
+https://archive.org/details/adhan.recordings.from.doha.qatar
 
-Source
-  Title:    Adhan Recordings from Doha, Qatar
-  Creator:  listed on the page only as "Doha, Qatar" (uploader: "Unknown")
-  Recorded: between 2013 and 2014 (per the item description)
-  Hosted:   Internet Archive, uploaded December 22, 2015
-  Item:     https://archive.org/details/adhan.recordings.from.doha.qatar
-  File:     https://archive.org/details/adhan.recordings.from.doha.qatar/Adhan_Doha_Qatar_04_Maghrib_Adhan.mp3
-  Accessed: 2026-11-07
+The recording is marked Public Domain Mark 1.0, which means it has no known copyright restrictions. No credit is required. It is credited here for transparency.
+https://creativecommons.org/publicdomain/mark/1.0/
 
-Terms
-  The Internet Archive item is marked "Public Domain Mark 1.0".
-  License page: https://creativecommons.org/publicdomain/mark/1.0/
-
-  The Public Domain Mark is a label saying a work is free of known
-  copyright restrictions. It is not a license that someone grants, so no
-  attribution is required and no license text needs to be shipped. This
-  notice records where the files came from, in case the page changes.
-
-  The label comes from the uploader. The page does not name a copyright
-  holder or explain how the recording came to be public domain. Treat it
-  as a good-faith label, not a guarantee.
-
-What was changed
-  adhan.mp3   The Maghrib adhan file from the item, renamed to adhan.mp3.
-  takbir.mp3  A shortened excerpt of the same recording.
-  [Edit this if you used a different file from the item, or trimmed, converted, or normalized the audio.]
-
-Proof of the page
-  Keep a saved copy of the item page here, for example:
-    ADHAN-source-page-2026-11-07.pdf
-  You can also save the page at https://web.archive.org (Save Page Now)
-  and paste the resulting link below.
-  Archived copy: [add link]
-
-If the status changes
-  If the Internet Archive item is removed or its label is changed, or a
-  rights holder contacts the project, replace these two sounds with
-  recordings that have an explicit license.
+The adhan is the Maghrib adhan from that item. The takbir is a shortened excerpt of the same recording.

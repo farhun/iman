@@ -50,8 +50,7 @@ Package README: "Copyright, Attribution & Usage Restrictions" (summary)
   supported and can render incorrectly.
 
 Written permission
-  Received from the QuranWBW Team by email on [7-11-2026]. Keep the email. It is the
-  proof of permission.
+  Received from the QuranWBW Team by email on [7-11-2026].
 
   Conditions given in that email (summarized)
   1. The project stays free (Sadaqa-e-Jaria) for all users, with no ads and no
