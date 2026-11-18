@@ -119,9 +119,13 @@ class PrayerNotificationScheduler(
     private val prayerTimeRepository = injectedPrayerTimeRepository ?: PrayerTimeRepository(settingsRepository)
     private val alarmManager = appContext.getSystemService(AlarmManager::class.java)
 
-    suspend fun syncNotifications(settings: UserSettings? = null, retryNow: Boolean = false) {
+    suspend fun syncNotifications(
+        settings: UserSettings? = null,
+        retryNow: Boolean = false,
+        noNetwork: Boolean = false
+    ) {
         try {
-            syncNotificationsSafely(settings, retryNow)
+            syncNotificationsSafely(settings, retryNow, noNetwork)
         } catch (cancelled: CancellationException) {
             throw cancelled
         } catch (error: Exception) {
@@ -129,14 +133,14 @@ class PrayerNotificationScheduler(
         }
     }
 
-    private suspend fun syncNotificationsSafely(settings: UserSettings?, retryNow: Boolean) {
+    private suspend fun syncNotificationsSafely(settings: UserSettings?, retryNow: Boolean, noNetwork: Boolean) {
         val currentSettings = settings ?: settingsRepository.settingsFlow.first()
         createNotificationChannels(appContext, currentSettings.prayerNotificationCustomSoundUri)
         cancelAllScheduledNotifications()
         scheduleMidnightReschedule()
         val todayDate = DateAnchor.Today.resolve()
         val todayPrayerTimes = prayerTimeRepository.getPrayerDateTimesForScheduling(
-            todayDate, currentSettings, retryNow
+            todayDate, currentSettings, retryNow, noNetwork
         )
         if (!hasAnyNotificationEnabled(currentSettings)) return
 
@@ -154,7 +158,8 @@ class PrayerNotificationScheduler(
                 prayerTimeRepository.getPrayerDateTimesForScheduling(
                     date = targetDate,
                     settings = currentSettings,
-                    retryNow = false
+                    retryNow = false,
+                    noNetwork = noNetwork
                 )
             }
             val extraPrayerTimes = prayerTimeRepository.getExtraPrayerDateTimes(
@@ -312,12 +317,14 @@ class PrayerNotificationScheduler(
 
         when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()) -> {
+                    (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()) -> {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, midnight, pendingIntent)
             }
+
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
                 alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, midnight, pendingIntent)
             }
+
             else -> alarmManager.setExact(AlarmManager.RTC_WAKEUP, midnight, pendingIntent)
         }
         Log.d(TAG, "Scheduled midnight reschedule at ${Date(midnight)} ($midnight)")
@@ -405,7 +412,7 @@ class PrayerNotificationScheduler(
             settings.maghribPrePrayerNotificationEnabled,
             settings.ishaPrePrayerNotificationEnabled
         ).any { it }
-            || settings.extraPrayerNotifications.isNotEmpty()
+                || settings.extraPrayerNotifications.isNotEmpty()
     }
 
     private fun isPrayerNotificationEnabled(settings: UserSettings, prayerName: String): Boolean {
@@ -574,96 +581,96 @@ class PrayerNotificationScheduler(
                 val localizedContext = LocaleHelper.wrap(appContext)
                 val notificationManager = appContext.getSystemService(NotificationManager::class.java)
                 val audioAttributes = AudioAttributes.Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-                .build()
-            val customSoundUri = customSoundUriString
-                .takeIf { it.isNotBlank() }
-                ?.let(Uri::parse)
-                ?: defaultCustomSoundUri()
-            val channels = listOf(
-                NotificationChannel(
-                    CHANNEL_PRAYER_DEFAULT,
-                    localizedContext.getString(R.string.notif_channel_prayer_sound_default),
-                    NotificationManager.IMPORTANCE_HIGH
-                ).apply {
-                    setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), audioAttributes)
-                    enableVibration(true)
-                    lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-                },
-                NotificationChannel(
-                    CHANNEL_PRAYER_ADHAN,
-                    localizedContext.getString(R.string.notif_channel_prayer_sound_adhan),
-                    NotificationManager.IMPORTANCE_HIGH
-                ).apply {
-                    setSound(soundUriForSelection(appContext, "ADHAN"), audioAttributes)
-                    enableVibration(true)
-                    lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-                },
-                NotificationChannel(
-                    CHANNEL_PRAYER_TAKBIR,
-                    localizedContext.getString(R.string.notif_channel_prayer_sound_takbir),
-                    NotificationManager.IMPORTANCE_HIGH
-                ).apply {
-                    setSound(soundUriForSelection(appContext, "TAKBIR"), audioAttributes)
-                    enableVibration(true)
-                    lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-                },
-                NotificationChannel(
-                    CHANNEL_PRAYER_SILENT,
-                    localizedContext.getString(R.string.notif_channel_prayer_sound_silent),
-                    NotificationManager.IMPORTANCE_HIGH
-                ).apply {
-                    setSound(null, null)
-                    enableVibration(false)
-                    lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-                },
-                NotificationChannel(
-                    CHANNEL_SYSTEM_SOUND,
-                    localizedContext.getString(R.string.notif_channel_prayer_reminders),
-                    NotificationManager.IMPORTANCE_HIGH
-                ).apply {
-                    description = localizedContext.getString(R.string.notif_channel_system_description)
-                    setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), audioAttributes)
-                    enableVibration(true)
-                    lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-                },
-                NotificationChannel(
-                    customSoundChannelId(customSoundUriString),
-                    localizedContext.getString(R.string.notif_channel_prayer_reminders_custom),
-                    NotificationManager.IMPORTANCE_HIGH
-                ).apply {
-                    description = localizedContext.getString(R.string.notif_channel_custom_description)
-                    setSound(customSoundUri, audioAttributes)
-                    enableVibration(true)
-                    lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-                },
-                NotificationChannel(
-                    CHANNEL_VIBRATION,
-                    localizedContext.getString(R.string.notif_channel_prayer_reminders_vibration),
-                    NotificationManager.IMPORTANCE_HIGH
-                ).apply {
-                    description = localizedContext.getString(R.string.notif_channel_vibration_description)
-                    setSound(null, null)
-                    enableVibration(true)
-                    vibrationPattern = longArrayOf(0L, 220L, 140L, 220L)
-                    lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-                },
-                NotificationChannel(
-                    CHANNEL_SILENT,
-                    localizedContext.getString(R.string.notif_channel_prayer_reminders_silent),
-                    NotificationManager.IMPORTANCE_HIGH
-                ).apply {
-                    description = localizedContext.getString(R.string.notif_channel_silent_description)
-                    setSound(null, null)
-                    enableVibration(false)
-                    setShowBadge(false)
-                    lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .build()
+                val customSoundUri = customSoundUriString
+                    .takeIf { it.isNotBlank() }
+                    ?.let(Uri::parse)
+                    ?: defaultCustomSoundUri()
+                val channels = listOf(
+                    NotificationChannel(
+                        CHANNEL_PRAYER_DEFAULT,
+                        localizedContext.getString(R.string.notif_channel_prayer_sound_default),
+                        NotificationManager.IMPORTANCE_HIGH
+                    ).apply {
+                        setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), audioAttributes)
+                        enableVibration(true)
+                        lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                    },
+                    NotificationChannel(
+                        CHANNEL_PRAYER_ADHAN,
+                        localizedContext.getString(R.string.notif_channel_prayer_sound_adhan),
+                        NotificationManager.IMPORTANCE_HIGH
+                    ).apply {
+                        setSound(soundUriForSelection(appContext, "ADHAN"), audioAttributes)
+                        enableVibration(true)
+                        lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                    },
+                    NotificationChannel(
+                        CHANNEL_PRAYER_TAKBIR,
+                        localizedContext.getString(R.string.notif_channel_prayer_sound_takbir),
+                        NotificationManager.IMPORTANCE_HIGH
+                    ).apply {
+                        setSound(soundUriForSelection(appContext, "TAKBIR"), audioAttributes)
+                        enableVibration(true)
+                        lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                    },
+                    NotificationChannel(
+                        CHANNEL_PRAYER_SILENT,
+                        localizedContext.getString(R.string.notif_channel_prayer_sound_silent),
+                        NotificationManager.IMPORTANCE_HIGH
+                    ).apply {
+                        setSound(null, null)
+                        enableVibration(false)
+                        lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                    },
+                    NotificationChannel(
+                        CHANNEL_SYSTEM_SOUND,
+                        localizedContext.getString(R.string.notif_channel_prayer_reminders),
+                        NotificationManager.IMPORTANCE_HIGH
+                    ).apply {
+                        description = localizedContext.getString(R.string.notif_channel_system_description)
+                        setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), audioAttributes)
+                        enableVibration(true)
+                        lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                    },
+                    NotificationChannel(
+                        customSoundChannelId(customSoundUriString),
+                        localizedContext.getString(R.string.notif_channel_prayer_reminders_custom),
+                        NotificationManager.IMPORTANCE_HIGH
+                    ).apply {
+                        description = localizedContext.getString(R.string.notif_channel_custom_description)
+                        setSound(customSoundUri, audioAttributes)
+                        enableVibration(true)
+                        lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                    },
+                    NotificationChannel(
+                        CHANNEL_VIBRATION,
+                        localizedContext.getString(R.string.notif_channel_prayer_reminders_vibration),
+                        NotificationManager.IMPORTANCE_HIGH
+                    ).apply {
+                        description = localizedContext.getString(R.string.notif_channel_vibration_description)
+                        setSound(null, null)
+                        enableVibration(true)
+                        vibrationPattern = longArrayOf(0L, 220L, 140L, 220L)
+                        lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                    },
+                    NotificationChannel(
+                        CHANNEL_SILENT,
+                        localizedContext.getString(R.string.notif_channel_prayer_reminders_silent),
+                        NotificationManager.IMPORTANCE_HIGH
+                    ).apply {
+                        description = localizedContext.getString(R.string.notif_channel_silent_description)
+                        setSound(null, null)
+                        enableVibration(false)
+                        setShowBadge(false)
+                        lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                    }
+                )
+                channels.forEach { channel ->
+                    notificationManager.createNotificationChannel(channel)
                 }
-            )
-            channels.forEach { channel ->
-                notificationManager.createNotificationChannel(channel)
-            }
             } catch (error: Exception) {
                 Log.e("ImanNotif", "Failed to build or create prayer notification channels", error)
                 createFallbackNotificationChannel(appContext)
@@ -705,6 +712,7 @@ class PrayerNotificationScheduler(
                     .takeIf { it.isNotBlank() }
                     ?.let(Uri::parse)
                     ?: defaultCustomSoundUri()
+
                 "SYSTEM_SOUND" -> RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
                 else -> null
             }

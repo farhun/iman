@@ -1,4 +1,4 @@
-# ![Iman logo](app/src/main/res/raw/readme-icon.png) Iman
+# ![Iman logo](app/src/main/res/raw/readme_icon.png) Iman
 
 Iman is an Android app for prayer times, Quran reading, and Tasbih. It focuses on reliable daily-prayer reminders, a customizable widget, and a simple Quran-first experience.
 

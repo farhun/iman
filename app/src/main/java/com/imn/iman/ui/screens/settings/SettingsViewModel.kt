@@ -23,7 +23,7 @@ import com.imn.iman.data.repository.PrayerTimeRepository
 import com.imn.iman.data.repository.SettingsRepository
 import com.imn.iman.data.repository.UserSettings
 
-import com.imn.iman.widget.PrayerWidgetProvider
+import com.imn.iman.widget.WidgetRefresher
 import com.imn.iman.notifications.PrayerNotificationScheduler
 import kotlinx.coroutines.Job
 
@@ -127,6 +127,7 @@ class SettingsViewModel(
                         current.locationLabelLat.toDouble(),
                         current.locationLabelLng.toDouble()
                     ) > 500.0 -> "saved coordinates moved more than 500 m"
+
                     current.locationLabelLang != languageTag -> "app language changed"
                     else -> "label is current"
                 }
@@ -155,7 +156,7 @@ class SettingsViewModel(
                     place,
                     languageTag
                 )
-                PrayerWidgetProvider.forceWidgetRefresh(appContext)
+                WidgetRefresher.refreshAll(appContext, "location_label")
             }
         }
     }
@@ -253,8 +254,6 @@ class SettingsViewModel(
     }
 
 
-
-
     fun setStartupTab(route: String) {
         viewModelScope.launch { repository.updateStartupTab(route) }
     }
@@ -301,8 +300,6 @@ class SettingsViewModel(
     fun setSelectedTranslationLang(lang: String) {
         viewModelScope.launch { repository.updateSelectedTranslationLang(lang) }
     }
-
-
 
 
     fun updateLastReadTopicId(id: String) {
@@ -435,14 +432,14 @@ class SettingsViewModel(
                 panelOpacity
             )
             fontColor?.let { repository.updateWidgetFontColor(it) }
-            PrayerWidgetProvider.forceWidgetRefresh(appContext)
+            WidgetRefresher.refreshAll(appContext, "widget_customization")
         }
     }
 
     fun updateWidgetCornerRadii(background: Float, panel: Float, indicator: Float) {
         viewModelScope.launch {
             repository.updateWidgetCornerRadii(background, panel, indicator)
-            PrayerWidgetProvider.forceWidgetRefresh(appContext)
+            WidgetRefresher.refreshAll(appContext, "widget_corner_radii")
         }
     }
 

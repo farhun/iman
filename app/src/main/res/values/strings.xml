@@ -76,6 +76,9 @@
     <string name="settings_appearance_summary">Theme, colors, and startup screen</string>
     <string name="widget_title">Widget</string>
     <string name="widget_settings_summary">Custom backgrounds and transparency</string>
+    <string name="settings_background_help_title">Widget not updating?</string>
+    <string name="settings_background_help_body">Some phones (Xiaomi, Samsung, Oppo, Vivo, Huawei, and others) stop apps in the background. Allow Iman to run in the background, and the widget and reminders stay on time.</string>
+    <string name="settings_background_help_button">Open guide</string>
 
     <string name="settings_tasbih_screen">Tasbih Screen</string>
     <string name="settings_tasbih_screen_summary">Customize the tasbih screen and canvas</string>

@@ -1,10 +1,8 @@
 package com.imn.iman.widget
 
-import android.app.AlarmManager
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -28,9 +26,10 @@ import com.imn.iman.i18n.prayerLabel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -38,33 +37,52 @@ import java.util.*
 class PrayerWidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        val pendingResult = goAsync()
-        val scope = CoroutineScope(Dispatchers.IO)
-        scope.launch {
-            try {
-                for (appWidgetId in appWidgetIds) {
-                    updateAppWidget(context, appWidgetManager, appWidgetId)
-                }
-            } finally {
-                pendingResult.finish()
-            }
-        }
+        refreshAsync(context, "appwidget_update")
+    }
+
+    override fun onEnabled(context: Context) {
+        super.onEnabled(context)
+        refreshAsync(context, "appwidget_enabled")
+    }
+
+    override fun onDisabled(context: Context) {
+        super.onDisabled(context)
+        WidgetRefresher.cancelAlarms(context.applicationContext)
+    }
+
+    override fun onRestored(context: Context, oldWidgetIds: IntArray, newWidgetIds: IntArray) {
+        super.onRestored(context, oldWidgetIds, newWidgetIds)
+        refreshAsync(context, "appwidget_restored")
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action != ACTION_COUNTDOWN_REFRESH) {
+        val action = intent.action
+        if (action == WidgetRefresher.ACTION_COUNTDOWN_REFRESH ||
+            action == WidgetRefresher.ACTION_BOUNDARY_REFRESH ||
+            action == Intent.ACTION_BOOT_COMPLETED ||
+            action == Intent.ACTION_MY_PACKAGE_REPLACED ||
+            action == Intent.ACTION_TIME_CHANGED ||
+            action == Intent.ACTION_TIMEZONE_CHANGED ||
+            action == Intent.ACTION_DATE_CHANGED
+        ) {
+            Log.d("ImanWidget", "Receiver action handled=$action")
+            refreshAsync(context, action ?: "unknown")
+        } else {
             super.onReceive(context, intent)
-            return
         }
+    }
 
+    private fun refreshAsync(context: Context, reason: String) {
         val pendingResult = goAsync()
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val manager = AppWidgetManager.getInstance(context)
-                val ids = manager.getAppWidgetIds(ComponentName(context, PrayerWidgetProvider::class.java))
-                for (appWidgetId in ids) {
-                    updateAppWidget(context, manager, appWidgetId)
-                }
+                withTimeout(8_000L) { WidgetRefresher.refreshAll(context, reason) }
+            } catch (timeout: TimeoutCancellationException) {
+                Log.w("ImanWidget", "Refresh timed out reason=$reason", timeout)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                Log.w("ImanWidget", "Refresh failed reason=$reason", error)
             } finally {
                 pendingResult.finish()
             }
@@ -73,7 +91,6 @@ class PrayerWidgetProvider : AppWidgetProvider() {
 
     companion object {
         private const val TAG = "PrayerWidgetProvider"
-        private const val ACTION_COUNTDOWN_REFRESH = "com.imn.iman.widget.REFRESH_COUNTDOWN"
 
         private data class PrayerItem(
             val name: String,
@@ -111,8 +128,9 @@ class PrayerWidgetProvider : AppWidgetProvider() {
             )
         )
 
-        suspend fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
+        suspend fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int): Long? {
             val localizedContext = LocaleHelper.wrap(context)
+            var nextPrayerBoundary: Long? = null
             val views = RemoteViews(localizedContext.packageName, R.layout.widget_prayer_times)
             val launchIntent = Intent(localizedContext, MainActivity::class.java)
             val contentIntent = PendingIntent.getActivity(
@@ -159,7 +177,7 @@ class PrayerWidgetProvider : AppWidgetProvider() {
 
                 val effectiveTimes = if (validLocation) {
                     try {
-                        prayerTimeRepository.getEffectivePrayerDateTimes(nowDate, settings)
+                        prayerTimeRepository.getPrayerDateTimesNoNetwork(nowDate, settings)
                     } catch (e: CancellationException) {
                         throw e
                     } catch (_: Exception) {
@@ -188,9 +206,13 @@ class PrayerWidgetProvider : AppWidgetProvider() {
                 }
                 val nextToday = orderedTimes.firstOrNull { it.second > nowMs }
                 val nextPrayer = nextToday ?: if (validLocation && orderedTimes.isNotEmpty()) {
-                    val tomorrow = Date(nowMs + 24L * 60L * 60L * 1000L)
+                    val zone = java.time.ZoneId.systemDefault()
+                    val tomorrow = Date.from(
+                        java.time.LocalDate.ofInstant(nowDate.toInstant(), zone)
+                            .plusDays(1).atStartOfDay(zone).toInstant()
+                    )
                     try {
-                        prayerTimeRepository.getEffectivePrayerDateTimes(tomorrow, settings)["Fajr"]?.let {
+                        prayerTimeRepository.getPrayerDateTimesNoNetwork(tomorrow, settings)["Fajr"]?.let {
                             "Fajr" to it.time
                         }
                     } catch (e: CancellationException) {
@@ -201,6 +223,7 @@ class PrayerWidgetProvider : AppWidgetProvider() {
                 } else {
                     null
                 }
+                nextPrayerBoundary = nextPrayer?.second
                 views.setTextViewText(
                     R.id.text_next_prayer,
                     nextPrayer?.first?.let {
@@ -236,13 +259,8 @@ class PrayerWidgetProvider : AppWidgetProvider() {
                 } catch (fallbackError: Exception) {
                     Log.w(TAG, "Could not render unavailable widget state", fallbackError)
                 }
-            } finally {
-                try {
-                    scheduleNextCountdownRefresh(localizedContext)
-                } catch (error: Exception) {
-                    Log.w(TAG, "Could not schedule widget countdown refresh", error)
-                }
             }
+            return nextPrayerBoundary
         }
 
         private fun formatCountdown(remainingMillis: Long): String {
@@ -297,30 +315,14 @@ class PrayerWidgetProvider : AppWidgetProvider() {
 
         private fun widgetContentHeightDp(settings: UserSettings): Int {
             val hidden = settings.hiddenWidgetItems
-            val showDates = WidgetVisibilityItems.GREGORIAN_DATE !in hidden || WidgetVisibilityItems.HIJRI_DATE !in hidden
+            val showDates =
+                WidgetVisibilityItems.GREGORIAN_DATE !in hidden || WidgetVisibilityItems.HIJRI_DATE !in hidden
             val showDetails = WidgetVisibilityItems.LOCATION !in hidden ||
                     WidgetVisibilityItems.COUNTDOWN !in hidden || WidgetVisibilityItems.NEXT_PRAYER !in hidden
             val showPrayers = prayerItems.any { it.visibilityKey !in hidden }
             return 16 + (if (showDates) 18 else 0) + (if (showDetails) 18 else 0) + (if (showPrayers) 48 else 0)
         }
 
-        private fun scheduleNextCountdownRefresh(context: Context) {
-            val widgetManager = AppWidgetManager.getInstance(context)
-            val widgetIds = widgetManager.getAppWidgetIds(ComponentName(context, PrayerWidgetProvider::class.java))
-            val alarmManager = context.getSystemService(AlarmManager::class.java) ?: return
-            val pendingIntent = PendingIntent.getBroadcast(
-                context,
-                0,
-                Intent(context, PrayerWidgetProvider::class.java).setAction(ACTION_COUNTDOWN_REFRESH),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-            if (widgetIds.isEmpty()) {
-                alarmManager.cancel(pendingIntent)
-                return
-            }
-            val nextMinute = (System.currentTimeMillis() / 60_000L + 1L) * 60_000L
-            alarmManager.setAndAllowWhileIdle(AlarmManager.RTC, nextMinute, pendingIntent)
-        }
 
         private fun applyCustomization(
             views: RemoteViews,
@@ -376,7 +378,12 @@ class PrayerWidgetProvider : AppWidgetProvider() {
             }
         }
 
-        private fun highlightActivePrayer(views: RemoteViews, prayer: String, settings: UserSettings, context: Context) {
+        private fun highlightActivePrayer(
+            views: RemoteViews,
+            prayer: String,
+            settings: UserSettings,
+            context: Context
+        ) {
             val item = prayerItems.firstOrNull { it.name == prayer } ?: return
             val fontColor = Color.parseColor(settings.widgetFontColor)
             views.setImageViewBitmap(
@@ -414,16 +421,5 @@ class PrayerWidgetProvider : AppWidgetProvider() {
             return bitmap
         }
 
-
-        fun forceWidgetRefresh(context: Context) {
-            val intent = Intent(context, PrayerWidgetProvider::class.java).apply {
-                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-                val ids = AppWidgetManager.getInstance(context).getAppWidgetIds(
-                    ComponentName(context, PrayerWidgetProvider::class.java)
-                )
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
-            }
-            context.sendBroadcast(intent)
-        }
     }
 }

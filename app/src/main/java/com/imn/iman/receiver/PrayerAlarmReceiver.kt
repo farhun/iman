@@ -9,6 +9,8 @@ import com.imn.iman.data.repository.UserSettings
 import com.imn.iman.notifications.PrayerAlarmType
 import com.imn.iman.notifications.PrayerNotificationPublisher
 import com.imn.iman.notifications.PrayerNotificationScheduler
+import com.imn.iman.widget.WidgetRefresher
+import com.imn.iman.worker.PrayerRefreshWork
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,13 +23,21 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         Log.d("ImanNotif", "PrayerAlarmReceiver started action=${intent.action}")
         if (intent.action != ACTION_FIRE_PRAYER_NOTIFICATION) {
-            Log.e("ImanNotif", "Ignoring unexpected prayer notification action", IllegalArgumentException("Unexpected action"))
+            Log.e(
+                "ImanNotif",
+                "Ignoring unexpected prayer notification action",
+                IllegalArgumentException("Unexpected action")
+            )
             return
         }
 
         val prayerName = intent.getStringExtra(EXTRA_PRAYER_NAME)
         if (prayerName == null) {
-            Log.e("ImanNotif", "Ignoring prayer notification without an id", IllegalArgumentException("Missing prayer id"))
+            Log.e(
+                "ImanNotif",
+                "Ignoring prayer notification without an id",
+                IllegalArgumentException("Missing prayer id")
+            )
             return
         }
         val type = try {
@@ -57,8 +67,9 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                         tasbeehListMode = true, startupTab = "home"
                     )
                 }
+                PrayerRefreshWork.enqueueIfNeeded(appContext, settings)
                 try {
-                    PrayerNotificationScheduler(appContext).syncNotifications(settings)
+                    PrayerNotificationScheduler(appContext).syncNotifications(settings, noNetwork = true)
                 } catch (cancelled: CancellationException) {
                     throw cancelled
                 } catch (error: Exception) {
@@ -87,6 +98,13 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                 } catch (error: Exception) {
                     Log.e("ImanNotif", "Unexpected failure while publishing prayer notification", error)
                     return@launch
+                }
+                try {
+                    WidgetRefresher.refreshAll(appContext, "prayer_notification")
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (error: Exception) {
+                    Log.w("ImanWidget", "Could not refresh widget after prayer notification", error)
                 }
                 try {
                     SettingsRepository(appContext).updateLastDeliveredPrayerNotificationEventId(

@@ -9,11 +9,6 @@ import com.batoulapps.adhan2.HighLatitudeRule
 import com.batoulapps.adhan2.Madhab
 import com.batoulapps.adhan2.PrayerTimes
 import android.content.Context
-import android.content.Intent
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.net.Uri
-import android.os.Build
 import android.util.Log
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
@@ -23,9 +18,10 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.batoulapps.adhan2.SunnahTimes
 import com.batoulapps.adhan2.data.DateComponents
-import com.imn.iman.receiver.PrayerRescheduleReceiver
+
 import com.imn.iman.notifications.PrayerNotificationScheduler
-import com.imn.iman.widget.PrayerWidgetProvider
+import com.imn.iman.widget.WidgetRefresher
+import com.imn.iman.worker.PrayerRefreshWork
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
@@ -128,7 +124,8 @@ fun validateApiTimes(
 
     val maxDeviationMillis = TimeUnit.MINUTES.toMillis(if (preciseLocalCalculation) 20L else 60L)
     for (name in required) {
-        val local = localTimes[name] ?: return ApiTimesValidationResult(false, reasonCode = "local_missing_${name.lowercase()}")
+        val local =
+            localTimes[name] ?: return ApiTimesValidationResult(false, reasonCode = "local_missing_${name.lowercase()}")
         if (kotlin.math.abs(parsed.getValue(name).time - local.time) > maxDeviationMillis) {
             return ApiTimesValidationResult(false, reasonCode = "deviation_${name.lowercase()}")
         }
@@ -180,7 +177,7 @@ class PrayerTimeRepository(
 
     fun usesApiSource(settings: UserSettings): Boolean {
         return settings.prayerSourceType == "API" ||
-            !supportsLocalCalculationMethod(settings.prayerCalculationMethod)
+                !supportsLocalCalculationMethod(settings.prayerCalculationMethod)
     }
 
     private fun validCoordinates(lat: Double, lng: Double): Boolean =
@@ -224,7 +221,11 @@ class PrayerTimeRepository(
     ): PrayerTimes {
         val coordinates = Coordinates(lat, lng)
         val calendar = Calendar.getInstance().apply { time = date }
-        val dateComponents = DateComponents(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH))
+        val dateComponents = DateComponents(
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH) + 1,
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
         val parameters = getCalculationParameters(methodStr).copy(
             madhab = if (madhabStr == "HANAFI") Madhab.HANAFI else Madhab.SHAFI,
             highLatitudeRule = HighLatitudeRule.MIDDLE_OF_THE_NIGHT
@@ -260,12 +261,17 @@ class PrayerTimeRepository(
             val savedLng = preferences?.get(floatPreferencesKey(KEY_LAST_VALID_LNG))?.toDouble()
             val candidates = buildList {
                 if (validCoordinates(lat, lng)) add(lat to lng)
-                if (savedLat != null && savedLng != null && validCoordinates(savedLat, savedLng)) add(savedLat to savedLng)
+                if (savedLat != null && savedLng != null && validCoordinates(
+                        savedLat,
+                        savedLng
+                    )
+                ) add(savedLat to savedLng)
                 add(DEFAULT_COORDINATES)
             }.distinct()
             candidates.forEach { coordinates ->
                 try {
-                    val calculated = calculateLocalPrayerTimes(date, coordinates.first, coordinates.second, methodStr, madhabStr)
+                    val calculated =
+                        calculateLocalPrayerTimes(date, coordinates.first, coordinates.second, methodStr, madhabStr)
                     rememberValidCoordinates(coordinates)
                     return LocalCalculation(calculated, coordinates)
                 } catch (cancelled: CancellationException) {
@@ -319,13 +325,53 @@ class PrayerTimeRepository(
         settings: UserSettings
     ): Map<String, Date> = getTimesResult(date, settings).times
 
+    suspend fun getPrayerDateTimesNoNetwork(date: Date, settings: UserSettings): Map<String, Date> {
+        getSavedPrayerDateTimes(date, settings)?.let { cached ->
+            Log.d("ImanWidget", "No-network read cache hit date=${dateKey(date)} source=${cached.source}")
+            return cached.times
+        }
+        val preferences = context.prayerTimesDataStore.data.first()
+        getProvisionalPrayerDateTimes(date, settings, preferences, ignoreExpiry = true)?.let { provisional ->
+            Log.d("ImanWidget", "No-network read cache hit date=${dateKey(date)} source=provisional")
+            return provisional.times
+        }
+        val localTimes = calculateSafeLocalPrayerTimes(
+            date, settings.locationLat.toDouble(), settings.locationLng.toDouble(),
+            settings.prayerCalculationMethod, settings.prayerMadhab
+        )?.prayerTimes?.let(::toPrayerDateTimes)?.let { applyOffsets(it, settings) }.orEmpty()
+        Log.d("ImanWidget", "No-network read local date=${dateKey(date)}")
+        return localTimes
+    }
+
+    suspend fun hasOnlinePrayerDateTimes(date: Date, settings: UserSettings): Boolean =
+        getSavedPrayerDateTimes(date, settings)?.source == TimesSource.ONLINE
+
+    suspend fun getProvisionalRetryAt(date: Date, settings: UserSettings): Long? {
+        val preferences = context.prayerTimesDataStore.data.first()
+        return getProvisionalPrayerDateTimes(date, settings, preferences, ignoreExpiry = true)?.nextRetryAt
+    }
+
+    suspend fun getWidgetPrayerDateTimes(date: Date, settings: UserSettings): Map<String, Date> =
+        getPrayerDateTimesNoNetwork(date, settings)
+
     suspend fun getTimesResult(
         date: Date,
         settings: UserSettings,
         retryNow: Boolean = false
+    ): TimesResult = getTimesResultSafelyCaught(date, settings, retryNow, false, true)
+
+    suspend fun refreshPrayerTimesOnline(date: Date, settings: UserSettings): TimesResult =
+        getTimesResultSafelyCaught(date, settings, true, true, false)
+
+    private suspend fun getTimesResultSafelyCaught(
+        date: Date,
+        settings: UserSettings,
+        retryNow: Boolean,
+        forceOnlineRefresh: Boolean,
+        refreshSurfaces: Boolean
     ): TimesResult {
         return try {
-            getTimesResultSafely(date, settings, retryNow)
+            getTimesResultSafely(date, settings, retryNow, forceOnlineRefresh, refreshSurfaces)
         } catch (cancelled: CancellationException) {
             throw cancelled
         } catch (error: Exception) {
@@ -338,19 +384,27 @@ class PrayerTimeRepository(
         }
     }
 
-    private suspend fun getTimesResultSafely(date: Date, settings: UserSettings, retryNow: Boolean): TimesResult {
+    private suspend fun getTimesResultSafely(
+        date: Date,
+        settings: UserSettings,
+        retryNow: Boolean,
+        forceOnlineRefresh: Boolean,
+        refreshSurfaces: Boolean
+    ): TimesResult {
         val isApiSource = usesApiSource(settings)
         val signature = prayerSettingsSignature(settings)
         getSavedPrayerDateTimes(date, settings)?.let { cached ->
-            Log.d(TAG, "Cache hit date=${dateKey(date)} source=${cached.source}")
-            return cached.also { _latestStatus.value = it }
+            if (!forceOnlineRefresh || cached.source == TimesSource.ONLINE) {
+                Log.d(TAG, "Cache hit date=${dateKey(date)} source=${cached.source}")
+                return cached.also { _latestStatus.value = it }
+            }
         }
         Log.d(TAG, "Cache miss date=${dateKey(date)}")
         if (!retryNow && isApiSource) {
             val preferences = context.prayerTimesDataStore.data.first()
             getProvisionalPrayerDateTimes(date, settings, preferences)?.let { provisional ->
                 Log.d(TAG, "Provisional cache hit date=${dateKey(date)} retryAt=${provisional.nextRetryAt}")
-                scheduleRetryAlarm(provisional.nextRetryAt)
+                PrayerRefreshWork.enqueueIfNeeded(context, settings)
                 return provisional.also { _latestStatus.value = it }
             }
         }
@@ -396,14 +450,21 @@ class PrayerTimeRepository(
         val previousProvisional = getProvisionalPrayerDateTimes(date, settings, retryPreferences, ignoreExpiry = true)
         return PRAYER_TIMES_API_MUTEX.withLock {
             getSavedPrayerDateTimes(date, settings)?.let { cached ->
-                Log.d(TAG, "Cache hit after request lock date=${dateKey(date)} source=${cached.source}")
-                return@withLock cached.also { _latestStatus.value = it }
+                if (!forceOnlineRefresh || cached.source == TimesSource.ONLINE) {
+                    Log.d(TAG, "Cache hit after request lock date=${dateKey(date)} source=${cached.source}")
+                    return@withLock cached.also { _latestStatus.value = it }
+                }
             }
             val currentPreferences = context.prayerTimesDataStore.data.first()
             if (retryNow && lastCompletedPrayerTimesRequestSignature == signature &&
                 System.currentTimeMillis() - lastCompletedPrayerTimesRequestAt < FORCED_RETRY_DEBOUNCE_MS
             ) {
-                getProvisionalPrayerDateTimes(date, settings, currentPreferences, ignoreExpiry = true)?.let { provisional ->
+                getProvisionalPrayerDateTimes(
+                    date,
+                    settings,
+                    currentPreferences,
+                    ignoreExpiry = true
+                )?.let { provisional ->
                     Log.d(TAG, "Skipping duplicate forced retry date=${dateKey(date)}")
                     return@withLock provisional.also { _latestStatus.value = it }
                 }
@@ -478,11 +539,15 @@ class PrayerTimeRepository(
                     _latestStatus.value = it
                     Log.d(TAG, "Source chosen=ONLINE date=${dateKey(date)}")
                 }
-                if (previousProvisional != null && prayerTimesDiffer(previousProvisional.times, onlineTimes)) {
+                if (refreshSurfaces && previousProvisional != null && prayerTimesDiffer(
+                        previousProvisional.times,
+                        onlineTimes
+                    )
+                ) {
                     Log.d(TAG, "Online timings replaced provisional values; refreshing reminders and widget")
                     try {
                         PrayerNotificationScheduler.syncInApplicationScope(context)
-                        PrayerWidgetProvider.forceWidgetRefresh(context)
+                        WidgetRefresher.refreshAll(context, "prayer_times_updated")
                     } catch (error: Exception) {
                         Log.w(TAG, "Could not refresh prayer surfaces after online replacement", error)
                     }
@@ -532,8 +597,13 @@ class PrayerTimeRepository(
     suspend fun getPrayerDateTimesForScheduling(
         date: Date,
         settings: UserSettings,
-        retryNow: Boolean = false
-    ): Map<String, Date> = getTimesResult(date, settings, retryNow).times
+        retryNow: Boolean = false,
+        noNetwork: Boolean = false
+    ): Map<String, Date> = if (noNetwork) {
+        getPrayerDateTimesNoNetwork(date, settings)
+    } else {
+        getTimesResult(date, settings, retryNow).times
+    }
 
     private suspend fun getSavedPrayerDateTimes(date: Date, settings: UserSettings): TimesResult? {
         val key = dateKey(date)
@@ -583,7 +653,8 @@ class PrayerTimeRepository(
             preferences[booleanPreferencesKey("provisional_present_$key")] != true
         ) return null
         val times = listOf("Fajr", "Dhuhr", "Asr", "Maghrib", "Isha").mapNotNull { name ->
-            val millis = preferences[longPreferencesKey("provisional_${name.lowercase()}_$key")] ?: return@mapNotNull null
+            val millis =
+                preferences[longPreferencesKey("provisional_${name.lowercase()}_$key")] ?: return@mapNotNull null
             name to Date(millis)
         }.toMap()
         if (times.isNotEmpty() && times.size != 5) return null
@@ -615,7 +686,9 @@ class PrayerTimeRepository(
             listOf("fajr", "dhuhr", "asr", "maghrib", "isha").forEach {
                 preferences.remove(longPreferencesKey("provisional_${it}_$key"))
             }
-            times.forEach { (name, time) -> preferences[longPreferencesKey("provisional_${name.lowercase()}_$key")] = time.time }
+            times.forEach { (name, time) ->
+                preferences[longPreferencesKey("provisional_${name.lowercase()}_$key")] = time.time
+            }
             if (updateGlobalState) {
                 preferences.remove(stringPreferencesKey("date_$key"))
                 preferences.remove(stringPreferencesKey("settings_$key"))
@@ -634,7 +707,7 @@ class PrayerTimeRepository(
         Log.d(TAG, "Source chosen=$source date=$key")
         Log.d(TAG, "Fallback used source=$source date=$key")
         Log.d(TAG, "Provisional state nextRetryAt=${Date(nextRetryAt)} attempt=$attempt")
-        scheduleRetryAlarm(nextRetryAt)
+        PrayerRefreshWork.enqueueIfNeeded(context, settings)
         return result
     }
 
@@ -653,7 +726,7 @@ class PrayerTimeRepository(
                 preferences.remove(stringPreferencesKey(KEY_LAST_ERROR))
             }
         }
-        cancelRetryAlarm()
+
     }
 
     private fun retryDelayMillis(attempt: Int): Long = when (attempt) {
@@ -670,46 +743,6 @@ class PrayerTimeRepository(
             kotlin.math.abs(old - new) >= TimeUnit.MINUTES.toMillis(1)
         }
 
-    private suspend fun scheduleRetryAlarm(retryAt: Long?) {
-        if (retryAt == null) return
-        try {
-            val alarmManager = context.getSystemService(AlarmManager::class.java) ?: return
-            val intent = Intent(context, PrayerRescheduleReceiver::class.java).apply {
-                action = ACTION_PRAYER_TIMES_RETRY
-                data = Uri.parse("iman://prayer-times/retry")
-            }
-            val pendingIntent = PendingIntent.getBroadcast(
-                context, RETRY_RESCHEDULE_REQUEST_CODE, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, retryAt, pendingIntent)
-            } else {
-                alarmManager.set(AlarmManager.RTC_WAKEUP, retryAt, pendingIntent)
-            }
-            Log.d(TAG, "Scheduled retry alarm at ${Date(retryAt)}")
-        } catch (error: Exception) {
-            Log.w(TAG, "Could not schedule prayer-time retry alarm", error)
-        }
-    }
-
-    private fun cancelRetryAlarm() {
-        try {
-            val alarmManager = context.getSystemService(AlarmManager::class.java) ?: return
-            val intent = Intent(context, PrayerRescheduleReceiver::class.java).apply {
-                action = ACTION_PRAYER_TIMES_RETRY
-                data = Uri.parse("iman://prayer-times/retry")
-            }
-            val pendingIntent = PendingIntent.getBroadcast(
-                context, RETRY_RESCHEDULE_REQUEST_CODE, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-            alarmManager.cancel(pendingIntent)
-            pendingIntent.cancel()
-        } catch (error: Exception) {
-            Log.w(TAG, "Could not cancel prayer-time retry alarm", error)
-        }
-    }
 
     private fun dateKey(date: Date): String = SimpleDateFormat("yyyyMMdd", Locale.ROOT).format(date)
 
@@ -732,15 +765,19 @@ class PrayerTimeRepository(
                 date, settings.locationLat.toDouble(), settings.locationLng.toDouble(),
                 settings.prayerCalculationMethod, settings.prayerMadhab
             ) ?: return emptyMap()
+            val nextDay = java.util.Date.from(
+                java.time.LocalDate.ofInstant(date.toInstant(), java.time.ZoneId.systemDefault())
+                    .plusDays(1).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
+            )
             val nextDayPrayerTimes = getSafeLocalPrayerTimes(
-                Date(date.time + TimeUnit.DAYS.toMillis(1)), settings.locationLat.toDouble(),
+                nextDay, settings.locationLat.toDouble(),
                 settings.locationLng.toDouble(), settings.prayerCalculationMethod, settings.prayerMadhab
             ) ?: return emptyMap()
             val localFajr = normalizeLocalTime(localPrayerTimes.fajr.toDate())
             val localMaghrib = normalizeLocalTime(localPrayerTimes.maghrib.toDate())
             val sunnahTimes = getSunnahTimes(localPrayerTimes)
             val firstThirdMillis = localMaghrib.time +
-                ((nextDayPrayerTimes.fajr.toDate().time - localMaghrib.time) / 3L)
+                    ((nextDayPrayerTimes.fajr.toDate().time - localMaghrib.time) / 3L)
             mapOf(
                 "IMSAK" to Date(localFajr.time - TimeUnit.MINUTES.toMillis(10)),
                 "SUNRISE" to normalizeLocalTime(localPrayerTimes.sunrise.toDate()),
@@ -862,7 +899,10 @@ class PrayerTimeRepository(
                 return ApiRequestResult.Failure("invalid_json", false)
             }
             if (response.code != 200) return ApiRequestResult.Failure("api_code_${response.code ?: "missing"}", false)
-            if (response.status != "OK") return ApiRequestResult.Failure("api_status_${response.status ?: "missing"}", false)
+            if (response.status != "OK") return ApiRequestResult.Failure(
+                "api_status_${response.status ?: "missing"}",
+                false
+            )
             val timings = response.data?.timings ?: return ApiRequestResult.Failure("missing_timings", false)
             val responseDate = response.data.date?.gregorian?.date
                 ?: return ApiRequestResult.Failure("missing_date", false)
@@ -937,8 +977,7 @@ class PrayerTimeRepository(
 
     private companion object {
         const val TAG = "ImanTimes"
-        const val ACTION_PRAYER_TIMES_RETRY = "com.imn.iman.action.PRAYER_TIMES_RETRY"
-        const val RETRY_RESCHEDULE_REQUEST_CODE = 0x50525452
+
         const val FORCED_RETRY_DEBOUNCE_MS = 10_000L
         const val KEY_LAST_VALID_LAT = "last_valid_lat"
         const val KEY_LAST_VALID_LNG = "last_valid_lng"

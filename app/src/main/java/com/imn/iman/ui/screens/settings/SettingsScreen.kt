@@ -19,6 +19,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,7 +31,8 @@ import com.imn.iman.R
 import com.imn.iman.i18n.LocaleHelper
 import com.imn.iman.i18n.SUPPORTED_LANGUAGES
 import com.imn.iman.notifications.PrayerNotificationScheduler
-import com.imn.iman.widget.PrayerWidgetProvider
+import com.imn.iman.widget.WidgetRefresher
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,6 +48,7 @@ fun SettingsScreen(
 ) {
 
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     val activity = remember(context) {
         var current = context
         while (current !is Activity && current is ContextWrapper) current = current.baseContext
@@ -55,7 +58,7 @@ fun SettingsScreen(
     val showLanguageDialog = remember { mutableStateOf(false) }
     val systemDefaultLabel = stringResource(R.string.language_system_default)
     val languageOptions = listOf("system" to systemDefaultLabel) +
-        SUPPORTED_LANGUAGES.map { it.tag to it.nativeName }
+            SUPPORTED_LANGUAGES.map { it.tag to it.nativeName }
     val selectedLanguageName = languageOptions
         .firstOrNull { it.first == selectedLanguageTag.value }
         ?.second ?: systemDefaultLabel
@@ -66,7 +69,7 @@ fun SettingsScreen(
         activity?.let { LocaleHelper.apply(it, tag) }
         onLanguageChanged()
         val appContext = context.applicationContext
-        PrayerWidgetProvider.forceWidgetRefresh(appContext)
+        coroutineScope.launch { WidgetRefresher.refreshAll(appContext, "language") }
         PrayerNotificationScheduler.syncInApplicationScope(appContext)
     }
 

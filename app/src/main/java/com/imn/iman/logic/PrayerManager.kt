@@ -1,4 +1,5 @@
 @file:OptIn(kotlin.time.ExperimentalTime::class)
+
 package com.imn.iman.logic
 
 import com.batoulapps.adhan2.Coordinates
@@ -91,7 +92,10 @@ class PrayerManager(
                     val nextTime = if (nextTodayName != null) {
                         effectiveTimes[nextTodayName]
                     } else {
-                        val tomorrow = Date(date.time + 86400000L)
+                        val tomorrow = Date.from(
+                            java.time.LocalDate.ofInstant(date.toInstant(), java.time.ZoneId.systemDefault())
+                                .plusDays(1).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
+                        )
                         val tomorrowTimes = prayerRepository.getEffectivePrayerDateTimes(tomorrow, settings)
                         tomorrowTimes["Fajr"]?.let { Instant.fromEpochMilliseconds(it.time) }
                     }
@@ -102,12 +106,14 @@ class PrayerManager(
                     }
                     val nextPrayer = nextTodayName ?: "Fajr"
 
-                    emit(PrayerState(
-                        current = normalizePrayerName(currentName),
-                        next = normalizePrayerName(nextPrayer),
-                        nextPrayerTime = nextTime,
-                        allPrayers = timings
-                    ))
+                    emit(
+                        PrayerState(
+                            current = normalizePrayerName(currentName),
+                            next = normalizePrayerName(nextPrayer),
+                            nextPrayerTime = nextTime,
+                            allPrayers = timings
+                        )
+                    )
 
                     val delayDurationMs = nextTime.toEpochMilliseconds() - nowMs
                     if (delayDurationMs > 0L) {

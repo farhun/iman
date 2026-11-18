@@ -63,6 +63,8 @@ import com.imn.iman.data.local.TasbeehDatabase
 import com.imn.iman.i18n.LocaleHelper
 import com.imn.iman.notifications.PrayerNotificationScheduler
 import com.imn.iman.notifications.toPrayerNotificationScheduleConfig
+import com.imn.iman.widget.WidgetRefresher
+import com.imn.iman.worker.PrayerRefreshWork
 import com.imn.iman.ui.components.PillNavBar
 import com.imn.iman.ui.components.ReleaseNotesDialog
 import com.imn.iman.ui.navigation.*
@@ -162,7 +164,7 @@ class MainActivity : ComponentActivity() {
     private fun disableReminderNotificationsIfPermissionsMissing() {
         val notificationsAllowed = NotificationManagerCompat.from(this).areNotificationsEnabled()
         val exactAlarmsAllowed = Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
-            getSystemService(AlarmManager::class.java)?.canScheduleExactAlarms() == true
+                getSystemService(AlarmManager::class.java)?.canScheduleExactAlarms() == true
         if (!notificationsAllowed || !exactAlarmsAllowed) {
             lifecycleScope.launch { settingsRepository.disableAllReminderNotifications() }
         }
@@ -232,7 +234,9 @@ class MainActivity : ComponentActivity() {
                 .map { settings -> settings.toPrayerNotificationScheduleConfig() to settings }
                 .distinctUntilChanged { old, new -> old.first == new.first }
                 .collect { (_, settings) ->
+                    PrayerRefreshWork.enqueueIfNeeded(applicationContext, settings)
                     prayerNotificationScheduler.syncNotifications(settings, retryNow = true)
+                    WidgetRefresher.refreshAll(applicationContext, "settings")
                 }
         }
 
@@ -296,59 +300,66 @@ class MainActivity : ComponentActivity() {
                 pureBlack = settings.pureBlack,
                 colorSeed = settings.colorSeed
             ) {
-            if (showFirstLocationExplanation) {
-                AlertDialog(
-                    onDismissRequest = {
-                        showFirstLocationExplanation = false
-                        showFirstLocationDeniedDialog = true
-                    },
-                    title = { Text(stringResource(R.string.settings_location_access_title)) },
-                    text = { Text(stringResource(R.string.settings_location_access_message)) },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            showFirstLocationExplanation = false
-                            getSharedPreferences(LOCATION_PREFS, MODE_PRIVATE).edit()
-                                .putBoolean(LOCATION_REQUESTED, true).apply()
-                            firstLaunchLocationRequest = true
-                            locationPermissionLauncher.launch(
-                                arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
-                            )
-                        }) { Text(stringResource(R.string.settings_update_continue)) }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = {
+                if (showFirstLocationExplanation) {
+                    AlertDialog(
+                        onDismissRequest = {
                             showFirstLocationExplanation = false
                             showFirstLocationDeniedDialog = true
-                        }) { Text(stringResource(R.string.settings_not_now)) }
-                    }
-                )
-            }
-            if (showFirstLocationDeniedDialog) {
-                AlertDialog(
-                    onDismissRequest = { showFirstLocationDeniedDialog = false },
-                    title = { Text(stringResource(R.string.settings_location_permission_denied)) },
-                    text = { Text(stringResource(R.string.settings_location_permission_denied_message)) },
-                    confirmButton = {
-                        TextButton(onClick = { showFirstLocationDeniedDialog = false }) { Text(stringResource(R.string.common_got_it)) }
-                    }
-                )
-            }
-            if (showLocationServicesDialog) {
-                AlertDialog(
-                    onDismissRequest = { showLocationServicesDialog = false },
-                    title = { Text(stringResource(R.string.settings_enable_device_location)) },
-                    text = { Text(stringResource(R.string.settings_enable_device_location_message)) },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            showLocationServicesDialog = false
-                            startActivity(android.content.Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-                        }) { Text(stringResource(R.string.settings_open_location_settings)) }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showLocationServicesDialog = false }) { Text(stringResource(R.string.settings_not_now)) }
-                    }
-                )
-            }
+                        },
+                        title = { Text(stringResource(R.string.settings_location_access_title)) },
+                        text = { Text(stringResource(R.string.settings_location_access_message)) },
+                        confirmButton = {
+                            TextButton(onClick = {
+                                showFirstLocationExplanation = false
+                                getSharedPreferences(LOCATION_PREFS, MODE_PRIVATE).edit()
+                                    .putBoolean(LOCATION_REQUESTED, true).apply()
+                                firstLaunchLocationRequest = true
+                                locationPermissionLauncher.launch(
+                                    arrayOf(
+                                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                                        Manifest.permission.ACCESS_FINE_LOCATION
+                                    )
+                                )
+                            }) { Text(stringResource(R.string.settings_update_continue)) }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = {
+                                showFirstLocationExplanation = false
+                                showFirstLocationDeniedDialog = true
+                            }) { Text(stringResource(R.string.settings_not_now)) }
+                        }
+                    )
+                }
+                if (showFirstLocationDeniedDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showFirstLocationDeniedDialog = false },
+                        title = { Text(stringResource(R.string.settings_location_permission_denied)) },
+                        text = { Text(stringResource(R.string.settings_location_permission_denied_message)) },
+                        confirmButton = {
+                            TextButton(onClick = {
+                                showFirstLocationDeniedDialog = false
+                            }) { Text(stringResource(R.string.common_got_it)) }
+                        }
+                    )
+                }
+                if (showLocationServicesDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showLocationServicesDialog = false },
+                        title = { Text(stringResource(R.string.settings_enable_device_location)) },
+                        text = { Text(stringResource(R.string.settings_enable_device_location_message)) },
+                        confirmButton = {
+                            TextButton(onClick = {
+                                showLocationServicesDialog = false
+                                startActivity(android.content.Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                            }) { Text(stringResource(R.string.settings_open_location_settings)) }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = {
+                                showLocationServicesDialog = false
+                            }) { Text(stringResource(R.string.settings_not_now)) }
+                        }
+                    )
+                }
             }
 
             val view = LocalView.current
@@ -725,8 +736,6 @@ private fun ImanApp(
                             )
                         }
                     }
-
-
 
 
                 }

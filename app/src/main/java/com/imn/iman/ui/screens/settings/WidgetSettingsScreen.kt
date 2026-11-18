@@ -43,7 +43,8 @@ import com.imn.iman.i18n.prayerLabel
 import com.imn.iman.data.repository.SettingsRepository
 import com.imn.iman.data.repository.UserSettings
 import com.imn.iman.data.repository.WidgetVisibilityItems
-import com.imn.iman.widget.PrayerWidgetProvider
+import com.imn.iman.widget.WidgetRefresher
+import com.imn.iman.ui.components.BackgroundHelpCard
 import kotlinx.coroutines.launch
 import com.imn.iman.ui.theme.PlusJakartaSans
 import kotlin.math.atan2
@@ -75,13 +76,13 @@ fun WidgetSettingsScreen(
     val setWidgetItemVisibility: (String, Boolean) -> Unit = { item, visible ->
         scope.launch {
             widgetSettingsRepository.updateWidgetItemVisibility(item, visible)
-            PrayerWidgetProvider.forceWidgetRefresh(context)
+            WidgetRefresher.refreshAll(context, "widget_visibility")
         }
     }
     val setWidgetIndicatorColor: (String) -> Unit = { color ->
         scope.launch {
             widgetSettingsRepository.updateWidgetIndicatorColor(color)
-            PrayerWidgetProvider.forceWidgetRefresh(context)
+            WidgetRefresher.refreshAll(context, "widget_indicator_color")
         }
     }
 
@@ -126,13 +127,22 @@ fun WidgetSettingsScreen(
                 ) {
                     setWidgetItemVisibility(WidgetVisibilityItems.GREGORIAN_DATE, it)
                 }
-                WidgetVisibilityToggle(stringResource(R.string.widget_hijri_date), WidgetVisibilityItems.HIJRI_DATE !in settings.hiddenWidgetItems) {
+                WidgetVisibilityToggle(
+                    stringResource(R.string.widget_hijri_date),
+                    WidgetVisibilityItems.HIJRI_DATE !in settings.hiddenWidgetItems
+                ) {
                     setWidgetItemVisibility(WidgetVisibilityItems.HIJRI_DATE, it)
                 }
-                WidgetVisibilityToggle(stringResource(R.string.settings_location), WidgetVisibilityItems.LOCATION !in settings.hiddenWidgetItems) {
+                WidgetVisibilityToggle(
+                    stringResource(R.string.settings_location),
+                    WidgetVisibilityItems.LOCATION !in settings.hiddenWidgetItems
+                ) {
                     setWidgetItemVisibility(WidgetVisibilityItems.LOCATION, it)
                 }
-                WidgetVisibilityToggle(stringResource(R.string.widget_countdown), WidgetVisibilityItems.COUNTDOWN !in settings.hiddenWidgetItems) {
+                WidgetVisibilityToggle(
+                    stringResource(R.string.widget_countdown),
+                    WidgetVisibilityItems.COUNTDOWN !in settings.hiddenWidgetItems
+                ) {
                     setWidgetItemVisibility(WidgetVisibilityItems.COUNTDOWN, it)
                 }
                 WidgetVisibilityToggle(
@@ -144,13 +154,19 @@ fun WidgetSettingsScreen(
                 WidgetVisibilityToggle(prayerLabel("Fajr"), WidgetVisibilityItems.FAJR !in settings.hiddenWidgetItems) {
                     setWidgetItemVisibility(WidgetVisibilityItems.FAJR, it)
                 }
-                WidgetVisibilityToggle(prayerLabel("Dhuhr"), WidgetVisibilityItems.DHUHR !in settings.hiddenWidgetItems) {
+                WidgetVisibilityToggle(
+                    prayerLabel("Dhuhr"),
+                    WidgetVisibilityItems.DHUHR !in settings.hiddenWidgetItems
+                ) {
                     setWidgetItemVisibility(WidgetVisibilityItems.DHUHR, it)
                 }
                 WidgetVisibilityToggle(prayerLabel("Asr"), WidgetVisibilityItems.ASR !in settings.hiddenWidgetItems) {
                     setWidgetItemVisibility(WidgetVisibilityItems.ASR, it)
                 }
-                WidgetVisibilityToggle(prayerLabel("Maghrib"), WidgetVisibilityItems.MAGHRIB !in settings.hiddenWidgetItems) {
+                WidgetVisibilityToggle(
+                    prayerLabel("Maghrib"),
+                    WidgetVisibilityItems.MAGHRIB !in settings.hiddenWidgetItems
+                ) {
                     setWidgetItemVisibility(WidgetVisibilityItems.MAGHRIB, it)
                 }
                 WidgetVisibilityToggle(prayerLabel("Isha"), WidgetVisibilityItems.ISHA !in settings.hiddenWidgetItems) {
@@ -329,6 +345,7 @@ fun WidgetSettingsScreen(
                 }
             }
 
+            BackgroundHelpCard(Modifier.padding(horizontal = 16.dp))
             Spacer(Modifier.height(32.dp))
         }
     }
@@ -567,7 +584,11 @@ fun AdvancedColorPickerSheet(
                     onClick = onResetToDefault,
                     modifier = Modifier.fillMaxWidth().height(48.dp),
                 ) {
-                    Text(stringResource(R.string.tasbih_reset_to_default), color = Color.Gray, fontFamily = PlusJakartaSans)
+                    Text(
+                        stringResource(R.string.tasbih_reset_to_default),
+                        color = Color.Gray,
+                        fontFamily = PlusJakartaSans
+                    )
                 }
             }
 
@@ -744,7 +765,11 @@ private fun WidgetPreview(settings: UserSettings) {
         Triple(WidgetVisibilityItems.FAJR, prayerLabel("Fajr"), stringResource(R.string.widget_preview_fajr_time)),
         Triple(WidgetVisibilityItems.DHUHR, prayerLabel("Dhuhr"), stringResource(R.string.widget_preview_dhuhr_time)),
         Triple(WidgetVisibilityItems.ASR, prayerLabel("Asr"), stringResource(R.string.widget_preview_asr_time)),
-        Triple(WidgetVisibilityItems.MAGHRIB, prayerLabel("Maghrib"), stringResource(R.string.widget_preview_maghrib_time)),
+        Triple(
+            WidgetVisibilityItems.MAGHRIB,
+            prayerLabel("Maghrib"),
+            stringResource(R.string.widget_preview_maghrib_time)
+        ),
         Triple(WidgetVisibilityItems.ISHA, prayerLabel("Isha"), stringResource(R.string.widget_preview_isha_time))
     ).filter { it.first !in hidden }
 
@@ -761,11 +786,21 @@ private fun WidgetPreview(settings: UserSettings) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Star, null, tint = fontColor, modifier = Modifier.size(12.dp))
                         Spacer(Modifier.width(4.dp))
-                        Text(stringResource(R.string.widget_preview_gregorian_date), color = fontColor, fontSize = 11.sp, fontFamily = PlusJakartaSans)
+                        Text(
+                            stringResource(R.string.widget_preview_gregorian_date),
+                            color = fontColor,
+                            fontSize = 11.sp,
+                            fontFamily = PlusJakartaSans
+                        )
                     }
                 }
                 Spacer(Modifier.weight(1f))
-                if (showHijri) Text(stringResource(R.string.widget_preview_hijri_date), color = fontColor, fontSize = 11.sp, fontFamily = PlusJakartaSans)
+                if (showHijri) Text(
+                    stringResource(R.string.widget_preview_hijri_date),
+                    color = fontColor,
+                    fontSize = 11.sp,
+                    fontFamily = PlusJakartaSans
+                )
             }
         }
 
@@ -779,7 +814,12 @@ private fun WidgetPreview(settings: UserSettings) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.MyLocation, null, tint = subFontColor, modifier = Modifier.size(12.dp))
                         Spacer(Modifier.width(4.dp))
-                        Text(stringResource(R.string.widget_preview_location), color = subFontColor, fontSize = 10.sp, fontFamily = PlusJakartaSans)
+                        Text(
+                            stringResource(R.string.widget_preview_location),
+                            color = subFontColor,
+                            fontSize = 10.sp,
+                            fontFamily = PlusJakartaSans
+                        )
                     }
                 }
                 Spacer(Modifier.weight(1f))
@@ -793,7 +833,12 @@ private fun WidgetPreview(settings: UserSettings) {
                         )
                         if (showCountdown) {
                             if (showNextPrayer) Spacer(Modifier.width(4.dp))
-                            Text(stringResource(R.string.widget_preview_countdown), color = subFontColor, fontSize = 10.sp, fontFamily = PlusJakartaSans)
+                            Text(
+                                stringResource(R.string.widget_preview_countdown),
+                                color = subFontColor,
+                                fontSize = 10.sp,
+                                fontFamily = PlusJakartaSans
+                            )
                         }
                     }
                 }

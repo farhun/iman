@@ -17,7 +17,7 @@ import com.imn.iman.data.repository.TimesSource
 import com.imn.iman.logic.PrayerManager
 import com.imn.iman.notifications.PrayerNotificationScheduler
 import com.imn.iman.ui.screens.settings.SettingsViewModel
-import com.imn.iman.widget.PrayerWidgetProvider
+import com.imn.iman.widget.WidgetRefresher
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -343,7 +343,7 @@ class HomeViewModel(
             } finally {
                 settingsViewModel.ensureLocationName()
                 try {
-                    PrayerWidgetProvider.forceWidgetRefresh(appContext)
+                    WidgetRefresher.refreshAll(appContext, "home_refresh")
                 } catch (cancelled: CancellationException) {
                     throw cancelled
                 } catch (error: Exception) {

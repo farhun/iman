@@ -76,6 +76,9 @@
     <string name="settings_appearance_summary">Tema, warna, dan layar awal</string>
     <string name="widget_title">Widget</string>
     <string name="widget_settings_summary">Latar belakang kustom dan transparansi</string>
+    <string name="settings_background_help_title">Widget gagal diperbarui?</string>
+    <string name="settings_background_help_body">Beberapa ponsel (seperti Xiaomi, Samsung, Oppo, Vivo, Huawei, dll) membatasi aplikasi yang berjalan di latar belakang. Izinkan Iman berjalan di latar belakang agar widget dan pengingat tetap diperbarui tepat waktu.</string>
+    <string name="settings_background_help_button">Lihat panduan</string>
 
     <string name="settings_tasbih_screen">Layar Tasbih</string>
     <string name="settings_tasbih_screen_summary">Sesuaikan layar dan kanvas tasbih</string>

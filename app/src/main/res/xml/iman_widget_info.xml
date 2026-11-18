@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+ enforces a 30-minute minimum; this is a safety net. -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:initialLayout="@layout/widget_prayer_times"
     android:minWidth="250dp"
     android:minHeight="110dp"
     android:resizeMode="horizontal|vertical"
-    android:updatePeriodMillis="900000"
+    android:updatePeriodMillis="1800000"
     android:widgetCategory="home_screen" />
