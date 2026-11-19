@@ -381,6 +381,7 @@ fun QuranReaderScreen(
     var readingMode by remember { mutableStateOf("verse_by_verse") }
     val bookmarkAddedMessage = stringResource(R.string.quran_bookmark_added)
     val bookmarkRemovedMessage = stringResource(R.string.quran_bookmark_removed)
+    val shareViaLabel = stringResource(R.string.quran_share_via)
 
     LaunchedEffect(surahNumber, settings.selectedTranslationLang) {
         viewModel.loadChapters()
@@ -663,7 +664,22 @@ fun QuranReaderScreen(
                                                     if (isBookmarked) bookmarkRemovedMessage else bookmarkAddedMessage
                                                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                                             },
-
+                                            onShareClick = { ayah ->
+                                                val shareIntent = android.content.Intent().apply {
+                                                    action = android.content.Intent.ACTION_SEND
+                                                    type = "text/plain"
+                                                    putExtra(
+                                                        android.content.Intent.EXTRA_TEXT,
+                                                        "${ayah.textUthmani ?: ""}\n\n— ${ayah.display}"
+                                                    )
+                                                }
+                                                context.startActivity(
+                                                    android.content.Intent.createChooser(
+                                                        shareIntent,
+                                                        shareViaLabel
+                                                    )
+                                                )
+                                            }
                                         )
                                         val ayahAudioError = audioState as? QuranAudioViewModel.AudioState.Error
                                         if (playingAyahIndex == index && ayahAudioError != null) {

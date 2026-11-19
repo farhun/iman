@@ -93,6 +93,7 @@ fun BlockRenderer(
     onBlockClick: (ContentBlock) -> Unit = {},
     onPlayClick: ((ContentBlock) -> Unit)? = null,
     onBookmarkClick: ((ContentBlock) -> Unit)? = null,
+    onShareClick: ((AyahBlock) -> Unit)? = null,
     source: ContentSource = ContentSource.QF,
     readingMode: String = "verse_by_verse",
     modifier: Modifier = Modifier,
@@ -117,6 +118,8 @@ fun BlockRenderer(
             source = source,
             onPlayClick = { onPlayClick?.invoke(block) },
             onBookmarkClick = { onBookmarkClick?.invoke(block) },
+            onShareClick = { onShareClick?.invoke(block) },
+            onMoreClick = { onBlockClick(block) },
             modifier = modifier.clickable { onBlockClick(block) }
         )
 
@@ -193,6 +196,8 @@ private fun AyahBlockView(
     source: ContentSource = ContentSource.QF,
     onPlayClick: () -> Unit,
     onBookmarkClick: () -> Unit,
+    onShareClick: () -> Unit,
+    onMoreClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val isReadingMode = readingMode == "reading"
@@ -357,7 +362,7 @@ private fun AyahBlockView(
                         modifier = Modifier.size(17.dp)
                     )
                 }
-                IconButton(onClick = {}, modifier = Modifier.size(32.dp)) {
+                IconButton(onClick = onShareClick, modifier = Modifier.size(32.dp)) {
                     Icon(
                         Icons.Default.Share,
                         contentDescription = stringResource(R.string.quran_share),
@@ -365,7 +370,7 @@ private fun AyahBlockView(
                         modifier = Modifier.size(17.dp)
                     )
                 }
-                IconButton(onClick = {}, modifier = Modifier.size(32.dp)) {
+                IconButton(onClick = onMoreClick, modifier = Modifier.size(32.dp)) {
                     Icon(
                         Icons.Default.MoreVert,
                         contentDescription = stringResource(R.string.quran_more_content_description),

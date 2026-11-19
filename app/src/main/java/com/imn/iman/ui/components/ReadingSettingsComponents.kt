@@ -178,21 +178,17 @@ fun ReadingSettingsSheet(
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
                                     text = if (settings.selectedScript == "indopak")
-                                        "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِیْمِ "
+                                        "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِیْمِ"
                                     else "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
-                                    fontFamily = rememberArabicScriptFontFamily(settings.selectedScript, availableQuranScripts),
+                                    fontFamily = rememberArabicScriptFontFamily(
+                                        settings.selectedScript,
+                                        availableQuranScripts
+                                    ),
                                     fontSize = settings.arabicSizeSp.sp,
                                     color = MaterialTheme.colorScheme.onSurface,
                                     textAlign = TextAlign.Center
                                 )
-                                if (settings.selectedScript == "indopak") {
-                                    Text(
-                                        text = "1:1",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        fontFamily = PlusJakartaSans,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.55f)
-                                    )
-                                }
+
                             }
                         }
                         if (settings.showTranslation) {
@@ -255,95 +251,122 @@ fun ReadingSettingsSheet(
                             }
 
                             item {
-                                SettingToggle(label = stringResource(R.string.quran_keep_screen_on), checked = settings.readingKeepScreenOn, onCheckedChange = onKeepScreenOnChange)
+                                SettingToggle(
+                                    label = stringResource(R.string.quran_keep_screen_on),
+                                    checked = settings.readingKeepScreenOn,
+                                    onCheckedChange = onKeepScreenOnChange
+                                )
                             }
                         }
+
                         1 -> { // Text & Translation
                             if (!isQuranContext) {
                                 item { Spacer(Modifier.height(1.dp)) }
                             } else {
-                            item {
-                                val context = LocalContext.current
-                                val currentMeta = remember(settings.selectedTranslationLang) {
-                                    CatalogRepository.translations(context).find { it.id == settings.selectedTranslationLang }
-                                }
-                                val langLabel = currentMeta?.let { "${it.langCode.uppercase()} • ${it.translatorName}" }
-                                    ?: if (settings.selectedTranslationLang.isBlank()) stringResource(R.string.quran_translation_none)
-                                    else stringResource(R.string.quran_translation_select)
+                                item {
+                                    val context = LocalContext.current
+                                    val currentMeta = remember(settings.selectedTranslationLang) {
+                                        CatalogRepository.translations(context)
+                                            .find { it.id == settings.selectedTranslationLang }
+                                    }
+                                    val langLabel =
+                                        currentMeta?.let { "${it.langCode.uppercase()} • ${it.translatorName}" }
+                                            ?: if (settings.selectedTranslationLang.isBlank()) stringResource(R.string.quran_translation_none)
+                                            else stringResource(R.string.quran_translation_select)
 
-                                SettingLabel(stringResource(R.string.quran_active_translation))
-                                Spacer(Modifier.height(12.dp))
-                                Button(
-                                    onClick = onOpenTranslationPicker,
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(12.dp),
-                                    contentPadding = PaddingValues(14.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                                    )
-                                ) {
-                                    Row(
+                                    SettingLabel(stringResource(R.string.quran_active_translation))
+                                    Spacer(Modifier.height(12.dp))
+                                    Button(
+                                        onClick = onOpenTranslationPicker,
                                         modifier = Modifier.fillMaxWidth(),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                        shape = RoundedCornerShape(12.dp),
+                                        contentPadding = PaddingValues(14.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                        )
                                     ) {
-                                        Icon(Icons.Default.Language, null, modifier = Modifier.size(20.dp))
-                                        Text(langLabel, style = MaterialTheme.typography.bodyLarge, fontFamily = PlusJakartaSans, fontWeight = FontWeight.SemiBold)
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                        ) {
+                                            Icon(Icons.Default.Language, null, modifier = Modifier.size(20.dp))
+                                            Text(
+                                                langLabel,
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                fontFamily = PlusJakartaSans,
+                                                fontWeight = FontWeight.SemiBold
+                                            )
+                                        }
                                     }
                                 }
-                            }
 
-                            item {
-                                SettingLabel(stringResource(R.string.quran_script_style))
-                                Spacer(Modifier.height(12.dp))
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    listOf("uthmani", "indopak").forEach { value ->
-                                        ScriptPreviewCard(
-                                            label = quranScriptLabel(value),
-                                            selected = settings.selectedScript == value,
-                                            onClick = { onScriptChange(value) },
-                                            modifier = Modifier.weight(1f)
+                                item {
+                                    SettingLabel(stringResource(R.string.quran_script_style))
+                                    Spacer(Modifier.height(12.dp))
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        listOf("uthmani", "indopak").forEach { value ->
+                                            ScriptPreviewCard(
+                                                label = quranScriptLabel(value),
+                                                selected = settings.selectedScript == value,
+                                                onClick = { onScriptChange(value) },
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                        }
+                                    }
+                                }
+
+                                item {
+                                    SettingLabel(
+                                        stringResource(
+                                            R.string.quran_arabic_text_size,
+                                            settings.arabicSizeSp.toInt()
+                                        )
+                                    )
+                                    Slider(
+                                        value = settings.arabicSizeSp,
+                                        onValueChange = onArabicSizeChange,
+                                        valueRange = 16f..64f,
+                                        steps = 11 // 16,20,24,28,32,36,40,44,48,52,56,60,64
+                                    )
+                                }
+
+                                if (settings.showTranslation) {
+                                    item {
+                                        SettingLabel(
+                                            stringResource(
+                                                R.string.quran_translation_size,
+                                                settings.translationSizeSp.toInt()
+                                            )
+                                        )
+                                        Slider(
+                                            value = settings.translationSizeSp,
+                                            onValueChange = onTranslationSizeChange,
+                                            valueRange = 12f..28f,
+                                            steps = 7
+                                        )
+                                    }
+                                }
+
+                                item {
+                                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+                                    Spacer(Modifier.height(12.dp))
+                                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+
+                                        SettingToggle(
+                                            label = stringResource(R.string.quran_show_translation),
+                                            checked = settings.showTranslation,
+                                            onCheckedChange = onShowTranslationChange
                                         )
                                     }
                                 }
                             }
-
-                            item {
-                                SettingLabel(stringResource(R.string.quran_arabic_text_size, settings.arabicSizeSp.toInt()))
-                                Slider(
-                                    value = settings.arabicSizeSp,
-                                    onValueChange = onArabicSizeChange,
-                                    valueRange = 16f..64f,
-                                    steps = 11 // 16,20,24,28,32,36,40,44,48,52,56,60,64
-                                )
-                            }
-
-                            if (settings.showTranslation) {
-                                item {
-                                    SettingLabel(stringResource(R.string.quran_translation_size, settings.translationSizeSp.toInt()))
-                                    Slider(
-                                        value = settings.translationSizeSp,
-                                        onValueChange = onTranslationSizeChange,
-                                        valueRange = 12f..28f,
-                                        steps = 7
-                                    )
-                                }
-                            }
-
-                            item {
-                                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
-                                Spacer(Modifier.height(12.dp))
-                                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-
-                                    SettingToggle(label = stringResource(R.string.quran_show_translation), checked = settings.showTranslation, onCheckedChange = onShowTranslationChange)
-                                }
-                            }
-                            }
                         }
+
                         2 -> { // Audio
                             if (isQuranContext) item {
                                 val reciters = remember { ReciterMeta.everyayahDefaults() }
@@ -356,13 +379,18 @@ fun ReadingSettingsSheet(
                                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                     reciters.forEach { reciter ->
                                         val isSelected = settings.selectedReciterId == reciter.id ||
-                                            settings.selectedReciterId == reciter.id.removePrefix("everyayah_")
+                                                settings.selectedReciterId == reciter.id.removePrefix("everyayah_")
 
                                         Surface(
                                             onClick = { onReciterChange(reciter.id) },
                                             shape = RoundedCornerShape(12.dp),
-                                            color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f) else Color.Transparent,
-                                            border = if (isSelected) BorderStroke(1.dp, MaterialTheme.colorScheme.primary) else null
+                                            color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(
+                                                alpha = 0.4f
+                                            ) else Color.Transparent,
+                                            border = if (isSelected) BorderStroke(
+                                                1.dp,
+                                                MaterialTheme.colorScheme.primary
+                                            ) else null
                                         ) {
                                             Row(
                                                 modifier = Modifier.fillMaxWidth().padding(12.dp),
@@ -372,7 +400,9 @@ fun ReadingSettingsSheet(
                                                 Icon(
                                                     imageVector = if (isSelected) Icons.Default.RadioButtonChecked else Icons.Default.RadioButtonUnchecked,
                                                     contentDescription = null,
-                                                    tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                                    tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                                        alpha = 0.6f
+                                                    )
                                                 )
                                                 Column {
                                                     Text(
@@ -487,35 +517,31 @@ fun ScriptPreviewCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val borderColor = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent
-    val containerBg = if (selected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceContainerHigh
-    val contentColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+    val contentColor = MaterialTheme.colorScheme.onSurfaceVariant
 
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.05f) else Color.Transparent)
-            .clickable(onClick = onClick)
             .padding(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Surface(
+            onClick = onClick,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(60.dp)
-                .border(2.dp, borderColor, RoundedCornerShape(10.dp)),
+                .height(60.dp),
             shape = RoundedCornerShape(10.dp),
-            color = containerBg,
-            shadowElevation = 1.dp
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            border = if (selected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Text(
                     text = label,
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.labelLarge,
                     fontFamily = PlusJakartaSans,
                     color = contentColor,
-                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                    fontWeight = FontWeight.Normal
                 )
             }
         }
@@ -605,8 +631,12 @@ fun TranslationPickerSheet(
 
                 if (isDownloading) {
                     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-                        Text(stringResource(R.string.settings_update_downloading), style = MaterialTheme.typography.bodyMedium,
-                            fontFamily = PlusJakartaSans, color = MaterialTheme.colorScheme.primary)
+                        Text(
+                            stringResource(R.string.settings_update_downloading),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontFamily = PlusJakartaSans,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                         Spacer(Modifier.height(6.dp))
                         LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
                         Spacer(Modifier.height(12.dp))
@@ -620,7 +650,7 @@ fun TranslationPickerSheet(
                             onClick = { if (!isDownloading) onSelectNone() },
                             shape = RoundedCornerShape(12.dp),
                             color = if (isNoneSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
-                                    else Color.Transparent,
+                            else Color.Transparent,
                             border = if (isNoneSelected) BorderStroke(1.dp, MaterialTheme.colorScheme.primary) else null
                         ) {
                             Row(
@@ -628,18 +658,27 @@ fun TranslationPickerSheet(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
-                                Text(stringResource(R.string.quran_translation_none), style = MaterialTheme.typography.bodyLarge,
+                                Text(
+                                    stringResource(R.string.quran_translation_none),
+                                    style = MaterialTheme.typography.bodyLarge,
                                     fontFamily = PlusJakartaSans,
-                                    fontWeight = if (isNoneSelected) FontWeight.Bold else FontWeight.Normal)
-                                if (isNoneSelected) Icon(Icons.Default.Check, null, tint = MaterialTheme.colorScheme.primary)
+                                    fontWeight = if (isNoneSelected) FontWeight.Bold else FontWeight.Normal
+                                )
+                                if (isNoneSelected) Icon(
+                                    Icons.Default.Check,
+                                    null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
                             }
                         }
                     }
                     visibleCatalog.forEach { (lang, translations) ->
                         item {
-                            Text(lang, style = MaterialTheme.typography.labelLarge,
+                            Text(
+                                lang, style = MaterialTheme.typography.labelLarge,
                                 fontFamily = PlusJakartaSans, color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(top = 8.dp))
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
                         }
                         items(translations) { meta ->
                             val isDownloaded = TranslationRepository.isDownloaded(context, meta.id)
@@ -649,7 +688,7 @@ fun TranslationPickerSheet(
                                 onClick = { if (!isDownloading) onSelect(meta) },
                                 shape = RoundedCornerShape(12.dp),
                                 color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
-                                        else Color.Transparent,
+                                else Color.Transparent,
                                 border = if (isSelected) BorderStroke(1.dp, MaterialTheme.colorScheme.primary) else null
                             ) {
                                 Row(
@@ -658,10 +697,12 @@ fun TranslationPickerSheet(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                 ) {
                                     Column(modifier = Modifier.weight(1f)) {
-                                        Text(meta.translatorName,
+                                        Text(
+                                            meta.translatorName,
                                             style = MaterialTheme.typography.bodyLarge,
                                             fontFamily = PlusJakartaSans,
-                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal)
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                        )
                                         Text(
                                             stringResource(
                                                 if (isDownloaded) R.string.quran_translation_downloaded_status
@@ -674,9 +715,16 @@ fun TranslationPickerSheet(
                                         )
                                     }
                                     when {
-                                        isSelected -> Icon(Icons.Default.Check, null, tint = MaterialTheme.colorScheme.primary)
-                                        !isDownloaded -> Icon(Icons.Default.Download, null,
-                                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
+                                        isSelected -> Icon(
+                                            Icons.Default.Check,
+                                            null,
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+
+                                        !isDownloaded -> Icon(
+                                            Icons.Default.Download, null,
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                        )
                                     }
                                 }
                             }
