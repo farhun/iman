@@ -76,6 +76,7 @@ class SettingsRepository(private val context: Context) {
         val SHOW_LAP_COUNTER = booleanPreferencesKey("show_lap_counter")
 
         val COLOR_SEED = stringPreferencesKey("color_seed")
+        val CUSTOM_ACCENT_COLOR = intPreferencesKey("custom_accent_color")
         val TASBEEH_LIST_MODE = booleanPreferencesKey("tasbeeh_list_mode")
         val STARTUP_TAB = stringPreferencesKey("startup_tab")
         val TASBIH_BACKGROUND_COLOR = stringPreferencesKey("tasbih_background_color")
@@ -295,6 +296,7 @@ class SettingsRepository(private val context: Context) {
                 showLapCounter = preferences[PreferencesKeys.SHOW_LAP_COUNTER] ?: true,
 
                 colorSeed = preferences[PreferencesKeys.COLOR_SEED] ?: "default",
+                customAccentColor = preferences[PreferencesKeys.CUSTOM_ACCENT_COLOR],
                 tasbeehListMode = preferences[PreferencesKeys.TASBEEH_LIST_MODE] ?: true,
                 startupTab = preferences[PreferencesKeys.STARTUP_TAB] ?: "home",
                 tasbihBackgroundColor = preferences[PreferencesKeys.TASBIH_BACKGROUND_COLOR]
@@ -756,7 +758,17 @@ class SettingsRepository(private val context: Context) {
 
 
     suspend fun updateColorSeed(seed: String) {
-        context.dataStore.edit { it[PreferencesKeys.COLOR_SEED] = seed }
+        context.dataStore.edit {
+            it[PreferencesKeys.COLOR_SEED] = seed
+            it.remove(PreferencesKeys.CUSTOM_ACCENT_COLOR)
+        }
+    }
+
+    suspend fun updateCustomAccentColor(color: Int) {
+        context.dataStore.edit {
+            it[PreferencesKeys.CUSTOM_ACCENT_COLOR] = color
+            it[PreferencesKeys.DYNAMIC_COLOR] = false
+        }
     }
 
     suspend fun updateTasbeehListMode(isList: Boolean) {
@@ -951,5 +963,6 @@ data class UserSettings(
     val widgetIndicatorColor: String = "#B0C6FE",
     val widgetBackgroundCornerRadius: Float = 24f,
     val widgetPanelCornerRadius: Float = 24f,
-    val widgetIndicatorCornerRadius: Float = 6f
+    val widgetIndicatorCornerRadius: Float = 6f,
+    val customAccentColor: Int? = null
 )

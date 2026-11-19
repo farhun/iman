@@ -7,9 +7,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -62,7 +62,7 @@ private val extendedColorPalette = listOf(
     "#F1C40F", "#F39C12", "#E67E22", "#D35400", "#C0392B", "#A93226"
 )
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WidgetSettingsScreen(
     viewModel: SettingsViewModel,
@@ -267,22 +267,11 @@ fun WidgetSettingsScreen(
                         }
                     }
                     Spacer(Modifier.height(12.dp))
-                    Box(modifier = Modifier.height(110.dp)) {
-                        LazyVerticalGrid(
-                            columns = GridCells.Adaptive(40.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            items(extendedColorPalette) { hex ->
-                                ColorCircle(
-                                    hex = hex,
-                                    isSelected = settings.widgetIndicatorColor == hex,
-                                    onClick = { setWidgetIndicatorColor(hex) }
-                                )
-                            }
-                        }
-                    }
+                    ColorPaletteRow(
+                        colors = extendedColorPalette,
+                        selectedColor = settings.widgetIndicatorColor,
+                        onColorSelected = setWidgetIndicatorColor
+                    )
                     Spacer(Modifier.height(20.dp))
                     WidgetCornerRadiusSlider(
                         radius = settings.widgetIndicatorCornerRadius,
@@ -321,27 +310,20 @@ fun WidgetSettingsScreen(
                     }
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    FlowRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        extendedColorPalette.take(18).forEach { hex ->
-                            ColorCircle(
-                                hex = hex,
-                                isSelected = settings.widgetFontColor == hex,
-                                onClick = {
-                                    viewModel.updateWidgetCustomization(
-                                        backgroundColor = settings.widgetBackgroundColor,
-                                        backgroundOpacity = settings.widgetBackgroundOpacity,
-                                        panelColor = settings.widgetPanelColor,
-                                        panelOpacity = settings.widgetPanelOpacity,
-                                        fontColor = hex
-                                    )
-                                }
+                    ColorPaletteRow(
+                        colors = extendedColorPalette.take(18),
+                        selectedColor = settings.widgetFontColor,
+                        spacing = 10.dp,
+                        onColorSelected = { hex ->
+                            viewModel.updateWidgetCustomization(
+                                backgroundColor = settings.widgetBackgroundColor,
+                                backgroundOpacity = settings.widgetBackgroundOpacity,
+                                panelColor = settings.widgetPanelColor,
+                                panelOpacity = settings.widgetPanelOpacity,
+                                fontColor = hex
                             )
                         }
-                    }
+                    )
                 }
             }
 
@@ -521,7 +503,7 @@ fun AdvancedColorPickerSheet(
                     val radius = size.minDimension / 2
                     val brush = Brush.sweepGradient(
                         colors = listOf(
-                            Color.Red, Color.Magenta, Color.Blue, Color.Cyan, Color.Green, Color.Yellow, Color.Red
+                            Color.Red, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta, Color.Red
                         )
                     )
                     drawCircle(brush = brush, radius = radius)
@@ -651,22 +633,11 @@ private fun ColorPaletteSlider(
         }
         Spacer(modifier = Modifier.height(12.dp))
 
-        Box(modifier = Modifier.height(110.dp)) {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(40.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(extendedColorPalette) { hex ->
-                    ColorCircle(
-                        hex = hex,
-                        isSelected = selectedColor == hex,
-                        onClick = { onColorChange(hex) }
-                    )
-                }
-            }
-        }
+        ColorPaletteRow(
+            colors = extendedColorPalette,
+            selectedColor = selectedColor,
+            onColorSelected = onColorChange
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -683,6 +654,44 @@ private fun ColorPaletteSlider(
             valueRange = opacityRange,
             modifier = Modifier.fillMaxWidth()
         )
+    }
+}
+
+@Composable
+private fun ColorPaletteRow(
+    colors: List<String>,
+    selectedColor: String,
+    spacing: androidx.compose.ui.unit.Dp = 8.dp,
+    onColorSelected: (String) -> Unit
+) {
+    val listState = rememberLazyListState()
+    val selectedIndex = colors.indexOf(selectedColor)
+
+    LaunchedEffect(selectedIndex) {
+        if (selectedIndex >= 0) {
+            val layoutInfo = listState.layoutInfo
+            val isFullyVisible = layoutInfo.visibleItemsInfo.any { item ->
+                item.index == selectedIndex &&
+                        item.offset >= layoutInfo.viewportStartOffset &&
+                        item.offset + item.size <= layoutInfo.viewportEndOffset
+            }
+            if (!isFullyVisible) listState.animateScrollToItem(selectedIndex)
+        }
+    }
+
+    LazyRow(
+        state = listState,
+        modifier = Modifier.fillMaxWidth().height(40.dp),
+        horizontalArrangement = Arrangement.spacedBy(spacing),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        items(colors) { hex ->
+            ColorCircle(
+                hex = hex,
+                isSelected = selectedColor == hex,
+                onClick = { onColorSelected(hex) }
+            )
+        }
     }
 }
 

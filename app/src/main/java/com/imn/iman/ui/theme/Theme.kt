@@ -14,12 +14,12 @@ import com.materialkolor.PaletteStyle
 // Map for O(1) lookups
 val colorSeeds = mapOf(
     "default" to Color(0xFF293041),
-    "teal"    to Color(0xFF004D40),
-    "green"   to Color(0xFF1B5E20),
-    "amber"   to Color(0xFF795548),
-    "red"     to Color(0xFFB71C1C),
-    "blue"    to Color(0xFF0D47A1),
-    "slate"   to Color(0xFF263238),
+    "teal" to Color(0xFF004D40),
+    "green" to Color(0xFF1B5E20),
+    "amber" to Color(0xFF795548),
+    "red" to Color(0xFFB71C1C),
+
+    "slate" to Color(0xFF263238),
 )
 
 // The fallback for Android 11 or when dynamic is off
@@ -31,6 +31,7 @@ fun ImanTheme(
     dynamicColor: Boolean = false,
     pureBlack: Boolean = false,
     colorSeed: String = "default",
+    customAccentColor: Int? = null,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
@@ -40,9 +41,12 @@ fun ImanTheme(
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
+
         else -> {
             // Use selected seed with TonalSpot for accurate color matching
-            val seedColor = colorSeeds[colorSeed] ?: DefaultSeedColor
+            val seedColor = customAccentColor?.let { Color(it) }
+                ?: colorSeeds[colorSeed]
+                ?: DefaultSeedColor
             dynamicColorScheme(
                 seedColor = seedColor,
                 isDark = darkTheme,
@@ -51,7 +55,8 @@ fun ImanTheme(
             )
         }
     }
-    val neutralScheme = if (darkTheme) androidx.compose.material3.darkColorScheme() else androidx.compose.material3.lightColorScheme()
+    val neutralScheme =
+        if (darkTheme) androidx.compose.material3.darkColorScheme() else androidx.compose.material3.lightColorScheme()
     var colorScheme = neutralScheme.copy(
         primary = generatedColorScheme.primary,
         onPrimary = generatedColorScheme.onPrimary,

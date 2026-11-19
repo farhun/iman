@@ -203,6 +203,10 @@ class SettingsViewModel(
         viewModelScope.launch { repository.updateColorSeed(seed) }
     }
 
+    fun setCustomAccentColor(color: Int) {
+        viewModelScope.launch { repository.updateCustomAccentColor(color) }
+    }
+
     fun setTasbihBackgroundColor(color: String) {
         viewModelScope.launch { repository.updateTasbihBackgroundColor(color) }
     }

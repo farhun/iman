@@ -95,6 +95,7 @@
     <string name="settings_startup_screen">Startup screen</string>
     <string name="settings_startup_screen_summary">Choose which area opens first when Iman launches.</string>
     <string name="settings_color">Color</string>
+    <string name="settings_custom_color">Custom color</string>
     <string name="settings_dynamic_color">Dynamic Color</string>
     <string name="settings_dynamic_color_summary">Sync the accent palette with your wallpaper.</string>
     <string name="settings_pure_amoled_black">Pure AMOLED Black</string>

@@ -299,7 +299,8 @@ class MainActivity : ComponentActivity() {
                 darkTheme = darkTheme,
                 dynamicColor = settings.dynamicColor,
                 pureBlack = settings.pureBlack,
-                colorSeed = settings.colorSeed
+                colorSeed = settings.colorSeed,
+                customAccentColor = settings.customAccentColor
             ) {
                 if (showFirstLocationExplanation) {
                     AlertDialog(
@@ -388,7 +389,8 @@ class MainActivity : ComponentActivity() {
                     darkTheme = darkTheme,
                     dynamicColor = settings.dynamicColor,
                     pureBlack = settings.pureBlack,
-                    colorSeed = settings.colorSeed
+                    colorSeed = settings.colorSeed,
+                    customAccentColor = settings.customAccentColor
                 ) {
                     ImanApp(
                         settingsViewModel = settingsViewModel,

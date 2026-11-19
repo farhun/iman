@@ -102,7 +102,12 @@ private fun contentColor(theme: String): Color {
 }
 
 @Composable
-private fun readingColorScheme(readingTheme: String, dynamicColor: Boolean, colorSeed: String): ColorScheme {
+private fun readingColorScheme(
+    readingTheme: String,
+    dynamicColor: Boolean,
+    colorSeed: String,
+    customAccentColor: Int?,
+): ColorScheme {
     val context = LocalContext.current
     val isSystemDark = androidx.compose.foundation.isSystemInDarkTheme()
     val isDark = when (readingTheme) {
@@ -116,8 +121,11 @@ private fun readingColorScheme(readingTheme: String, dynamicColor: Boolean, colo
     val generatedColorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ->
             if (isDark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+
         else -> dynamicColorScheme(
-            seedColor = colorSeeds[colorSeed] ?: DefaultSeedColor,
+            seedColor = customAccentColor?.let { Color(it) }
+                ?: colorSeeds[colorSeed]
+                ?: DefaultSeedColor,
             isDark = isDark,
             isAmoled = false,
             style = PaletteStyle.TonalSpot,
@@ -248,8 +256,9 @@ fun QuranReaderScreen(
                 val averageSize = visible.sumOf { it.size }.toFloat() / visible.size
                 val contentSize = averageSize * info.totalItemsCount + with(density) { 32.dp.toPx() }
                 val viewport = info.viewportSize.height.toFloat()
-                val position = ((listState.firstVisibleItemIndex * averageSize + listState.firstVisibleItemScrollOffset) /
-                    (contentSize - viewport).coerceAtLeast(1f)).coerceIn(0f, 1f)
+                val position =
+                    ((listState.firstVisibleItemIndex * averageSize + listState.firstVisibleItemScrollOffset) /
+                            (contentSize - viewport).coerceAtLeast(1f)).coerceIn(0f, 1f)
                 position to (viewport / contentSize).coerceIn(0f, 1f)
             }
         }
@@ -356,7 +365,12 @@ fun QuranReaderScreen(
         quranAudioViewModel.setController(media3Controller)
     }
 
-    val scheme = readingColorScheme(settings.readingTheme, settings.dynamicColor, settings.colorSeed)
+    val scheme = readingColorScheme(
+        settings.readingTheme,
+        settings.dynamicColor,
+        settings.colorSeed,
+        settings.customAccentColor,
+    )
 
     var showSettings by remember { mutableStateOf(false) }
     var showTranslationPicker by remember { mutableStateOf(false) }
@@ -498,241 +512,251 @@ fun QuranReaderScreen(
                                 contentPadding = PaddingValues(bottom = 32.dp),
                                 modifier = Modifier.fillMaxSize()
                             ) {
-                            item {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp, vertical = 24.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    surah?.let {
-                                        Text(
-                                            text = it.nameArabic,
-                                            style = MaterialTheme.typography.displaySmall.copy(
-                                                fontFamily = NotoSansArabic,
-                                                color = fg
-                                            ),
-                                            textAlign = TextAlign.Center
-                                        )
-                                        Text(
-                                            text = it.nameSimple,
-                                            style = MaterialTheme.typography.titleMedium.copy(
-                                                color = MaterialTheme.colorScheme.primary,
-                                                fontWeight = FontWeight.Bold
-                                            ),
-                                            modifier = Modifier.padding(top = 8.dp)
-                                        )
-
-                                        Row(
-                                            modifier = Modifier.padding(top = 12.dp),
-                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Surface(
-                                                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
-                                                shape = RoundedCornerShape(12.dp)
-                                            ) {
-                                                Text(
-                                                    text = revelationPlaceLabel(it.revelationPlace).uppercase(),
-                                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                                                    style = MaterialTheme.typography.labelSmall.copy(fontFamily = PlusJakartaSans),
-                                                    color = MaterialTheme.colorScheme.primary
-                                                )
-                                            }
+                                item {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 16.dp, vertical = 24.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        surah?.let {
                                             Text(
-                                                text = pluralStringResource(R.plurals.quran_verse_count, it.versesCount, it.versesCount).uppercase(),
-                                                style = MaterialTheme.typography.labelSmall.copy(fontFamily = PlusJakartaSans),
-                                                color = fg.copy(alpha = 0.6f)
+                                                text = it.nameArabic,
+                                                style = MaterialTheme.typography.displaySmall.copy(
+                                                    fontFamily = NotoSansArabic,
+                                                    color = fg
+                                                ),
+                                                textAlign = TextAlign.Center
                                             )
-                                        }
-
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(vertical = 24.dp),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            HorizontalDivider(
-                                                modifier = Modifier.fillMaxWidth(0.5f),
-                                                color = fg.copy(alpha = 0.15f)
-                                            )
-                                        }
-                                    }
-
-                                    // Show Bismillah for all surahs except At-Tawbah (9)
-                                    // and NOT for Al-Fatihah (1) since bismillah is its first verse
-                                    if (surahNumber != 9 && surahNumber != 1) {
-                                        Spacer(Modifier.height(8.dp))
-                                        Text(
-                                            text = "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ",
-                                            textAlign = TextAlign.Center,
-                                            fontFamily = arabicScriptFontFamily,
-                                            fontSize = 26.sp,
-                                            color = fg.copy(alpha = 0.85f),
-                                            modifier = Modifier.fillMaxWidth()
-                                        )
-                                    }
-                                }
-                            }
-
-                            itemsIndexed(blocks) { index, block ->
-                                val ayahNum = block.ayah
-                                val meta = viewModel.verseMeta.value["$surahNumber:$ayahNum"]
-                                val prevMeta =
-                                    if (ayahNum > 1) viewModel.verseMeta.value["$surahNumber:${ayahNum - 1}"] else null
-                                val showJuzHeader = meta != null && (prevMeta == null || prevMeta.juz != meta.juz)
-
-                                Column {
-                                    if (showJuzHeader && ayahNum > 1) {
-                                        JuzHeader(juzNumber = meta!!.juz, contentColor = fg)
-                                    }
-                                    if (meta?.sajda != null) {
-                                        SajdaIndicator(type = meta.sajda, contentColor = fg)
-                                    }
-
-                                    val topicId = "quran_surah_$surahNumber"
-                                    val bookmarkKey = "$topicId:$index"
-                                    val isBookmarked = bookmarkKey in bookmarkedAyahKeys
-                                    val translationMap = remember(translations) {
-                                        translations.mapKeys { it.key.toString() }
-                                    }
-
-                                    BlockRenderer(
-                                        block = block,
-                                        settings = settings,
-                                        fg = fg,
-                                        bg = bg,
-                                        translationMap = translationMap,
-                                        scriptMap = scriptMap,
-                                        arabicFontFamily = arabicScriptFontFamily,
-                                        isHighlighted = playingAyahIndex == index,
-                                        isBookmarked = isBookmarked,
-                                        isAyahPlaying = currentAyahKey == "$surahNumber:${block.ayah}" &&
-                                            (audioState == QuranAudioViewModel.AudioState.Loading ||
-                                                audioState == QuranAudioViewModel.AudioState.Playing),
-                                        readingMode = readingMode,
-                                        source = ContentSource.QF,
-                                        onBlockClick = { activeBlock = it to index },
-                                        onPlayClick = {
-                                            val ayahIsActive = currentAyahKey == "$surahNumber:${block.ayah}" &&
-                                                (audioState == QuranAudioViewModel.AudioState.Loading ||
-                                                    audioState == QuranAudioViewModel.AudioState.Playing)
-                                            if (ayahIsActive) {
-                                                quranAudioViewModel.stopAyah()
-                                            } else {
-                                                quranAudioViewModel.playAyah(
-                                                    surahNumber,
-                                                    index,
-                                                    blocks,
-                                                    settings.selectedReciterId,
-                                                    sequence = false
-                                                )
-                                            }
-                                        },
-                                        onBookmarkClick = {
-                                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
-                                            lastTappedAyahIndex = index
-                                            bookmarkedAyahKeys = if (isBookmarked) {
-                                                bookmarkedAyahKeys - bookmarkKey
-                                            } else {
-                                                bookmarkedAyahKeys + bookmarkKey
-                                            }
-                                            settingsViewModel.toggleBookmark(topicId, index)
-                                            val msg = if (isBookmarked) bookmarkRemovedMessage else bookmarkAddedMessage
-                                            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-                                        },
-
-                                    )
-                                    val ayahAudioError = audioState as? QuranAudioViewModel.AudioState.Error
-                                    if (playingAyahIndex == index && ayahAudioError != null) {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
                                             Text(
-                                                ayahAudioError.msg,
-                                                modifier = Modifier.weight(1f),
-                                                style = MaterialTheme.typography.labelSmall,
-                                                color = fg.copy(alpha = 0.7f)
+                                                text = it.nameSimple,
+                                                style = MaterialTheme.typography.titleMedium.copy(
+                                                    color = MaterialTheme.colorScheme.primary,
+                                                    fontWeight = FontWeight.Bold
+                                                ),
+                                                modifier = Modifier.padding(top = 8.dp)
                                             )
-                                            TextButton(onClick = {
-                                                quranAudioViewModel.playAyah(
-                                                    surahNumber,
-                                                    index,
-                                                    blocks,
-                                                    settings.selectedReciterId,
-                                                    sequence = false
-                                                )
-                                            }) {
-                                                Text(stringResource(R.string.common_retry))
-                                            }
-                                        }
-                                    }
-                                }
-                            }
 
-                            item {
-                                val isArmed = fillProgress >= 1f
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(bottom = 64.dp, top = 24.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.quran_end_of_surah),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = fg.copy(alpha = 0.15f)
-                                    )
-
-                                    if (nextSurah != null) {
-                                        Spacer(Modifier.height(24.dp))
-
-                                        // Circle hidden until swiping
-                                        if (overscrollState.floatValue > 0f) {
-                                            Box(
-                                                modifier = Modifier.size(36.dp),
-                                                contentAlignment = Alignment.Center
+                                            Row(
+                                                modifier = Modifier.padding(top = 12.dp),
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                                verticalAlignment = Alignment.CenterVertically
                                             ) {
-                                                CircularProgressIndicator(
-                                                    progress = { fillProgress },
-                                                    modifier = Modifier.fillMaxSize(),
-                                                    color = if (isArmed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(
-                                                        alpha = 0.2f
-                                                    ),
-                                                    strokeWidth = 3.dp,
-                                                    strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
-                                                )
-                                                if (isArmed) {
-                                                    Icon(
-                                                        imageVector = androidx.compose.material.icons.Icons.Default.KeyboardArrowUp,
-                                                        contentDescription = null,
-                                                        modifier = Modifier.size(20.dp),
-                                                        tint = MaterialTheme.colorScheme.primary
+                                                Surface(
+                                                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                                                    shape = RoundedCornerShape(12.dp)
+                                                ) {
+                                                    Text(
+                                                        text = revelationPlaceLabel(it.revelationPlace).uppercase(),
+                                                        modifier = Modifier.padding(
+                                                            horizontal = 12.dp,
+                                                            vertical = 4.dp
+                                                        ),
+                                                        style = MaterialTheme.typography.labelSmall.copy(fontFamily = PlusJakartaSans),
+                                                        color = MaterialTheme.colorScheme.primary
                                                     )
                                                 }
+                                                Text(
+                                                    text = pluralStringResource(
+                                                        R.plurals.quran_verse_count,
+                                                        it.versesCount,
+                                                        it.versesCount
+                                                    ).uppercase(),
+                                                    style = MaterialTheme.typography.labelSmall.copy(fontFamily = PlusJakartaSans),
+                                                    color = fg.copy(alpha = 0.6f)
+                                                )
                                             }
-                                            Spacer(Modifier.height(12.dp))
+
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(vertical = 24.dp),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                HorizontalDivider(
+                                                    modifier = Modifier.fillMaxWidth(0.5f),
+                                                    color = fg.copy(alpha = 0.15f)
+                                                )
+                                            }
                                         }
 
-                                        Text(
-                                            text = stringResource(if (isArmed) R.string.quran_next_surah_release else R.string.quran_next_surah_swipe),
-                                            style = MaterialTheme.typography.labelMedium,
-                                            color = if (isArmed) MaterialTheme.colorScheme.primary else fg.copy(alpha = 0.3f)
-                                        )
-
-                                        // Only show next surah name after threshold is met
-                                        if (isArmed) {
+                                        // Show Bismillah for all surahs except At-Tawbah (9)
+                                        // and NOT for Al-Fatihah (1) since bismillah is its first verse
+                                        if (surahNumber != 9 && surahNumber != 1) {
+                                            Spacer(Modifier.height(8.dp))
                                             Text(
-                                                text = nextSurah.nameSimple,
-                                                style = MaterialTheme.typography.titleSmall,
-                                                color = MaterialTheme.colorScheme.primary,
-                                                fontWeight = FontWeight.Bold
+                                                text = "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ",
+                                                textAlign = TextAlign.Center,
+                                                fontFamily = arabicScriptFontFamily,
+                                                fontSize = 26.sp,
+                                                color = fg.copy(alpha = 0.85f),
+                                                modifier = Modifier.fillMaxWidth()
                                             )
                                         }
                                     }
                                 }
-                            }
+
+                                itemsIndexed(blocks) { index, block ->
+                                    val ayahNum = block.ayah
+                                    val meta = viewModel.verseMeta.value["$surahNumber:$ayahNum"]
+                                    val prevMeta =
+                                        if (ayahNum > 1) viewModel.verseMeta.value["$surahNumber:${ayahNum - 1}"] else null
+                                    val showJuzHeader = meta != null && (prevMeta == null || prevMeta.juz != meta.juz)
+
+                                    Column {
+                                        if (showJuzHeader && ayahNum > 1) {
+                                            JuzHeader(juzNumber = meta!!.juz, contentColor = fg)
+                                        }
+                                        if (meta?.sajda != null) {
+                                            SajdaIndicator(type = meta.sajda, contentColor = fg)
+                                        }
+
+                                        val topicId = "quran_surah_$surahNumber"
+                                        val bookmarkKey = "$topicId:$index"
+                                        val isBookmarked = bookmarkKey in bookmarkedAyahKeys
+                                        val translationMap = remember(translations) {
+                                            translations.mapKeys { it.key.toString() }
+                                        }
+
+                                        BlockRenderer(
+                                            block = block,
+                                            settings = settings,
+                                            fg = fg,
+                                            bg = bg,
+                                            translationMap = translationMap,
+                                            scriptMap = scriptMap,
+                                            arabicFontFamily = arabicScriptFontFamily,
+                                            isHighlighted = playingAyahIndex == index,
+                                            isBookmarked = isBookmarked,
+                                            isAyahPlaying = currentAyahKey == "$surahNumber:${block.ayah}" &&
+                                                    (audioState == QuranAudioViewModel.AudioState.Loading ||
+                                                            audioState == QuranAudioViewModel.AudioState.Playing),
+                                            readingMode = readingMode,
+                                            source = ContentSource.QF,
+                                            onBlockClick = { activeBlock = it to index },
+                                            onPlayClick = {
+                                                val ayahIsActive = currentAyahKey == "$surahNumber:${block.ayah}" &&
+                                                        (audioState == QuranAudioViewModel.AudioState.Loading ||
+                                                                audioState == QuranAudioViewModel.AudioState.Playing)
+                                                if (ayahIsActive) {
+                                                    quranAudioViewModel.stopAyah()
+                                                } else {
+                                                    quranAudioViewModel.playAyah(
+                                                        surahNumber,
+                                                        index,
+                                                        blocks,
+                                                        settings.selectedReciterId,
+                                                        sequence = false
+                                                    )
+                                                }
+                                            },
+                                            onBookmarkClick = {
+                                                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                                                lastTappedAyahIndex = index
+                                                bookmarkedAyahKeys = if (isBookmarked) {
+                                                    bookmarkedAyahKeys - bookmarkKey
+                                                } else {
+                                                    bookmarkedAyahKeys + bookmarkKey
+                                                }
+                                                settingsViewModel.toggleBookmark(topicId, index)
+                                                val msg =
+                                                    if (isBookmarked) bookmarkRemovedMessage else bookmarkAddedMessage
+                                                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                                            },
+
+                                        )
+                                        val ayahAudioError = audioState as? QuranAudioViewModel.AudioState.Error
+                                        if (playingAyahIndex == index && ayahAudioError != null) {
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Text(
+                                                    ayahAudioError.msg,
+                                                    modifier = Modifier.weight(1f),
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                    color = fg.copy(alpha = 0.7f)
+                                                )
+                                                TextButton(onClick = {
+                                                    quranAudioViewModel.playAyah(
+                                                        surahNumber,
+                                                        index,
+                                                        blocks,
+                                                        settings.selectedReciterId,
+                                                        sequence = false
+                                                    )
+                                                }) {
+                                                    Text(stringResource(R.string.common_retry))
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                item {
+                                    val isArmed = fillProgress >= 1f
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(bottom = 64.dp, top = 24.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.quran_end_of_surah),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = fg.copy(alpha = 0.15f)
+                                        )
+
+                                        if (nextSurah != null) {
+                                            Spacer(Modifier.height(24.dp))
+
+                                            // Circle hidden until swiping
+                                            if (overscrollState.floatValue > 0f) {
+                                                Box(
+                                                    modifier = Modifier.size(36.dp),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    CircularProgressIndicator(
+                                                        progress = { fillProgress },
+                                                        modifier = Modifier.fillMaxSize(),
+                                                        color = if (isArmed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(
+                                                            alpha = 0.2f
+                                                        ),
+                                                        strokeWidth = 3.dp,
+                                                        strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
+                                                    )
+                                                    if (isArmed) {
+                                                        Icon(
+                                                            imageVector = androidx.compose.material.icons.Icons.Default.KeyboardArrowUp,
+                                                            contentDescription = null,
+                                                            modifier = Modifier.size(20.dp),
+                                                            tint = MaterialTheme.colorScheme.primary
+                                                        )
+                                                    }
+                                                }
+                                                Spacer(Modifier.height(12.dp))
+                                            }
+
+                                            Text(
+                                                text = stringResource(if (isArmed) R.string.quran_next_surah_release else R.string.quran_next_surah_swipe),
+                                                style = MaterialTheme.typography.labelMedium,
+                                                color = if (isArmed) MaterialTheme.colorScheme.primary else fg.copy(
+                                                    alpha = 0.3f
+                                                )
+                                            )
+
+                                            // Only show next surah name after threshold is met
+                                            if (isArmed) {
+                                                Text(
+                                                    text = nextSurah.nameSimple,
+                                                    style = MaterialTheme.typography.titleSmall,
+                                                    color = MaterialTheme.colorScheme.primary,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
                             }
                             Box(
                                 modifier = Modifier.align(Alignment.CenterEnd).width(24.dp).fillMaxHeight()
@@ -743,7 +767,10 @@ fun QuranReaderScreen(
                                             val fraction = latestScrollMetrics.value.second
                                             val viewport = listState.layoutInfo.viewportSize.height.toFloat()
                                             if (fraction < 1f && fraction > 0f && viewport > 0f) {
-                                                val thumbHeight = (size.height * fraction).coerceIn(24.dp.toPx(), size.height.toFloat())
+                                                val thumbHeight = (size.height * fraction).coerceIn(
+                                                    24.dp.toPx(),
+                                                    size.height.toFloat()
+                                                )
                                                 val contentRange = (viewport / fraction - viewport).coerceAtLeast(1f)
                                                 val trackRange = (size.height - thumbHeight).coerceAtLeast(1f)
                                                 scrollIndicatorScope.launch { listState.scrollBy(dragAmount * contentRange / trackRange) }
@@ -797,8 +824,8 @@ fun QuranReaderScreen(
                                 onPlayAyah = {
                                     val ayahKey = (block as? AyahBlock)?.let { "$surahNumber:${it.ayah}" }
                                     val ayahIsActive = ayahKey != null && currentAyahKey == ayahKey &&
-                                        (audioState == QuranAudioViewModel.AudioState.Loading ||
-                                            audioState == QuranAudioViewModel.AudioState.Playing)
+                                            (audioState == QuranAudioViewModel.AudioState.Loading ||
+                                                    audioState == QuranAudioViewModel.AudioState.Playing)
                                     if (ayahIsActive) {
                                         quranAudioViewModel.stopAyah()
                                     } else {
@@ -872,15 +899,21 @@ fun QuranReaderScreen(
                             translationDownloadScope.launch {
                                 isTranslationDownloading = true
                                 try {
-                                    val downloaded = TranslationRepository.download(context, meta.id, meta.downloadUrl) { progress ->
-                                        translationDownloadProgress = progress
-                                    }
+                                    val downloaded =
+                                        TranslationRepository.download(context, meta.id, meta.downloadUrl) { progress ->
+                                            translationDownloadProgress = progress
+                                        }
                                     if (downloaded) {
                                         withContext(Dispatchers.IO) { TranslationRepository.load(context, meta.id) }
                                         settingsViewModel.setSelectedTranslationLang(meta.id)
                                         showTranslationPicker = false
                                     } else {
-                                        Toast.makeText(context, LocaleHelper.wrap(context).getString(R.string.settings_update_download_failed), Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(
+                                            context,
+                                            LocaleHelper.wrap(context)
+                                                .getString(R.string.settings_update_download_failed),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
                                 } finally {
                                     isTranslationDownloading = false

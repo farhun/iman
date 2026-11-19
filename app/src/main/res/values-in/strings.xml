@@ -95,6 +95,7 @@
     <string name="settings_startup_screen">Layar awal</string>
     <string name="settings_startup_screen_summary">Pilih bagian yang pertama kali terbuka saat Iman dijalankan.</string>
     <string name="settings_color">Warna</string>
+    <string name="settings_custom_color">Warna kustom</string>
     <string name="settings_dynamic_color">Warna Dinamis</string>
     <string name="settings_dynamic_color_summary">Selaraskan palet warna aksen dengan wallpaper Anda.</string>
     <string name="settings_pure_amoled_black">Hitam AMOLED Murni</string>
