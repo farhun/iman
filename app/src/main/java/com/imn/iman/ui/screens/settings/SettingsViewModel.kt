@@ -224,10 +224,6 @@ class SettingsViewModel(
     }
 
 
-    fun toggleTasbeehStealthModeAllowed(enabled: Boolean) {
-        viewModelScope.launch { repository.updateTasbeehStealthModeAllowed(enabled) }
-    }
-
     fun toggleTasbeehVolumeEnabled(enabled: Boolean) {
         viewModelScope.launch { repository.setTasbeehVolumeEnabled(enabled) }
     }
@@ -280,9 +276,6 @@ class SettingsViewModel(
         viewModelScope.launch { repository.updateReadingKeepScreenOn(keep) }
     }
 
-    fun toggleShowContinueReading(show: Boolean) {
-        viewModelScope.launch { repository.updateShowContinueReading(show) }
-    }
 
     fun setQuranExitReminderDisabled(disabled: Boolean) {
         viewModelScope.launch { repository.updateQuranExitReminderDisabled(disabled) }
@@ -386,17 +379,10 @@ class SettingsViewModel(
         viewModelScope.launch { repository.updatePrayerNotificationSound(prayerName, sound) }
     }
 
-    fun setPrePrayerNotificationSound(sound: String) {
-        viewModelScope.launch { repository.updatePrePrayerNotificationSound(sound) }
+    fun setPrePrayerNotificationSound(prayerName: String, sound: String) {
+        viewModelScope.launch { repository.updatePrePrayerNotificationSound(prayerName, sound) }
     }
 
-    fun setPrayerNotificationAlertStyle(style: String) {
-        viewModelScope.launch { repository.updatePrayerNotificationAlertStyle(style) }
-    }
-
-    fun setPrayerNotificationCustomSoundUri(uri: String) {
-        viewModelScope.launch { repository.updatePrayerNotificationCustomSoundUri(uri) }
-    }
 
     fun toggleExtraPrayerTiming(id: String, enabled: Boolean) {
         val updated = settings.value.selectedExtraPrayerTimings.toMutableSet().apply {
@@ -412,8 +398,8 @@ class SettingsViewModel(
         viewModelScope.launch { repository.updateExtraPrayerNotifications(updated) }
     }
 
-    fun toggleShowExtraPrayerTimingsOnHome(enabled: Boolean) {
-        viewModelScope.launch { repository.updateShowExtraPrayerTimingsOnHome(enabled) }
+    fun setExtraPrayerNotificationSound(id: String, sound: String) {
+        viewModelScope.launch { repository.updateExtraPrayerNotificationSound(id, sound) }
     }
 
 

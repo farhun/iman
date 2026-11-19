@@ -117,18 +117,18 @@ fun SettingsScreen(
                 )
 
                 SettingsMenuItem(
-                    title = stringResource(R.string.widget_title),
-                    subtitle = stringResource(R.string.widget_settings_summary),
-                    imageVector = Icons.Default.Layers,
-                    onClick = onNavigateWidget
-                )
-
-
-                SettingsMenuItem(
                     title = stringResource(R.string.settings_tasbih_screen),
                     subtitle = stringResource(R.string.settings_tasbih_screen_summary),
                     imageVector = Icons.Default.Tune,
                     onClick = onNavigateTasbeeh
+                )
+
+
+                SettingsMenuItem(
+                    title = stringResource(R.string.widget_title),
+                    subtitle = stringResource(R.string.widget_settings_summary),
+                    imageVector = Icons.Default.Layers,
+                    onClick = onNavigateWidget
                 )
 
                 SettingsMenuItem(

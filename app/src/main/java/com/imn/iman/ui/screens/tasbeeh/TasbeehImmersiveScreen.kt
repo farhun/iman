@@ -90,7 +90,7 @@ import com.imn.iman.data.repository.UserSettings
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
+
 
 private val PRESS_BEAD_SIZE = 72.dp
 private val PRESS_BEAD_BOTTOM_PADDING = 120.dp
@@ -145,7 +145,7 @@ fun TasbeehImmersiveScreen(
     BackHandler(onBack = { exitToList() })
 
     val topInset = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() +
-        WindowInsets.displayCutout.asPaddingValues().calculateTopPadding()
+            WindowInsets.displayCutout.asPaddingValues().calculateTopPadding()
     val navigationBottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val bottomContentPadding = if (isPressMode) {
         maxOf(PRESS_BEAD_BOTTOM_PADDING + PRESS_BEAD_SIZE, 96.dp + navigationBottomInset)
@@ -171,13 +171,13 @@ fun TasbeehImmersiveScreen(
     // fisheyeAlpha fades 0→1 on touch-down and 1→0 on lift — smooth fisheye release.
     val fisheyeAlpha = remember { Animatable(0f) }
     // Transit bead state — tracks a bead being dragged across the gap between stacks.
-    val transitYAnim      = remember { Animatable(0f) }
-    val transitLiftAnim   = remember { Animatable(0f) }
-    var isInTransit       by remember { mutableStateOf(false) }
+    val transitYAnim = remember { Animatable(0f) }
+    val transitLiftAnim = remember { Animatable(0f) }
+    var isInTransit by remember { mutableStateOf(false) }
     var transitFromBottom by remember { mutableStateOf(true) }
     // Conveyor-belt scroll: snapped to ±beadStep then animated to 0 on each successful transit.
-    val scrollOffsetAnim  = remember { Animatable(0f) }
-    var widgetsVisible by remember { mutableStateOf(true) }
+    val scrollOffsetAnim = remember { Animatable(0f) }
+
     var resetProgress by remember { mutableFloatStateOf(0f) }
     var resetArmed by remember { mutableStateOf(false) }
     var showResetOverlay by remember { mutableStateOf(false) }
@@ -215,7 +215,9 @@ fun TasbeehImmersiveScreen(
         if (currentCount > 0 || currentItemIndex > 0) {
             haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
             if (currentCount > 0) currentCount--
-            else { currentItemIndex--; currentCount = items[currentItemIndex].targetCount - 1 }
+            else {
+                currentItemIndex--; currentCount = items[currentItemIndex].targetCount - 1
+            }
         }
     }
 
@@ -281,9 +283,9 @@ fun TasbeehImmersiveScreen(
         if ((fromBottom && bottomCount == 0) || (!fromBottom && topCount == 0)) return false
 
         val topBoundaryY = canvasTop + beadRadius +
-            (topCount - 1).coerceAtLeast(0) * (2f * beadRadius + beadGap)
+                (topCount - 1).coerceAtLeast(0) * (2f * beadRadius + beadGap)
         val bottomBoundaryY = canvasTop + canvasHeight - beadRadius -
-            (bottomCount - 1).coerceAtLeast(0) * (2f * beadRadius + beadGap)
+                (bottomCount - 1).coerceAtLeast(0) * (2f * beadRadius + beadGap)
         val destinationY = if (fromBottom) {
             topBoundaryY + 2f * beadRadius + beadGap
         } else {
@@ -331,10 +333,12 @@ fun TasbeehImmersiveScreen(
                             scope.launch { handleVolumeCount(true, settings.tasbeehVolumeAnimation) }
                             true
                         }
+
                         Key.VolumeDown -> {
                             scope.launch { handleVolumeCount(false, settings.tasbeehVolumeAnimation) }
                             true
                         }
+
                         else -> false
                     }
                 } else false
@@ -346,46 +350,54 @@ fun TasbeehImmersiveScreen(
     ) {
         if (screenWidth > 0f && screenHeight > 0f) {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                AnimatedVisibility(visible = widgetsVisible, enter = fadeIn(), exit = fadeOut()) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        widgets.sortedBy { it.zIndex }.forEach { widget ->
-                            Box(
-                                modifier = Modifier.graphicsLayer {
-                                    translationX = (widget.offsetX * screenWidth) - (size.width / 2f)
-                                    translationY = (widget.offsetY * screenHeight) - (size.height / 2f)
-                                    scaleX = widget.scale
-                                    scaleY = widget.scale
-                                    transformOrigin = TransformOrigin.Center
-                                    clip = false
-                                }
-                            ) {
-                                TasbihWidgetRenderer(
-                                    widget = widget,
-                                    countedBeads = currentCount,
-                                    totalBeads = currentTarget,
-                                    beadColor = beadColor,
-                                    textColor = textColor,
-                                    thumbPositionProvider = if (widget is TasbihWidget.StringBeadWidget) {
-                                        val offsetY = widget.offsetY
-                                        { fingerYOnString?.let { fy -> Offset(0f, fy - offsetY * screenHeight) } }
-                                    } else { { null } },
-                                    fisheyeStrengthProvider = if (widget is TasbihWidget.StringBeadWidget) {
-                                        { fisheyeAlpha.value }
-                                    } else { { 1f } },
-                                    transitBeadProvider = if (widget is TasbihWidget.StringBeadWidget) {
-                                        val offsetY  = widget.offsetY
-                                        val canvasH  = screenHeight * 0.9f
-                                        { if (isInTransit) transitYAnim.value - offsetY * screenHeight + canvasH / 2f else null }
-                                    } else { { null } },
-                                    transitLiftProvider = if (widget is TasbihWidget.StringBeadWidget) {
-                                        { transitLiftAnim.value }
-                                    } else { { 0f } },
-                                    transitFromBottom = transitFromBottom,
-                                    scrollOffsetProvider = if (widget is TasbihWidget.StringBeadWidget) {
-                                        { scrollOffsetAnim.value }
-                                    } else { { 0f } },
-                                )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    widgets.sortedBy { it.zIndex }.forEach { widget ->
+                        Box(
+                            modifier = Modifier.graphicsLayer {
+                                translationX = (widget.offsetX * screenWidth) - (size.width / 2f)
+                                translationY = (widget.offsetY * screenHeight) - (size.height / 2f)
+                                scaleX = widget.scale
+                                scaleY = widget.scale
+                                transformOrigin = TransformOrigin.Center
+                                clip = false
                             }
+                        ) {
+                            TasbihWidgetRenderer(
+                                widget = widget,
+                                countedBeads = currentCount,
+                                totalBeads = currentTarget,
+                                beadColor = beadColor,
+                                textColor = textColor,
+                                thumbPositionProvider = if (widget is TasbihWidget.StringBeadWidget) {
+                                    val offsetY = widget.offsetY
+                                    { fingerYOnString?.let { fy -> Offset(0f, fy - offsetY * screenHeight) } }
+                                } else {
+                                    { null }
+                                },
+                                fisheyeStrengthProvider = if (widget is TasbihWidget.StringBeadWidget) {
+                                    { fisheyeAlpha.value }
+                                } else {
+                                    { 1f }
+                                },
+                                transitBeadProvider = if (widget is TasbihWidget.StringBeadWidget) {
+                                    val offsetY = widget.offsetY
+                                    val canvasH = screenHeight * 0.9f
+                                    { if (isInTransit) transitYAnim.value - offsetY * screenHeight + canvasH / 2f else null }
+                                } else {
+                                    { null }
+                                },
+                                transitLiftProvider = if (widget is TasbihWidget.StringBeadWidget) {
+                                    { transitLiftAnim.value }
+                                } else {
+                                    { 0f }
+                                },
+                                transitFromBottom = transitFromBottom,
+                                scrollOffsetProvider = if (widget is TasbihWidget.StringBeadWidget) {
+                                    { scrollOffsetAnim.value }
+                                } else {
+                                    { 0f }
+                                },
+                            )
                         }
                     }
                 }
@@ -398,7 +410,7 @@ fun TasbeehImmersiveScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .pointerInput(screenWidth, screenHeight, widgets, widgetsVisible, settings.tasbeehStealthModeAllowed) {
+                    .pointerInput(screenWidth, screenHeight, widgets) {
                         awaitEachGesture {
                             val down = awaitFirstDown()
 
@@ -406,12 +418,13 @@ fun TasbeehImmersiveScreen(
                             val startScreenY = down.position.y
                             val stringScreenX = (stringWidget?.offsetX ?: 0.88f) * screenWidth
                             val pressBeadDiameter = PRESS_BEAD_SIZE.toPx()
-                            val pressBeadCenterY = screenHeight - PRESS_BEAD_BOTTOM_PADDING.toPx() - pressBeadDiameter / 2f
+                            val pressBeadCenterY =
+                                screenHeight - PRESS_BEAD_BOTTOM_PADDING.toPx() - pressBeadDiameter / 2f
                             val isOnPressBead = isPressMode &&
-                                kotlin.math.abs(startScreenX - screenWidth / 2f) <= pressBeadDiameter / 2f &&
-                                kotlin.math.abs(startScreenY - pressBeadCenterY) <= pressBeadDiameter / 2f
-                            val isNearString = hasString && widgetsVisible &&
-                                kotlin.math.abs(startScreenX - stringScreenX) < 70f * density && !showResetOverlay
+                                    kotlin.math.abs(startScreenX - screenWidth / 2f) <= pressBeadDiameter / 2f &&
+                                    kotlin.math.abs(startScreenY - pressBeadCenterY) <= pressBeadDiameter / 2f
+                            val isNearString = hasString &&
+                                    kotlin.math.abs(startScreenX - stringScreenX) < 70f * density && !showResetOverlay
 
                             var localResetArmed = false
                             var hasMoved = false
@@ -422,7 +435,9 @@ fun TasbeehImmersiveScreen(
                                     kotlinx.coroutines.delay(500)
                                     showResetOverlay = true
                                     resetProgress = 0f; resetArmed = false
-                                    for (i in 1..20) { kotlinx.coroutines.delay(40); resetProgress = i / 20f }
+                                    for (i in 1..20) {
+                                        kotlinx.coroutines.delay(40); resetProgress = i / 20f
+                                    }
                                     resetArmed = true; localResetArmed = true
                                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                                 }
@@ -434,19 +449,20 @@ fun TasbeehImmersiveScreen(
                             // ── Boundary-bead positions in screen space ──────────────
                             // These are natural (no-zoom) positions; close enough for trigger detection.
                             val sw = stringWidget
-                            val beadR    = BEAD_RADIUS_BASE * (sw?.beadSizeScale ?: 1f) * density
-                            val beadGap  = beadR * 0.4f
-                            val canvasH  = screenHeight * 0.9f
+                            val beadR = BEAD_RADIUS_BASE * (sw?.beadSizeScale ?: 1f) * density
+                            val beadGap = beadR * 0.4f
+                            val canvasH = screenHeight * 0.9f
                             val canvasTopScreen = (sw?.offsetY ?: 0.5f) * screenHeight - canvasH / 2f
-                            val topCount    = minOf(currentCount,          sw?.topStackLimit    ?: 0).coerceAtLeast(0)
-                            val bottomCount = minOf(currentTarget - currentCount, sw?.bottomStackLimit ?: 0).coerceAtLeast(0)
+                            val topCount = minOf(currentCount, sw?.topStackLimit ?: 0).coerceAtLeast(0)
+                            val bottomCount =
+                                minOf(currentTarget - currentCount, sw?.bottomStackLimit ?: 0).coerceAtLeast(0)
 
                             // Bottom-most bead of the TOP stack (screen Y)
                             val topBoundaryY = canvasTopScreen + beadR +
-                                (topCount - 1).coerceAtLeast(0) * (2f * beadR + beadGap)
+                                    (topCount - 1).coerceAtLeast(0) * (2f * beadR + beadGap)
                             // Top-most bead of the BOTTOM stack (screen Y)
                             val bottomBoundaryY = canvasTopScreen + canvasH - beadR -
-                                (bottomCount - 1).coerceAtLeast(0) * (2f * beadR + beadGap)
+                                    (bottomCount - 1).coerceAtLeast(0) * (2f * beadR + beadGap)
                             val gapDistance = (bottomBoundaryY - topBoundaryY).coerceAtLeast(0f)
                             // Commit once the bead has travelled a reasonable portion of the gap
                             // from its source side, so upward and downward swipes feel balanced.
@@ -454,8 +470,10 @@ fun TasbeehImmersiveScreen(
                             val triggerZone = beadR * 2.5f  // how close the finger must start
                             val triggerMove = beadR * 1.5f  // how far it must move to begin transit
 
-                            val isNearTopBoundary    = topCount    > 0 && kotlin.math.abs(startScreenY - topBoundaryY)    < triggerZone
-                            val isNearBottomBoundary = bottomCount > 0 && kotlin.math.abs(startScreenY - bottomBoundaryY) < triggerZone
+                            val isNearTopBoundary =
+                                topCount > 0 && kotlin.math.abs(startScreenY - topBoundaryY) < triggerZone
+                            val isNearBottomBoundary =
+                                bottomCount > 0 && kotlin.math.abs(startScreenY - bottomBoundaryY) < triggerZone
 
                             // Track finger Y and handle transit activation.
                             while (true) {
@@ -470,12 +488,14 @@ fun TasbeehImmersiveScreen(
                                 // (not startScreenY) so swiping through the stack naturally triggers transit.
                                 if (isNearString && !isInTransit) {
                                     val curY = change.position.y
-                                    val currentlyNearBottom = bottomCount > 0 && kotlin.math.abs(curY - bottomBoundaryY) < triggerZone
-                                    val currentlyNearTop    = topCount    > 0 && kotlin.math.abs(curY - topBoundaryY)    < triggerZone
-                                    val canGoUp   = dy < -triggerMove && currentlyNearBottom
-                                    val canGoDown = dy >  triggerMove && currentlyNearTop
+                                    val currentlyNearBottom =
+                                        bottomCount > 0 && kotlin.math.abs(curY - bottomBoundaryY) < triggerZone
+                                    val currentlyNearTop =
+                                        topCount > 0 && kotlin.math.abs(curY - topBoundaryY) < triggerZone
+                                    val canGoUp = dy < -triggerMove && currentlyNearBottom
+                                    val canGoDown = dy > triggerMove && currentlyNearTop
                                     if (canGoUp || canGoDown) {
-                                        isInTransit    = true
+                                        isInTransit = true
                                         transitFromBottom = canGoUp
                                         scope.launch {
                                             transitLiftAnim.snapTo(1f)
@@ -522,7 +542,10 @@ fun TasbeehImmersiveScreen(
                                     val snapTarget = if (transitFromBottom) bottomBoundaryY else topBoundaryY
                                     scope.launch {
                                         val moveJob = launch {
-                                            transitYAnim.animateTo(snapTarget, spring(stiffness = 300f, dampingRatio = 0.7f))
+                                            transitYAnim.animateTo(
+                                                snapTarget,
+                                                spring(stiffness = 300f, dampingRatio = 0.7f)
+                                            )
                                         }
                                         val liftJob = launch {
                                             transitLiftAnim.animateTo(0f, tween(180))
@@ -540,36 +563,14 @@ fun TasbeehImmersiveScreen(
                                             haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                                         }
                                     }
+
                                     showResetOverlay -> {
                                         haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                     }
+
                                     isPressMode -> registerIncrement()
-                                    // No string or stealth hidden: single tap counts, double-tap toggles stealth.
-                                    !hasString || !widgetsVisible -> {
-                                        if (settings.tasbeehStealthModeAllowed) {
-                                            val secondTap = withTimeoutOrNull(300L) { awaitFirstDown(requireUnconsumed = false) }
-                                            if (secondTap != null) {
-                                                secondTap.consume()
-                                                widgetsVisible = !widgetsVisible
-                                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                                            } else {
-                                                registerIncrement()
-                                            }
-                                        } else {
-                                            registerIncrement()
-                                        }
-                                    }
-                                    // String visible, not near string: double-tap → stealth toggle.
-                                    settings.tasbeehStealthModeAllowed && !isNearString -> {
-                                        val secondTap = withTimeoutOrNull(300L) { awaitFirstDown(requireUnconsumed = false) }
-                                        if (secondTap != null) {
-                                            secondTap.consume()
-                                            widgetsVisible = !widgetsVisible
-                                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                                        }
-                                    }
-                                    // Tap off-string with no stealth allowed → increment.
-                                    !isNearString -> { registerIncrement() }
+                                    !hasString -> registerIncrement()
+                                    !isNearString -> registerIncrement()
                                     // Tap on string with no move → do nothing (Step 3 handles swipe).
                                 }
                             }
@@ -578,47 +579,45 @@ fun TasbeehImmersiveScreen(
                         }
                     }
             ) {
-                AnimatedVisibility(visible = widgetsVisible, enter = fadeIn(), exit = fadeOut()) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(start = 24.dp, end = 24.dp, top = topInset),
-                    ) {
-                        Column {
-                            Text(
-                                text = currentCount.toString(),
-                                style = TextStyle(
-                                    color = textColor,
-                                    fontSize = 96.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    platformStyle = PlatformTextStyle(includeFontPadding = false),
-                                ),
-                                textAlign = TextAlign.Start,
-                                maxLines = 1,
-                            )
-                            Text(
-                                text = stringResource(R.string.tasbih_out_of, currentItem?.targetCount ?: 0),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = textColor.copy(alpha = 0.5f),
-                                textAlign = TextAlign.Start,
-                                maxLines = 1,
-                            )
-                        }
-                        Box(
-                            modifier = Modifier.weight(1f).then(
-                                slideDhikrTextWidth?.let { Modifier.width(it) } ?: Modifier.fillMaxWidth()
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(start = 24.dp, end = 24.dp, top = topInset),
+                ) {
+                    Column {
+                        Text(
+                            text = currentCount.toString(),
+                            style = TextStyle(
+                                color = textColor,
+                                fontSize = 96.sp,
+                                fontWeight = FontWeight.Normal,
+                                platformStyle = PlatformTextStyle(includeFontPadding = false),
                             ),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            CompositionLocalProvider(LocalContentColor provides textColor) {
-                                TasbihDhikrText(
-                                    text = currentItem?.name ?: "سُبْحَانَ اللَّهِ",
-                                    modifier = Modifier.fillMaxSize(),
-                                )
-                            }
-                        }
-                        Spacer(Modifier.height(bottomContentPadding))
+                            textAlign = TextAlign.Start,
+                            maxLines = 1,
+                        )
+                        Text(
+                            text = stringResource(R.string.tasbih_out_of, currentItem?.targetCount ?: 0),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = textColor.copy(alpha = 0.5f),
+                            textAlign = TextAlign.Start,
+                            maxLines = 1,
+                        )
                     }
+                    Box(
+                        modifier = Modifier.weight(1f).then(
+                            slideDhikrTextWidth?.let { Modifier.width(it) } ?: Modifier.fillMaxWidth()
+                        ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        CompositionLocalProvider(LocalContentColor provides textColor) {
+                            TasbihDhikrText(
+                                text = currentItem?.name ?: "سُبْحَانَ اللَّهِ",
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                        }
+                    }
+                    Spacer(Modifier.height(bottomContentPadding))
                 }
 
                 if (isPressMode) {
@@ -699,9 +698,9 @@ fun TasbeehImmersiveScreen(
                     Spacer(Modifier.width(16.dp))
                     Text(
                         text = stringResource(
-                                                    if (resetArmed) R.string.tasbih_release_to_reset_hint
-                                                    else R.string.tasbih_holding_to_reset_hint,
-                                                ),
+                            if (resetArmed) R.string.tasbih_release_to_reset_hint
+                            else R.string.tasbih_holding_to_reset_hint,
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = if (resetArmed) MaterialTheme.colorScheme.error else Color.White
                     )

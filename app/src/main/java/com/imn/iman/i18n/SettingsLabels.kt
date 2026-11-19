@@ -49,14 +49,6 @@ fun sourceTypeLabelRes(id: String): Int = when (id) {
     else -> 0
 }
 
-@StringRes
-fun alertStyleLabelRes(id: String): Int = when (id) {
-    "CUSTOM_SOUND" -> R.string.settings_alert_custom_sound
-    "SYSTEM_SOUND" -> R.string.settings_alert_system_sound
-    "VIBRATION" -> R.string.settings_alert_vibration
-    "SILENT" -> R.string.settings_option_silent
-    else -> 0
-}
 
 @StringRes
 fun soundOptionLabelRes(id: String): Int = when (id) {

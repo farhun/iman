@@ -88,8 +88,7 @@
     <string name="settings_theme_system">Sistem</string>
     <string name="settings_theme_light">Terang</string>
     <string name="settings_theme_dark">Gelap</string>
-    <string name="settings_show_continue_reading">Tampilkan Lanjutkan Membaca</string>
-    <string name="settings_show_continue_reading_summary">Tetap tampilkan topik belajar yang terakhir dibuka di halaman Belajar.</string>
+
     <string name="settings_keep_screen_awake">Jaga Layar Tetap Menyala</string>
     <string name="settings_keep_screen_awake_summary">Cegah layar mati saat Iman sedang dibuka.</string>
     <string name="settings_show_quran_exit_reminder">Tampilkan pengingat saat keluar dari Al-Qur\'an tanpa penanda</string>
@@ -133,7 +132,7 @@
 
     <string name="settings_calculation">Perhitungan</string>
     <string name="settings_convention">Metode</string>
-    <string name="settings_convention_summary">Metode perhitungan yang digunakan untuk Subuh dan Isya.</string>
+    <string name="settings_convention_summary">Metode perhitungan yang digunakan untuk Jadwal Salat.</string>
     <string name="settings_conventions_for_country">Konvensi untuk %1$s</string>
     <string name="settings_madhab">Mazhab</string>
     <string name="settings_madhab_summary">Aturan bayangan Asar yang digunakan dalam perhitungan.</string>
@@ -170,15 +169,12 @@
     <string name="settings_method_api">API AlAdhan (Online)</string>
     <string name="settings_madhab_standard">Standar (Syafi\'i, Maliki, Hanbali)</string>
     <string name="settings_madhab_hanafi">Hanafi</string>
-    <string name="settings_alert_custom_sound">Suara kustom</string>
-    <string name="settings_alert_system_sound">Suara sistem</string>
-    <string name="settings_alert_vibration">Getar saja</string>
+
     <string name="settings_option_silent">Senyap</string>
     <string name="settings_sound_default">Default</string>
     <string name="settings_sound_adhan">Azan</string>
     <string name="settings_sound_takbir">Takbir</string>
-    <string name="settings_system_default_alarm">Alarm default sistem</string>
-    <string name="settings_selected_custom_sound">Suara kustom yang dipilih</string>
+
     <string name="settings_not_refreshed_yet">Belum diperbarui</string>
 
     <string name="settings_location">Lokasi</string>
@@ -200,14 +196,8 @@
 
     <string name="settings_reminders">Pengingat</string>
 
-    <string name="settings_extra_timing_alert_style">Gaya notifikasi waktu tambahan</string>
-    <string name="settings_extra_timing_alert_style_summary">Pilih bagaimana notifikasi waktu tambahan berbunyi atau berperilaku.</string>
-    <string name="settings_custom_sound">Suara Kustom</string>
-    <string name="settings_no_ringtone_picker">Pemilih nada dering tidak tersedia di perangkat ini.</string>
-    <string name="settings_choose_alarm_sound">Pilih Suara Alarm</string>
-    <string name="settings_use_system_default">Gunakan Default Sistem</string>
-    <string name="settings_pre_prayer_reminder_sound">Suara pengingat sebelum salat</string>
-    <string name="settings_pre_prayer_reminder_sound_summary">Dipakai bersama oleh semua pengingat sebelum salat.</string>
+
+
 
     <string name="settings_prayer_on">Salat aktif</string>
     <string name="settings_prayer_off">Salat nonaktif</string>
@@ -227,8 +217,7 @@
         <item quantity="other">%1$d menit sebelumnya</item>
     </plurals>
     <string name="settings_extra_timings">Waktu Tambahan</string>
-    <string name="settings_show_extra_timings_home">Tampilkan waktu tambahan di Beranda</string>
-    <string name="settings_show_extra_timings_home_summary">Sertakan waktu tambahan yang dipilih pada tampilan Beranda.</string>
+
     <string name="settings_extra_timing_summary">%1$s · %2$s</string>
     <string name="settings_shown">Ditampilkan</string>
     <string name="settings_hidden">Disembunyikan</string>
@@ -371,8 +360,7 @@
     <string name="tasbih_text_color">Warna teks</string>
     <string name="tasbih_reset_to_default">Kembalikan ke default</string>
     <string name="tasbih_settings_behavior">Perilaku</string>
-    <string name="tasbih_settings_stealth_mode">Mode Senyap</string>
-    <string name="tasbih_settings_stealth_mode_summary">Izinkan menyembunyikan widget agar tampilan lebih bersih.</string>
+
     <string name="tasbih_settings_volume_buttons">Tombol Volume</string>
     <string name="tasbih_settings_volume_buttons_summary">Gunakan tombol volume fisik untuk menghitung.</string>
     <string name="tasbih_settings_animate_volume_keys">Animasikan Tombol Volume</string>
@@ -399,6 +387,8 @@
     <string name="home_now">SEKARANG</string>
     <string name="home_next_prayer">SALAT BERIKUTNYA</string>
     <string name="home_todays_prayers">SALAT HARI INI</string>
+    <string name="home_reminder_on_for">Pengingat aktif untuk %1$s</string>
+    <string name="home_reminder_off_for">Pengingat nonaktif untuk %1$s</string>
     <string name="home_extra_timings">WAKTU TAMBAHAN</string>
     <string name="home_prayers_done_count">%1$d/5</string>
     <string name="home_your_area">Area Anda</string>
@@ -482,14 +472,7 @@
     <string name="notif_channel_prayer_sound_adhan">Suara Salat: Azan</string>
     <string name="notif_channel_prayer_sound_takbir">Suara Salat: Takbir</string>
     <string name="notif_channel_prayer_sound_silent">Suara Salat: Senyap</string>
-    <string name="notif_channel_prayer_reminders">Pengingat Salat</string>
-    <string name="notif_channel_prayer_reminders_custom">Pengingat Salat Kustom</string>
-    <string name="notif_channel_prayer_reminders_vibration">Pengingat Salat Getar</string>
-    <string name="notif_channel_prayer_reminders_silent">Pengingat Salat Senyap</string>
-    <string name="notif_channel_system_description">Pengingat salat dengan suara notifikasi sistem dan peringatan pop-up</string>
-    <string name="notif_channel_custom_description">Pengingat salat dengan nada bergaya alarm yang lebih kuat dan peringatan pop-up</string>
-    <string name="notif_channel_vibration_description">Pengingat salat dengan peringatan pop-up yang hanya bergetar</string>
-    <string name="notif_channel_silent_description">Pengingat salat tanpa suara maupun getar</string>
+
 
     <string name="notif_title_fajr_1">Waktu %1$s tiba. Yuk, awali hari dengan baik.</string>
     <string name="notif_title_fajr_2">Waktu %1$s. Awal hari yang tenang menantimu.</string>

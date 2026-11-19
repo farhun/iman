@@ -106,7 +106,15 @@ class HomeViewModel(
                 locationLabelLat = settings.locationLabelLat,
                 locationLabelLng = settings.locationLabelLng,
                 calculationSource = toHomeCalculationSource(timesResult.source),
-                showExtraPrayerTimingsOnHome = settings.showExtraPrayerTimingsOnHome
+                selectedExtraPrayerTimings = settings.selectedExtraPrayerTimings,
+                prayerNotificationsEnabled = buildSet {
+                    if (settings.fajrPrayerNotificationEnabled) add("Fajr")
+                    if (settings.dhuhrPrayerNotificationEnabled) add("Dhuhr")
+                    if (settings.asrPrayerNotificationEnabled) add("Asr")
+                    if (settings.maghribPrayerNotificationEnabled) add("Maghrib")
+                    if (settings.ishaPrayerNotificationEnabled) add("Isha")
+                },
+                extraPrayerNotifications = settings.extraPrayerNotifications
             )
         }
 
@@ -302,7 +310,15 @@ class HomeViewModel(
             locationLabelLat = settings.locationLabelLat,
             locationLabelLng = settings.locationLabelLng,
             calculationSource = toHomeCalculationSource(timesResult.source),
-            showExtraPrayerTimingsOnHome = settings.showExtraPrayerTimingsOnHome
+            selectedExtraPrayerTimings = settings.selectedExtraPrayerTimings,
+            prayerNotificationsEnabled = buildSet {
+                if (settings.fajrPrayerNotificationEnabled) add("Fajr")
+                if (settings.dhuhrPrayerNotificationEnabled) add("Dhuhr")
+                if (settings.asrPrayerNotificationEnabled) add("Asr")
+                if (settings.maghribPrayerNotificationEnabled) add("Maghrib")
+                if (settings.ishaPrayerNotificationEnabled) add("Isha")
+            },
+            extraPrayerNotifications = settings.extraPrayerNotifications
         )
     }.stateIn(
         scope = viewModelScope,

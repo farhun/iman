@@ -88,8 +88,7 @@
     <string name="settings_theme_system">System</string>
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
-    <string name="settings_show_continue_reading">Show Continue Reading</string>
-    <string name="settings_show_continue_reading_summary">Keep the last opened study topic visible in Study.</string>
+
     <string name="settings_keep_screen_awake">Keep Screen Awake</string>
     <string name="settings_keep_screen_awake_summary">Prevent the screen from sleeping while Iman is open.</string>
     <string name="settings_show_quran_exit_reminder">Show exit reminder for unbookmarked Quran</string>
@@ -133,7 +132,7 @@
 
     <string name="settings_calculation">Calculation</string>
     <string name="settings_convention">Convention</string>
-    <string name="settings_convention_summary">The calculation convention used for Fajr and Isha.</string>
+    <string name="settings_convention_summary">The calculation convention used for Prayer Times.</string>
     <string name="settings_conventions_for_country">Conventions for %1$s</string>
     <string name="settings_madhab">Madhab</string>
     <string name="settings_madhab_summary">The Asr shadow rule used in the calculation.</string>
@@ -170,15 +169,12 @@
     <string name="settings_method_api">AlAdhan API (Online)</string>
     <string name="settings_madhab_standard">Standard (Shafi, Maliki, Hanbali)</string>
     <string name="settings_madhab_hanafi">Hanafi</string>
-    <string name="settings_alert_custom_sound">Custom sound</string>
-    <string name="settings_alert_system_sound">System sound</string>
-    <string name="settings_alert_vibration">Vibration only</string>
+
     <string name="settings_option_silent">Silent</string>
     <string name="settings_sound_default">Default</string>
     <string name="settings_sound_adhan">Adhan</string>
     <string name="settings_sound_takbir">Takbir</string>
-    <string name="settings_system_default_alarm">System default alarm</string>
-    <string name="settings_selected_custom_sound">Selected custom sound</string>
+
     <string name="settings_not_refreshed_yet">Not refreshed yet</string>
 
     <string name="settings_location">Location</string>
@@ -200,14 +196,8 @@
 
     <string name="settings_reminders">Reminders</string>
 
-    <string name="settings_extra_timing_alert_style">Extra timing alert style</string>
-    <string name="settings_extra_timing_alert_style_summary">Choose how extra timing notifications sound or behave.</string>
-    <string name="settings_custom_sound">Custom Sound</string>
-    <string name="settings_no_ringtone_picker">No ringtone picker is available on this device.</string>
-    <string name="settings_choose_alarm_sound">Choose Alarm Sound</string>
-    <string name="settings_use_system_default">Use System Default</string>
-    <string name="settings_pre_prayer_reminder_sound">Pre-prayer reminder sound</string>
-    <string name="settings_pre_prayer_reminder_sound_summary">Shared by all pre-prayer reminders.</string>
+
+
 
     <string name="settings_prayer_on">Prayer on</string>
     <string name="settings_prayer_off">Prayer off</string>
@@ -228,8 +218,7 @@
         <item quantity="other">%1$d minutes before</item>
     </plurals>
     <string name="settings_extra_timings">Extra Timings</string>
-    <string name="settings_show_extra_timings_home">Show extra timings on Home</string>
-    <string name="settings_show_extra_timings_home_summary">Include selected extra timings on Home surfaces.</string>
+
     <string name="settings_extra_timing_summary">%1$s · %2$s</string>
     <string name="settings_shown">Shown</string>
     <string name="settings_hidden">Hidden</string>
@@ -372,8 +361,7 @@
     <string name="tasbih_text_color">Text color</string>
     <string name="tasbih_reset_to_default">Reset to default</string>
     <string name="tasbih_settings_behavior">Behavior</string>
-    <string name="tasbih_settings_stealth_mode">Stealth Mode</string>
-    <string name="tasbih_settings_stealth_mode_summary">Allow hiding widgets for a cleaner view.</string>
+
     <string name="tasbih_settings_volume_buttons">Volume Buttons</string>
     <string name="tasbih_settings_volume_buttons_summary">Use physical volume keys to count.</string>
     <string name="tasbih_settings_animate_volume_keys">Animate Volume Keys</string>
@@ -400,6 +388,8 @@
     <string name="home_now">NOW</string>
     <string name="home_next_prayer">NEXT PRAYER</string>
     <string name="home_todays_prayers">TODAY\'S PRAYERS</string>
+    <string name="home_reminder_on_for">Reminder on for %1$s</string>
+    <string name="home_reminder_off_for">Reminder off for %1$s</string>
     <string name="home_extra_timings">EXTRA TIMINGS</string>
     <string name="home_prayers_done_count">%1$d/5</string>
     <string name="home_your_area">Your area</string>
@@ -483,14 +473,7 @@
     <string name="notif_channel_prayer_sound_adhan">Prayer Sound: Adhan</string>
     <string name="notif_channel_prayer_sound_takbir">Prayer Sound: Takbir</string>
     <string name="notif_channel_prayer_sound_silent">Prayer Sound: Silent</string>
-    <string name="notif_channel_prayer_reminders">Prayer Reminders</string>
-    <string name="notif_channel_prayer_reminders_custom">Prayer Reminders Custom</string>
-    <string name="notif_channel_prayer_reminders_vibration">Prayer Reminders Vibration</string>
-    <string name="notif_channel_prayer_reminders_silent">Prayer Reminders Silent</string>
-    <string name="notif_channel_system_description">Prayer reminders with system notification sound and heads-up alerts</string>
-    <string name="notif_channel_custom_description">Prayer reminders with a stronger alarm-style tone and heads-up alerts</string>
-    <string name="notif_channel_vibration_description">Prayer reminders with vibration-only heads-up alerts</string>
-    <string name="notif_channel_silent_description">Prayer reminders with no sound or vibration</string>
+
 
     <string name="notif_title_fajr_1">%1$s is here. Let\'s begin the day well.</string>
     <string name="notif_title_fajr_2">%1$s time. A quiet start is waiting for you.</string>

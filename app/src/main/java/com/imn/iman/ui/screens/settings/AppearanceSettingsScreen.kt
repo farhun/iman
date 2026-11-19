@@ -148,12 +148,6 @@ fun AppearanceSettingsScreen(
                     }
                 }
 
-                SettingsToggleItem(
-                    title = stringResource(R.string.settings_show_continue_reading),
-                    subtitle = stringResource(R.string.settings_show_continue_reading_summary),
-                    checked = settings.showContinueReading,
-                    onCheckedChange = viewModel::toggleShowContinueReading
-                )
 
                 SettingsToggleItem(
                     title = stringResource(R.string.settings_keep_screen_awake),

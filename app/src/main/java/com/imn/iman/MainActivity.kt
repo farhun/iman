@@ -230,6 +230,7 @@ class MainActivity : ComponentActivity() {
 
 
         lifecycleScope.launch {
+            settingsRepository.migrateReminderSettingsV2()
             settingsRepository.settingsFlow
                 .map { settings -> settings.toPrayerNotificationScheduleConfig() to settings }
                 .distinctUntilChanged { old, new -> old.first == new.first }
@@ -514,6 +515,11 @@ private fun ImanApp(
                             contentPadding = screenContentPadding,
                             onSettingsClick = {
                                 navController.navigate(SETTINGS_ROUTE) { launchSingleTop = true }
+                            },
+                            onReminderClick = { focusId ->
+                                navController.navigate(prayerSettingsRoute(focusId)) {
+                                    launchSingleTop = true
+                                }
                             }
                         )
                     }
@@ -649,15 +655,23 @@ private fun ImanApp(
                     }
 
                     composable(
-                        route = com.imn.iman.ui.navigation.SETTINGS_PRAYER_ROUTE,
+                        route = SETTINGS_PRAYER_FOCUS_ROUTE,
+                        arguments = listOf(
+                            navArgument("focus") {
+                                type = NavType.StringType
+                                nullable = true
+                                defaultValue = null
+                            }
+                        ),
                         enterTransition = { subScreenEnter() },
                         exitTransition = { subScreenExit() },
                         popEnterTransition = { subScreenPopEnter() },
                         popExitTransition = { subScreenPopExit() },
-                    ) {
+                    ) { backStackEntry ->
                         PrayerSettingsScreen(
                             viewModel = settingsViewModel,
-                            onBack = { navController.popBackStack() }
+                            onBack = { navController.popBackStack() },
+                            focusId = backStackEntry.arguments?.getString("focus")
                         )
                     }
 

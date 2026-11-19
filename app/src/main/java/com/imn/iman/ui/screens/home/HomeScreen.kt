@@ -164,6 +164,7 @@ private fun compassPointLabel(bearing: Double): String {
 }
 
 private data class CompassState(val heading: Float?, val accuracy: Int)
+
 @Composable
 private fun rememberDeviceHeading(latitude: Float, longitude: Float): CompassState {
     val context = LocalContext.current
@@ -554,6 +555,7 @@ fun HomeScreen(
     hazeState: HazeState,
     contentPadding: PaddingValues,
     onSettingsClick: () -> Unit,
+    onReminderClick: (String) -> Unit,
     viewModel: HomeViewModel,
     modifier: Modifier = Modifier,
 ) {
@@ -610,7 +612,8 @@ fun HomeScreen(
 
 
     val displayPrayers = uiState.prayers.ifEmpty { cachedPrayers }
-    val displayExtraTimings = uiState.extraTimings.ifEmpty { cachedExtraTimings }
+    val displayExtraTimings = (uiState.extraTimings.ifEmpty { cachedExtraTimings })
+        .filter { it.name in uiState.selectedExtraPrayerTimings }
 
     val displayHijriDate = uiState.hijriDate.ifBlank { cachedHijriDate }
     val hijriDateFallback = stringResource(R.string.home_hijri_date_fallback)
@@ -623,12 +626,11 @@ fun HomeScreen(
     }
 
     val currentPrayer = findCurrentPrayer(displayPrayers, currentTimeMillis)
-    val homeVisibleTimings =
-        if (uiState.showExtraPrayerTimingsOnHome) {
-            (displayPrayers + displayExtraTimings).sortedBy { it.rawTime.toEpochMilliseconds() }
-        } else {
-            displayPrayers
-        }
+    val homeVisibleTimings = if (displayExtraTimings.isNotEmpty()) {
+        (displayPrayers + displayExtraTimings).sortedBy { it.rawTime.toEpochMilliseconds() }
+    } else {
+        displayPrayers
+    }
     val nextPrayer = findNextPrayer(homeVisibleTimings, currentTimeMillis)
 
     val sunArcT by derivedStateOf {
@@ -794,7 +796,8 @@ fun HomeScreen(
                                 state = listState,
                                 contentPadding = PaddingValues(
                                     bottom = contentPadding.calculateBottomPadding() +
-                                            WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 32.dp
+                                            WindowInsets.navigationBars.asPaddingValues()
+                                                .calculateBottomPadding() + 32.dp
                                 ),
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -803,14 +806,15 @@ fun HomeScreen(
                                 item {
                                     PrayerSlab(
                                         prayers = displayPrayers,
-                                        extraTimings =
-                                            if (uiState.showExtraPrayerTimingsOnHome) displayExtraTimings
-                                            else emptyList(),
+                                        extraTimings = displayExtraTimings,
                                         activePrayerName = currentPrayer?.name,
                                         ayahRef = uiState.ayahRef,
                                         darkTheme = darkTheme,
                                         locationLabel = locationLabel,
                                         source = uiState.calculationSource,
+                                        prayerRemindersEnabled = uiState.prayerNotificationsEnabled,
+                                        extraRemindersEnabled = uiState.extraPrayerNotifications,
+                                        onReminderClick = onReminderClick,
                                         modifier = Modifier.fillMaxWidth(),
                                     )
                                 }
@@ -911,7 +915,9 @@ fun HomeScreen(
                             showTimeOverrideDialog = false
                         }
                     ) { Text(stringResource(R.string.common_reset)) }
-                    TextButton(onClick = { showTimeOverrideDialog = false }) { Text(stringResource(R.string.common_close)) }
+                    TextButton(onClick = {
+                        showTimeOverrideDialog = false
+                    }) { Text(stringResource(R.string.common_close)) }
                 }
             }
         )

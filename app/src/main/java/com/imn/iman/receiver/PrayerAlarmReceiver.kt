@@ -54,8 +54,10 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         val pendingResult = goAsync()
         CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             try {
+                val reminderSettingsRepository = SettingsRepository(appContext)
                 val settings = try {
-                    SettingsRepository(appContext).settingsFlow.first()
+                    reminderSettingsRepository.migrateReminderSettingsV2()
+                    reminderSettingsRepository.settingsFlow.first()
                 } catch (cancelled: CancellationException) {
                     throw cancelled
                 } catch (error: Exception) {
@@ -76,10 +78,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                     Log.e("ImanNotif", "Failed to resync prayer alarms before notification", error)
                 }
                 try {
-                    PrayerNotificationScheduler.createNotificationChannels(
-                        appContext,
-                        settings.prayerNotificationCustomSoundUri
-                    )
+                    PrayerNotificationScheduler.createNotificationChannels(appContext)
                 } catch (error: Exception) {
                     Log.e("ImanNotif", "Failed to prepare prayer notification channels", error)
                 }
@@ -90,8 +89,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                         prayerName = prayerName,
                         type = type,
                         triggerAtMillis = triggerAtMillis,
-                        prePrayerMinutes = prePrayerMinutes,
-                        alertStyle = settings.prayerNotificationAlertStyle
+                        prePrayerMinutes = prePrayerMinutes
                     )
                 } catch (cancelled: CancellationException) {
                     throw cancelled

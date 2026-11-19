@@ -23,7 +23,6 @@ object PrayerNotificationPublisher {
         type: PrayerAlarmType,
         triggerAtMillis: Long,
         prePrayerMinutes: Int,
-        alertStyle: String,
     ) {
         val appContext = context.applicationContext
         val notificationManager = NotificationManagerCompat.from(appContext)
@@ -44,14 +43,23 @@ object PrayerNotificationPublisher {
         }
 
         val selectedSound = when {
-            type == PrayerAlarmType.PRE_PRAYER -> settings.prePrayerNotificationSound
+            type == PrayerAlarmType.PRE_PRAYER -> when (prayerName) {
+                "Fajr" -> settings.fajrPrePrayerNotificationSound
+                "Dhuhr" -> settings.dhuhrPrePrayerNotificationSound
+                "Asr" -> settings.asrPrePrayerNotificationSound
+                "Maghrib" -> settings.maghribPrePrayerNotificationSound
+                "Isha" -> settings.ishaPrePrayerNotificationSound
+                else -> "DEFAULT"
+            }
+
+            settings.extraPrayerSounds.containsKey(prayerName) -> settings.extraPrayerSounds[prayerName] ?: "DEFAULT"
             else -> when (prayerName) {
                 "Fajr" -> settings.fajrPrayerNotificationSound
                 "Dhuhr" -> settings.dhuhrPrayerNotificationSound
                 "Asr" -> settings.asrPrayerNotificationSound
                 "Maghrib" -> settings.maghribPrayerNotificationSound
                 "Isha" -> settings.ishaPrayerNotificationSound
-                else -> null
+                else -> "DEFAULT"
             }
         }
 
@@ -80,11 +88,23 @@ object PrayerNotificationPublisher {
         }
         Log.d("ImanNotif", "Resolved notification locale=$localeTag title=${content.title} body=${content.utilityLine}")
 
-        val requestedChannelId = selectedSound?.let(PrayerNotificationScheduler::channelIdForSound)
-            ?: PrayerNotificationScheduler.channelIdForStyle(
-                style = alertStyle,
-                customSoundUriString = settings.prayerNotificationCustomSoundUri
+        val requestedChannelId = PrayerNotificationScheduler.channelIdForSound(selectedSound)
+        when {
+            type == PrayerAlarmType.PRE_PRAYER -> Log.d(
+                "ImanNotif",
+                "Pre-prayer channel selected prayer=$prayerName sound=$selectedSound channel=$requestedChannelId"
             )
+
+            settings.extraPrayerSounds.containsKey(prayerName) -> Log.d(
+                "ImanNotif",
+                "Extra timing channel selected timing=$prayerName sound=$selectedSound channel=$requestedChannelId"
+            )
+
+            else -> Log.d(
+                "ImanNotif",
+                "Prayer channel selected prayer=$prayerName sound=$selectedSound channel=$requestedChannelId"
+            )
+        }
         var channelId = requestedChannelId
         val notificationsEnabled = try {
             notificationManager.areNotificationsEnabled()
@@ -112,64 +132,50 @@ object PrayerNotificationPublisher {
                 null
             }
         }
-        Log.d("ImanNotif", "areNotificationsEnabled=$notificationsEnabled channelId=$channelId importance=$channelImportance")
+        Log.d(
+            "ImanNotif",
+            "areNotificationsEnabled=$notificationsEnabled channelId=$channelId importance=$channelImportance"
+        )
         Log.d("ImanNotif", "Using notification channel id=$channelId")
 
         try {
-        val builder = NotificationCompat.Builder(
-            appContext,
-            channelId
-        )
-            .setSmallIcon(R.drawable.ic_notification_glyph)
-            .setColor(ContextCompat.getColor(appContext, R.color.notification_icon_background))
-            .setContentTitle(content.title)
-            .setContentText(content.utilityLine)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(content.expandedText))
-            .setCategory(NotificationCompat.CATEGORY_REMINDER)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setPriority(
-                if (selectedSound == "SILENT" || (selectedSound == null && alertStyle == "SILENT")) {
-                    NotificationCompat.PRIORITY_LOW
-                } else {
-                    NotificationCompat.PRIORITY_HIGH
-                }
+            val builder = NotificationCompat.Builder(
+                appContext,
+                channelId
             )
-            .setAutoCancel(true)
-        contentIntent?.let(builder::setContentIntent)
+                .setSmallIcon(R.drawable.ic_notification_glyph)
+                .setColor(ContextCompat.getColor(appContext, R.color.notification_icon_background))
+                .setContentTitle(content.title)
+                .setContentText(content.utilityLine)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(content.expandedText))
+                .setCategory(NotificationCompat.CATEGORY_REMINDER)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setPriority(
+                    if (selectedSound == "SILENT") {
+                        NotificationCompat.PRIORITY_LOW
+                    } else {
+                        NotificationCompat.PRIORITY_HIGH
+                    }
+                )
+                .setAutoCancel(true)
+            contentIntent?.let(builder::setContentIntent)
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O && selectedSound != null) {
-            if (selectedSound == "SILENT") {
-                builder.setSilent(true)
-            } else {
-                PrayerNotificationScheduler.soundUriForSelection(appContext, selectedSound)?.let(builder::setSound)
-                builder.setDefaults(NotificationCompat.DEFAULT_LIGHTS)
-                builder.setVibrate(longArrayOf(0L, 180L, 120L, 180L))
-            }
-        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            when (alertStyle) {
-                "CUSTOM_SOUND", "SYSTEM_SOUND" -> {
-                    builder.setSound(
-                        PrayerNotificationScheduler.defaultSoundUriForStyle(
-                            style = alertStyle,
-                            customSoundUriString = settings.prayerNotificationCustomSoundUri
-                        )
-                    )
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                if (selectedSound == "SILENT") {
+                    builder.setSilent(true)
+                } else {
+                    PrayerNotificationScheduler.soundUriForSelection(appContext, selectedSound)?.let(builder::setSound)
                     builder.setDefaults(NotificationCompat.DEFAULT_LIGHTS)
                     builder.setVibrate(longArrayOf(0L, 180L, 120L, 180L))
                 }
-                "VIBRATION" -> {
-                    builder.setVibrate(longArrayOf(0L, 220L, 140L, 220L))
-                }
-                "SILENT" -> builder.setSilent(true)
+            } else if (selectedSound == "SILENT") {
+                builder.setSilent(true)
             }
-        } else if (selectedSound == "SILENT" || (selectedSound == null && alertStyle == "SILENT")) {
-            builder.setSilent(true)
-        }
 
-        val notificationId = "$prayerName-${type.name}".hashCode()
-        Log.d("ImanNotif", "Calling notify() for $prayerName ${type.name}")
-        notificationManager.notify(notificationId, builder.build())
-        Log.d("ImanNotif", "notify() completed for $prayerName ${type.name}")
+            val notificationId = "$prayerName-${type.name}".hashCode()
+            Log.d("ImanNotif", "Calling notify() for $prayerName ${type.name}")
+            notificationManager.notify(notificationId, builder.build())
+            Log.d("ImanNotif", "notify() completed for $prayerName ${type.name}")
         } catch (error: Exception) {
             Log.e("ImanNotif", "Failed to build or post notification; retrying with fallback text", error)
             try {

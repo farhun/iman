@@ -66,9 +66,13 @@ data class PrayerNotificationScheduleConfig(
     val asrPrayerNotificationSound: String,
     val maghribPrayerNotificationSound: String,
     val ishaPrayerNotificationSound: String,
-    val prePrayerNotificationSound: String,
-    val prayerNotificationAlertStyle: String,
+    val fajrPrePrayerNotificationSound: String,
+    val dhuhrPrePrayerNotificationSound: String,
+    val asrPrePrayerNotificationSound: String,
+    val maghribPrePrayerNotificationSound: String,
+    val ishaPrePrayerNotificationSound: String,
     val extraPrayerNotifications: Set<String>,
+    val extraPrayerSounds: Map<String, String>,
 )
 
 fun UserSettings.toPrayerNotificationScheduleConfig(): PrayerNotificationScheduleConfig {
@@ -104,9 +108,13 @@ fun UserSettings.toPrayerNotificationScheduleConfig(): PrayerNotificationSchedul
         asrPrayerNotificationSound = asrPrayerNotificationSound,
         maghribPrayerNotificationSound = maghribPrayerNotificationSound,
         ishaPrayerNotificationSound = ishaPrayerNotificationSound,
-        prePrayerNotificationSound = prePrayerNotificationSound,
-        prayerNotificationAlertStyle = prayerNotificationAlertStyle,
+        fajrPrePrayerNotificationSound = fajrPrePrayerNotificationSound,
+        dhuhrPrePrayerNotificationSound = dhuhrPrePrayerNotificationSound,
+        asrPrePrayerNotificationSound = asrPrePrayerNotificationSound,
+        maghribPrePrayerNotificationSound = maghribPrePrayerNotificationSound,
+        ishaPrePrayerNotificationSound = ishaPrePrayerNotificationSound,
         extraPrayerNotifications = extraPrayerNotifications,
+        extraPrayerSounds = extraPrayerSounds,
     )
 }
 
@@ -134,8 +142,13 @@ class PrayerNotificationScheduler(
     }
 
     private suspend fun syncNotificationsSafely(settings: UserSettings?, retryNow: Boolean, noNetwork: Boolean) {
-        val currentSettings = settings ?: settingsRepository.settingsFlow.first()
-        createNotificationChannels(appContext, currentSettings.prayerNotificationCustomSoundUri)
+        val migrated = settingsRepository.migrateReminderSettingsV2()
+        val currentSettings = if (migrated) {
+            settingsRepository.settingsFlow.first()
+        } else {
+            settings ?: settingsRepository.settingsFlow.first()
+        }
+        createNotificationChannels(appContext)
         cancelAllScheduledNotifications()
         scheduleMidnightReschedule()
         val todayDate = DateAnchor.Today.resolve()
@@ -475,8 +488,7 @@ class PrayerNotificationScheduler(
             prayerName = prayerName,
             type = type,
             triggerAtMillis = triggerAtMillis,
-            prePrayerMinutes = prePrayerMinutes,
-            alertStyle = settings.prayerNotificationAlertStyle
+            prePrayerMinutes = prePrayerMinutes
         )
         settingsRepository.updateLastDeliveredPrayerNotificationEventId(eventId)
     }
@@ -517,10 +529,7 @@ class PrayerNotificationScheduler(
     }
 
     companion object {
-        const val CHANNEL_SYSTEM_SOUND = "prayer_reminders_system_sound_v2"
-        const val CHANNEL_CUSTOM_SOUND_PREFIX = "prayer_reminders_custom_sound_v3_"
-        const val CHANNEL_VIBRATION = "prayer_reminders_vibration_v2"
-        const val CHANNEL_SILENT = "prayer_reminders_silent_v3"
+
         const val CHANNEL_PRAYER_DEFAULT = "prayer_default"
         const val CHANNEL_PRAYER_ADHAN = "prayer_adhan"
         const val CHANNEL_PRAYER_TAKBIR = "prayer_takbir"
@@ -530,6 +539,12 @@ class PrayerNotificationScheduler(
         private const val ACTION_RESCHEDULE_AT_MIDNIGHT = "com.imn.iman.action.RESCHEDULE_AT_MIDNIGHT"
 
         private const val TAG = "PrayerAlarmScheduler"
+        private const val OBSOLETE_CHANNELS_PREFERENCES = "reminder_channel_cleanup"
+        private const val OBSOLETE_CHANNELS_DELETED_KEY = "obsolete_channels_deleted_v2"
+        private const val LEGACY_CHANNEL_SYSTEM_SOUND = "prayer_reminders_system_sound_v2"
+        private const val LEGACY_CHANNEL_CUSTOM_SOUND_PREFIX = "prayer_reminders_custom_sound_v3_"
+        private const val LEGACY_CHANNEL_VIBRATION = "prayer_reminders_vibration_v2"
+        private const val LEGACY_CHANNEL_SILENT = "prayer_reminders_silent_v3"
         private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
         fun launchInApplicationScope(block: suspend () -> Unit): Job = applicationScope.launch { block() }
@@ -570,13 +585,41 @@ class PrayerNotificationScheduler(
             }
         }
 
-        fun createNotificationChannels(
-            context: Context,
-            customSoundUriString: String = "",
-        ) {
+        @Synchronized
+        fun deleteObsoleteNotificationChannels(context: Context) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+            val appContext = context.applicationContext
+            val preferences = appContext.getSharedPreferences(
+                OBSOLETE_CHANNELS_PREFERENCES,
+                Context.MODE_PRIVATE
+            )
+            if (preferences.getBoolean(OBSOLETE_CHANNELS_DELETED_KEY, false)) return
+            try {
+                val notificationManager = appContext.getSystemService(NotificationManager::class.java)
+                val obsoleteCustomChannels = notificationManager.notificationChannels
+                    .orEmpty()
+                    .map { it.id }
+                    .filter { it.startsWith(LEGACY_CHANNEL_CUSTOM_SOUND_PREFIX) }
+                val obsoleteChannels = listOf(
+                    LEGACY_CHANNEL_SYSTEM_SOUND,
+                    LEGACY_CHANNEL_VIBRATION,
+                    LEGACY_CHANNEL_SILENT
+                ) + obsoleteCustomChannels
+                obsoleteChannels.distinct().forEach { channelId ->
+                    notificationManager.deleteNotificationChannel(channelId)
+                    Log.d("ImanNotif", "Deleted obsolete notification channel id=$channelId")
+                }
+                preferences.edit().putBoolean(OBSOLETE_CHANNELS_DELETED_KEY, true).apply()
+            } catch (error: Exception) {
+                Log.e("ImanNotif", "Failed to delete obsolete notification channels", error)
+            }
+        }
+
+        fun createNotificationChannels(context: Context) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
 
             val appContext = context.applicationContext
+            deleteObsoleteNotificationChannels(appContext)
             try {
                 val localizedContext = LocaleHelper.wrap(appContext)
                 val notificationManager = appContext.getSystemService(NotificationManager::class.java)
@@ -584,10 +627,6 @@ class PrayerNotificationScheduler(
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                     .build()
-                val customSoundUri = customSoundUriString
-                    .takeIf { it.isNotBlank() }
-                    ?.let(Uri::parse)
-                    ?: defaultCustomSoundUri()
                 val channels = listOf(
                     NotificationChannel(
                         CHANNEL_PRAYER_DEFAULT,
@@ -625,48 +664,7 @@ class PrayerNotificationScheduler(
                         enableVibration(false)
                         lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                     },
-                    NotificationChannel(
-                        CHANNEL_SYSTEM_SOUND,
-                        localizedContext.getString(R.string.notif_channel_prayer_reminders),
-                        NotificationManager.IMPORTANCE_HIGH
-                    ).apply {
-                        description = localizedContext.getString(R.string.notif_channel_system_description)
-                        setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), audioAttributes)
-                        enableVibration(true)
-                        lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-                    },
-                    NotificationChannel(
-                        customSoundChannelId(customSoundUriString),
-                        localizedContext.getString(R.string.notif_channel_prayer_reminders_custom),
-                        NotificationManager.IMPORTANCE_HIGH
-                    ).apply {
-                        description = localizedContext.getString(R.string.notif_channel_custom_description)
-                        setSound(customSoundUri, audioAttributes)
-                        enableVibration(true)
-                        lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-                    },
-                    NotificationChannel(
-                        CHANNEL_VIBRATION,
-                        localizedContext.getString(R.string.notif_channel_prayer_reminders_vibration),
-                        NotificationManager.IMPORTANCE_HIGH
-                    ).apply {
-                        description = localizedContext.getString(R.string.notif_channel_vibration_description)
-                        setSound(null, null)
-                        enableVibration(true)
-                        vibrationPattern = longArrayOf(0L, 220L, 140L, 220L)
-                        lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-                    },
-                    NotificationChannel(
-                        CHANNEL_SILENT,
-                        localizedContext.getString(R.string.notif_channel_prayer_reminders_silent),
-                        NotificationManager.IMPORTANCE_HIGH
-                    ).apply {
-                        description = localizedContext.getString(R.string.notif_channel_silent_description)
-                        setSound(null, null)
-                        enableVibration(false)
-                        setShowBadge(false)
-                        lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-                    }
+
                 )
                 channels.forEach { channel ->
                     notificationManager.createNotificationChannel(channel)
@@ -691,32 +689,6 @@ class PrayerNotificationScheduler(
             else -> RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         }
 
-        fun channelIdForStyle(
-            style: String,
-            customSoundUriString: String = "",
-        ): String {
-            return when (style) {
-                "CUSTOM_SOUND" -> customSoundChannelId(customSoundUriString)
-                "VIBRATION" -> CHANNEL_VIBRATION
-                "SILENT" -> CHANNEL_SILENT
-                else -> CHANNEL_SYSTEM_SOUND
-            }
-        }
-
-        fun defaultSoundUriForStyle(
-            style: String,
-            customSoundUriString: String = "",
-        ): Uri? {
-            return when (style) {
-                "CUSTOM_SOUND" -> customSoundUriString
-                    .takeIf { it.isNotBlank() }
-                    ?.let(Uri::parse)
-                    ?: defaultCustomSoundUri()
-
-                "SYSTEM_SOUND" -> RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-                else -> null
-            }
-        }
 
         fun eventIdFor(
             prayerName: String,
@@ -733,14 +705,7 @@ class PrayerNotificationScheduler(
             )
         }
 
-        private fun defaultCustomSoundUri(): Uri {
-            return RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-        }
 
-        private fun customSoundChannelId(customSoundUriString: String): String {
-            val channelSuffix = customSoundUriString.ifBlank { "default" }.hashCode().toString().replace("-", "n")
-            return "$CHANNEL_CUSTOM_SOUND_PREFIX$channelSuffix"
-        }
     }
 }
 

@@ -27,11 +27,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material.icons.filled.WbTwilight
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
@@ -73,6 +76,7 @@ import com.imn.iman.ui.theme.PlusJakartaSansBold
 import com.imn.iman.ui.theme.PlusJakartaSans
 import com.imn.iman.ui.theme.NotoSansArabic
 import java.util.Calendar
+import java.util.Locale
 import kotlin.math.max
 import kotlin.math.min
 import kotlinx.coroutines.delay
@@ -2223,6 +2227,9 @@ fun PrayerSlab(
     darkTheme: Boolean,
     locationLabel: String,
     source: CalculationSource,
+    prayerRemindersEnabled: Set<String>,
+    extraRemindersEnabled: Set<String>,
+    onReminderClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -2312,6 +2319,24 @@ fun PrayerSlab(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 8.5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        val reminderEnabled = p.name in prayerRemindersEnabled
+                        IconButton(
+                            onClick = { onReminderClick("reminder_${p.name.lowercase(Locale.ROOT)}") },
+                            modifier = Modifier.offset(x = (-10).dp).size(40.dp)
+                        ) {
+                            Icon(
+                                imageVector = if (reminderEnabled) Icons.Default.NotificationsActive
+                                else Icons.Default.NotificationsOff,
+                                contentDescription = stringResource(
+                                    if (reminderEnabled) R.string.home_reminder_on_for
+                                    else R.string.home_reminder_off_for,
+                                    prayerLabel(p.name)
+                                ),
+                                tint = if (reminderEnabled) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                modifier = Modifier.size(19.dp)
+                            )
+                        }
                         // Name
                         Text(
                             text = prayerLabel(p.name),
@@ -2359,6 +2384,7 @@ fun PrayerSlab(
                                     minWidth = 60.dp
                                 )
                         )
+
                     }
 
                     if (i < prayers.size - 1) {
@@ -2436,6 +2462,24 @@ fun PrayerSlab(
                             modifier = Modifier.fillMaxWidth().padding(vertical = 8.5.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
+                            val reminderEnabled = timing.name in extraRemindersEnabled
+                            IconButton(
+                                onClick = { onReminderClick("extra_${timing.name}") },
+                                modifier = Modifier.offset(x = (-10).dp).size(40.dp),
+                            ) {
+                                Icon(
+                                    imageVector = if (reminderEnabled) Icons.Default.NotificationsActive
+                                    else Icons.Default.NotificationsOff,
+                                    contentDescription = stringResource(
+                                        if (reminderEnabled) R.string.home_reminder_on_for
+                                        else R.string.home_reminder_off_for,
+                                        prayerLabel(timing.name)
+                                    ),
+                                    tint = if (reminderEnabled) MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                    modifier = Modifier.size(19.dp),
+                                )
+                            }
                             Text(
                                 text = prayerLabel(timing.name),
                                 style = MaterialTheme.typography.bodyLarge.copy(
@@ -2464,6 +2508,7 @@ fun PrayerSlab(
                                 textAlign = TextAlign.End,
                                 modifier = Modifier.defaultMinSize(minWidth = 60.dp),
                             )
+
                         }
                         if (index < extraTimings.lastIndex) {
                             Box(

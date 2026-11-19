@@ -84,6 +84,7 @@ fun TasbeehCustomizeScreen(
 
             }
 
+
             SettingsGroup {
                 Box(modifier = Modifier.padding(horizontal = 20.dp)) {
                     SettingsDropdown(
@@ -102,17 +103,12 @@ fun TasbeehCustomizeScreen(
                 }
             }
 
+
+
             SettingsGroup(
                 title = stringResource(R.string.tasbih_settings_behavior),
 //                description = "How the Tasbih screen reacts while you count."
             ) {
-
-                SettingsToggleItem(
-                    title = stringResource(R.string.tasbih_settings_stealth_mode),
-                    subtitle = stringResource(R.string.tasbih_settings_stealth_mode_summary),
-                    checked = settings.tasbeehStealthModeAllowed,
-                    onCheckedChange = { viewModel.toggleTasbeehStealthModeAllowed(it) }
-                )
                 SettingsToggleItem(
                     title = stringResource(R.string.tasbih_settings_volume_buttons),
                     subtitle = stringResource(R.string.tasbih_settings_volume_buttons_summary),
