@@ -69,9 +69,11 @@ fun AboutSettingsScreen(
             LargeTopAppBar(
                 title = { SettingsTopBarTitle(stringResource(R.string.about_title), scrollBehavior) },
                 navigationIcon = { SettingsBackButton(onBack) },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                colors = SettingsTopAppBarColors()
             )
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
             modifier = Modifier

@@ -472,9 +472,11 @@ fun PrayerSettingsScreen(
             LargeTopAppBar(
                 title = { SettingsTopBarTitle(stringResource(R.string.settings_prayer_times), scrollBehavior) },
                 navigationIcon = { SettingsBackButton(onBack) },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                colors = SettingsTopAppBarColors()
             )
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
             modifier = Modifier

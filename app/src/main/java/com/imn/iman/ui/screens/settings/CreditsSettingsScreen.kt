@@ -74,9 +74,11 @@ fun CreditsSettingsScreen(onBack: () -> Unit) {
             LargeTopAppBar(
                 title = { SettingsTopBarTitle(stringResource(R.string.about_credits_title), scrollBehavior) },
                 navigationIcon = { SettingsBackButton(onBack) },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                colors = SettingsTopAppBarColors()
             )
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(paddingValues),

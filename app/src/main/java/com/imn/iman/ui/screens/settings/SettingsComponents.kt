@@ -34,6 +34,13 @@ import androidx.compose.runtime.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun SettingsTopAppBarColors() = TopAppBarDefaults.largeTopAppBarColors(
+    containerColor = MaterialTheme.colorScheme.background,
+    scrolledContainerColor = MaterialTheme.colorScheme.background
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun SettingsTopBarTitle(text: String, scrollBehavior: TopAppBarScrollBehavior) {
     val fraction = scrollBehavior.state.collapsedFraction
     val fontSize = lerp(28f, 20f, fraction).sp

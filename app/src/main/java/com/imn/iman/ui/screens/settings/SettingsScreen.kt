@@ -82,12 +82,10 @@ fun SettingsScreen(
                 title = { SettingsTopBarTitle(stringResource(R.string.common_settings), scrollBehavior) },
                 navigationIcon = { SettingsBackButton(onBack) },
                 scrollBehavior = scrollBehavior,
-                colors = TopAppBarDefaults.largeTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    scrolledContainerColor = MaterialTheme.colorScheme.background
-                )
+                colors = SettingsTopAppBarColors()
             )
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
             modifier = Modifier

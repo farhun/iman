@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Refresh
@@ -29,6 +30,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
@@ -40,6 +42,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.imn.iman.R
 import com.imn.iman.i18n.prayerLabel
+import com.imn.iman.data.repository.DEFAULT_WIDGET_BACKGROUND_COLOR
+import com.imn.iman.data.repository.DEFAULT_WIDGET_BACKGROUND_OPACITY
+import com.imn.iman.data.repository.DEFAULT_WIDGET_FONT_COLOR
+import com.imn.iman.data.repository.DEFAULT_WIDGET_INDICATOR_COLOR
+import com.imn.iman.data.repository.DEFAULT_WIDGET_PANEL_COLOR
+import com.imn.iman.data.repository.DEFAULT_WIDGET_PANEL_OPACITY
 import com.imn.iman.data.repository.SettingsRepository
 import com.imn.iman.data.repository.UserSettings
 import com.imn.iman.data.repository.WidgetVisibilityItems
@@ -94,15 +102,16 @@ fun WidgetSettingsScreen(
             LargeTopAppBar(
                 title = { SettingsTopBarTitle(stringResource(R.string.widget_designer), scrollBehavior) },
                 navigationIcon = { SettingsBackButton(onBack) },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                colors = SettingsTopAppBarColors()
             )
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
         ) {
 
             // --- LIVE PREVIEW ---
@@ -120,215 +129,283 @@ fun WidgetSettingsScreen(
 
             Spacer(Modifier.height(8.dp))
 
-            SettingsGroup(title = stringResource(R.string.widget_visible_items)) {
-                WidgetVisibilityToggle(
-                    stringResource(R.string.widget_gregorian_date),
-                    WidgetVisibilityItems.GREGORIAN_DATE !in settings.hiddenWidgetItems
-                ) {
-                    setWidgetItemVisibility(WidgetVisibilityItems.GREGORIAN_DATE, it)
-                }
-                WidgetVisibilityToggle(
-                    stringResource(R.string.widget_hijri_date),
-                    WidgetVisibilityItems.HIJRI_DATE !in settings.hiddenWidgetItems
-                ) {
-                    setWidgetItemVisibility(WidgetVisibilityItems.HIJRI_DATE, it)
-                }
-                WidgetVisibilityToggle(
-                    stringResource(R.string.settings_location),
-                    WidgetVisibilityItems.LOCATION !in settings.hiddenWidgetItems
-                ) {
-                    setWidgetItemVisibility(WidgetVisibilityItems.LOCATION, it)
-                }
-                WidgetVisibilityToggle(
-                    stringResource(R.string.widget_countdown),
-                    WidgetVisibilityItems.COUNTDOWN !in settings.hiddenWidgetItems
-                ) {
-                    setWidgetItemVisibility(WidgetVisibilityItems.COUNTDOWN, it)
-                }
-                WidgetVisibilityToggle(
-                    stringResource(R.string.widget_next_prayer_label),
-                    WidgetVisibilityItems.NEXT_PRAYER !in settings.hiddenWidgetItems
-                ) {
-                    setWidgetItemVisibility(WidgetVisibilityItems.NEXT_PRAYER, it)
-                }
-                WidgetVisibilityToggle(prayerLabel("Fajr"), WidgetVisibilityItems.FAJR !in settings.hiddenWidgetItems) {
-                    setWidgetItemVisibility(WidgetVisibilityItems.FAJR, it)
-                }
-                WidgetVisibilityToggle(
-                    prayerLabel("Dhuhr"),
-                    WidgetVisibilityItems.DHUHR !in settings.hiddenWidgetItems
-                ) {
-                    setWidgetItemVisibility(WidgetVisibilityItems.DHUHR, it)
-                }
-                WidgetVisibilityToggle(prayerLabel("Asr"), WidgetVisibilityItems.ASR !in settings.hiddenWidgetItems) {
-                    setWidgetItemVisibility(WidgetVisibilityItems.ASR, it)
-                }
-                WidgetVisibilityToggle(
-                    prayerLabel("Maghrib"),
-                    WidgetVisibilityItems.MAGHRIB !in settings.hiddenWidgetItems
-                ) {
-                    setWidgetItemVisibility(WidgetVisibilityItems.MAGHRIB, it)
-                }
-                WidgetVisibilityToggle(prayerLabel("Isha"), WidgetVisibilityItems.ISHA !in settings.hiddenWidgetItems) {
-                    setWidgetItemVisibility(WidgetVisibilityItems.ISHA, it)
-                }
-            }
-
-            Spacer(Modifier.height(8.dp))
-
-            // --- BACKGROUND CONTROLS ---
-            SettingsGroup(title = stringResource(R.string.widget_background_layer)) {
-                ColorPaletteSlider(
-                    title = stringResource(R.string.settings_color),
-                    selectedColor = settings.widgetBackgroundColor,
-                    opacity = settings.widgetBackgroundOpacity,
-                    opacityRange = 0f..1.0f,
-                    onColorChange = {
-                        viewModel.updateWidgetCustomization(
-                            backgroundColor = it,
-                            backgroundOpacity = settings.widgetBackgroundOpacity,
-                            panelColor = settings.widgetPanelColor,
-                            panelOpacity = settings.widgetPanelOpacity,
-                            fontColor = settings.widgetFontColor
-                        )
-                    },
-                    onOpacityChange = {
-                        viewModel.updateWidgetCustomization(
-                            backgroundColor = settings.widgetBackgroundColor,
-                            backgroundOpacity = it,
-                            panelColor = settings.widgetPanelColor,
-                            panelOpacity = settings.widgetPanelOpacity,
-                            fontColor = settings.widgetFontColor
-                        )
-                    },
-                    onCustomClick = { showColorPickerFor = "bg" }
-                )
-                WidgetCornerRadiusSlider(settings.widgetBackgroundCornerRadius) { radius ->
-                    viewModel.updateWidgetCornerRadii(
-                        radius,
-                        settings.widgetPanelCornerRadius,
-                        settings.widgetIndicatorCornerRadius
-                    )
-                }
-            }
-
-            // --- PANEL CONTROLS ---
-            SettingsGroup(title = stringResource(R.string.widget_prayer_panel_layer)) {
-                ColorPaletteSlider(
-                    title = stringResource(R.string.settings_color),
-                    selectedColor = settings.widgetPanelColor,
-                    opacity = settings.widgetPanelOpacity,
-                    opacityRange = 0f..0.8f,
-                    onColorChange = {
-                        viewModel.updateWidgetCustomization(
-                            backgroundColor = settings.widgetBackgroundColor,
-                            backgroundOpacity = settings.widgetBackgroundOpacity,
-                            panelColor = it,
-                            panelOpacity = settings.widgetPanelOpacity,
-                            fontColor = settings.widgetFontColor
-                        )
-                    },
-                    onOpacityChange = {
-                        viewModel.updateWidgetCustomization(
-                            backgroundColor = settings.widgetBackgroundColor,
-                            backgroundOpacity = settings.widgetBackgroundOpacity,
-                            panelColor = settings.widgetPanelColor,
-                            panelOpacity = it,
-                            fontColor = settings.widgetFontColor
-                        )
-                    },
-                    onCustomClick = { showColorPickerFor = "panel" }
-                )
-                WidgetCornerRadiusSlider(settings.widgetPanelCornerRadius) { radius ->
-                    viewModel.updateWidgetCornerRadii(
-                        settings.widgetBackgroundCornerRadius,
-                        radius,
-                        settings.widgetIndicatorCornerRadius
-                    )
-                }
-            }
-
-            SettingsGroup(title = stringResource(R.string.widget_current_prayer_indicator)) {
-                Column(modifier = Modifier.padding(20.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                SettingsGroup(title = stringResource(R.string.widget_visible_items)) {
+                    WidgetVisibilityToggle(
+                        stringResource(R.string.widget_gregorian_date),
+                        WidgetVisibilityItems.GREGORIAN_DATE !in settings.hiddenWidgetItems
                     ) {
-                        Text(
-                            text = stringResource(R.string.widget_indicator_color),
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                fontFamily = PlusJakartaSans,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        )
-                        IconButton(onClick = { showColorPickerFor = "indicator" }) {
-                            Icon(Icons.Default.Palette, null, tint = MaterialTheme.colorScheme.primary)
-                        }
+                        setWidgetItemVisibility(WidgetVisibilityItems.GREGORIAN_DATE, it)
                     }
-                    Spacer(Modifier.height(12.dp))
-                    ColorPaletteRow(
-                        colors = extendedColorPalette,
-                        selectedColor = settings.widgetIndicatorColor,
-                        onColorSelected = setWidgetIndicatorColor
+                    WidgetVisibilityToggle(
+                        stringResource(R.string.widget_hijri_date),
+                        WidgetVisibilityItems.HIJRI_DATE !in settings.hiddenWidgetItems
+                    ) {
+                        setWidgetItemVisibility(WidgetVisibilityItems.HIJRI_DATE, it)
+                    }
+                    WidgetVisibilityToggle(
+                        stringResource(R.string.settings_location),
+                        WidgetVisibilityItems.LOCATION !in settings.hiddenWidgetItems
+                    ) {
+                        setWidgetItemVisibility(WidgetVisibilityItems.LOCATION, it)
+                    }
+                    WidgetVisibilityToggle(
+                        stringResource(R.string.widget_countdown),
+                        WidgetVisibilityItems.COUNTDOWN !in settings.hiddenWidgetItems
+                    ) {
+                        setWidgetItemVisibility(WidgetVisibilityItems.COUNTDOWN, it)
+                    }
+                    WidgetVisibilityToggle(
+                        stringResource(R.string.widget_next_prayer_label),
+                        WidgetVisibilityItems.NEXT_PRAYER !in settings.hiddenWidgetItems
+                    ) {
+                        setWidgetItemVisibility(WidgetVisibilityItems.NEXT_PRAYER, it)
+                    }
+                    WidgetVisibilityToggle(
+                        prayerLabel("Fajr"),
+                        WidgetVisibilityItems.FAJR !in settings.hiddenWidgetItems
+                    ) {
+                        setWidgetItemVisibility(WidgetVisibilityItems.FAJR, it)
+                    }
+                    WidgetVisibilityToggle(
+                        prayerLabel("Dhuhr"),
+                        WidgetVisibilityItems.DHUHR !in settings.hiddenWidgetItems
+                    ) {
+                        setWidgetItemVisibility(WidgetVisibilityItems.DHUHR, it)
+                    }
+                    WidgetVisibilityToggle(
+                        prayerLabel("Asr"),
+                        WidgetVisibilityItems.ASR !in settings.hiddenWidgetItems
+                    ) {
+                        setWidgetItemVisibility(WidgetVisibilityItems.ASR, it)
+                    }
+                    WidgetVisibilityToggle(
+                        prayerLabel("Maghrib"),
+                        WidgetVisibilityItems.MAGHRIB !in settings.hiddenWidgetItems
+                    ) {
+                        setWidgetItemVisibility(WidgetVisibilityItems.MAGHRIB, it)
+                    }
+                    WidgetVisibilityToggle(
+                        prayerLabel("Isha"),
+                        WidgetVisibilityItems.ISHA !in settings.hiddenWidgetItems
+                    ) {
+                        setWidgetItemVisibility(WidgetVisibilityItems.ISHA, it)
+                    }
+                }
+
+                Spacer(Modifier.height(8.dp))
+
+                // --- BACKGROUND CONTROLS ---
+                SettingsGroup(title = stringResource(R.string.widget_background_layer)) {
+                    ColorPaletteSlider(
+                        title = stringResource(R.string.settings_color),
+                        selectedColor = settings.widgetBackgroundColor,
+                        opacity = settings.widgetBackgroundOpacity,
+                        opacityRange = 0f..1.0f,
+                        onColorChange = {
+                            viewModel.updateWidgetCustomization(
+                                backgroundColor = it,
+                                backgroundOpacity = settings.widgetBackgroundOpacity,
+                                panelColor = settings.widgetPanelColor,
+                                panelOpacity = settings.widgetPanelOpacity,
+                                fontColor = settings.widgetFontColor
+                            )
+                        },
+                        onOpacityChange = {
+                            viewModel.updateWidgetCustomization(
+                                backgroundColor = settings.widgetBackgroundColor,
+                                backgroundOpacity = it,
+                                panelColor = settings.widgetPanelColor,
+                                panelOpacity = settings.widgetPanelOpacity,
+                                fontColor = settings.widgetFontColor
+                            )
+                        },
+                        onCustomClick = { showColorPickerFor = "bg" },
+                        onColorReset = {
+                            viewModel.updateWidgetCustomization(
+                                backgroundColor = DEFAULT_WIDGET_BACKGROUND_COLOR,
+                                backgroundOpacity = settings.widgetBackgroundOpacity,
+                                panelColor = settings.widgetPanelColor,
+                                panelOpacity = settings.widgetPanelOpacity,
+                                fontColor = settings.widgetFontColor
+                            )
+                        },
+                        onOpacityReset = {
+                            viewModel.updateWidgetCustomization(
+                                backgroundColor = settings.widgetBackgroundColor,
+                                backgroundOpacity = DEFAULT_WIDGET_BACKGROUND_OPACITY,
+                                panelColor = settings.widgetPanelColor,
+                                panelOpacity = settings.widgetPanelOpacity,
+                                fontColor = settings.widgetFontColor
+                            )
+                        }
                     )
-                    Spacer(Modifier.height(20.dp))
-                    WidgetCornerRadiusSlider(
-                        radius = settings.widgetIndicatorCornerRadius,
-                        defaultRadius = 6f,
-                        maxRadius = 9f,
-                        steps = 8,
-                        modifier = Modifier
-                    ) { radius ->
+                    WidgetCornerRadiusSlider(settings.widgetBackgroundCornerRadius) { radius ->
                         viewModel.updateWidgetCornerRadii(
-                            settings.widgetBackgroundCornerRadius,
+                            radius,
                             settings.widgetPanelCornerRadius,
-                            radius
+                            settings.widgetIndicatorCornerRadius
                         )
                     }
                 }
-            }
 
-            // --- FONT CONTROLS ---
-            SettingsGroup(title = stringResource(R.string.widget_typography)) {
-                Column(modifier = Modifier.padding(20.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(R.string.widget_font_color),
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                fontFamily = PlusJakartaSans,
-                                fontWeight = FontWeight.SemiBold
+                // --- PANEL CONTROLS ---
+                SettingsGroup(title = stringResource(R.string.widget_prayer_panel_layer)) {
+                    ColorPaletteSlider(
+                        title = stringResource(R.string.settings_color),
+                        selectedColor = settings.widgetPanelColor,
+                        opacity = settings.widgetPanelOpacity,
+                        opacityRange = 0f..0.8f,
+                        onColorChange = {
+                            viewModel.updateWidgetCustomization(
+                                backgroundColor = settings.widgetBackgroundColor,
+                                backgroundOpacity = settings.widgetBackgroundOpacity,
+                                panelColor = it,
+                                panelOpacity = settings.widgetPanelOpacity,
+                                fontColor = settings.widgetFontColor
                             )
-                        )
-                        IconButton(onClick = { showColorPickerFor = "font" }) {
-                            Icon(Icons.Default.Palette, null, tint = MaterialTheme.colorScheme.primary)
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    ColorPaletteRow(
-                        colors = extendedColorPalette.take(18),
-                        selectedColor = settings.widgetFontColor,
-                        spacing = 10.dp,
-                        onColorSelected = { hex ->
+                        },
+                        onOpacityChange = {
                             viewModel.updateWidgetCustomization(
                                 backgroundColor = settings.widgetBackgroundColor,
                                 backgroundOpacity = settings.widgetBackgroundOpacity,
                                 panelColor = settings.widgetPanelColor,
+                                panelOpacity = it,
+                                fontColor = settings.widgetFontColor
+                            )
+                        },
+                        onCustomClick = { showColorPickerFor = "panel" },
+                        onColorReset = {
+                            viewModel.updateWidgetCustomization(
+                                backgroundColor = settings.widgetBackgroundColor,
+                                backgroundOpacity = settings.widgetBackgroundOpacity,
+                                panelColor = DEFAULT_WIDGET_PANEL_COLOR,
                                 panelOpacity = settings.widgetPanelOpacity,
-                                fontColor = hex
+                                fontColor = settings.widgetFontColor
+                            )
+                        },
+                        onOpacityReset = {
+                            viewModel.updateWidgetCustomization(
+                                backgroundColor = settings.widgetBackgroundColor,
+                                backgroundOpacity = settings.widgetBackgroundOpacity,
+                                panelColor = settings.widgetPanelColor,
+                                panelOpacity = DEFAULT_WIDGET_PANEL_OPACITY,
+                                fontColor = settings.widgetFontColor
                             )
                         }
                     )
+                    WidgetCornerRadiusSlider(settings.widgetPanelCornerRadius) { radius ->
+                        viewModel.updateWidgetCornerRadii(
+                            settings.widgetBackgroundCornerRadius,
+                            radius,
+                            settings.widgetIndicatorCornerRadius
+                        )
+                    }
                 }
-            }
 
-            BackgroundHelpCard(Modifier.padding(horizontal = 16.dp))
-            Spacer(Modifier.height(32.dp))
+                SettingsGroup(title = stringResource(R.string.widget_current_prayer_indicator)) {
+                    Column(modifier = Modifier.padding(20.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.widget_indicator_color),
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontFamily = PlusJakartaSans,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                WidgetResetButton(onClick = {
+                                    setWidgetIndicatorColor(DEFAULT_WIDGET_INDICATOR_COLOR)
+                                })
+                                IconButton(onClick = { showColorPickerFor = "indicator" }) {
+                                    Icon(Icons.Default.Palette, null, tint = MaterialTheme.colorScheme.primary)
+                                }
+                            }
+                        }
+                        Spacer(Modifier.height(12.dp))
+                        ColorPaletteRow(
+                            colors = extendedColorPalette,
+                            selectedColor = settings.widgetIndicatorColor,
+                            onColorSelected = setWidgetIndicatorColor
+                        )
+                        Spacer(Modifier.height(20.dp))
+                        WidgetCornerRadiusSlider(
+                            radius = settings.widgetIndicatorCornerRadius,
+                            defaultRadius = 6f,
+                            maxRadius = 9f,
+                            steps = 8,
+                            modifier = Modifier
+                        ) { radius ->
+                            viewModel.updateWidgetCornerRadii(
+                                settings.widgetBackgroundCornerRadius,
+                                settings.widgetPanelCornerRadius,
+                                radius
+                            )
+                        }
+                    }
+                }
+
+                // --- FONT CONTROLS ---
+                SettingsGroup(title = stringResource(R.string.widget_typography)) {
+                    Column(modifier = Modifier.padding(20.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.widget_font_color),
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontFamily = PlusJakartaSans,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                WidgetResetButton(onClick = {
+                                    viewModel.updateWidgetCustomization(
+                                        backgroundColor = settings.widgetBackgroundColor,
+                                        backgroundOpacity = settings.widgetBackgroundOpacity,
+                                        panelColor = settings.widgetPanelColor,
+                                        panelOpacity = settings.widgetPanelOpacity,
+                                        fontColor = DEFAULT_WIDGET_FONT_COLOR
+                                    )
+                                })
+                                IconButton(onClick = { showColorPickerFor = "font" }) {
+                                    Icon(Icons.Default.Palette, null, tint = MaterialTheme.colorScheme.primary)
+                                }
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        ColorPaletteRow(
+                            colors = extendedColorPalette.take(18),
+                            selectedColor = settings.widgetFontColor,
+                            spacing = 10.dp,
+                            onColorSelected = { hex ->
+                                viewModel.updateWidgetCustomization(
+                                    backgroundColor = settings.widgetBackgroundColor,
+                                    backgroundOpacity = settings.widgetBackgroundOpacity,
+                                    panelColor = settings.widgetPanelColor,
+                                    panelOpacity = settings.widgetPanelOpacity,
+                                    fontColor = hex
+                                )
+                            }
+                        )
+                    }
+                }
+
+                BackgroundHelpCard(Modifier.padding(horizontal = 16.dp))
+                Spacer(Modifier.height(32.dp))
+            }
         }
     }
 
@@ -605,6 +682,20 @@ fun AdvancedColorPickerSheet(
 }
 
 @Composable
+private fun WidgetResetButton(onClick: () -> Unit) {
+    IconButton(
+        onClick = onClick,
+        modifier = Modifier.size(32.dp)
+    ) {
+        Icon(
+            Icons.Default.Refresh,
+            contentDescription = stringResource(R.string.common_reset),
+            modifier = Modifier.size(18.dp)
+        )
+    }
+}
+
+@Composable
 private fun ColorPaletteSlider(
     title: String,
     selectedColor: String,
@@ -612,7 +703,9 @@ private fun ColorPaletteSlider(
     opacityRange: ClosedFloatingPointRange<Float> = 0.1f..1.0f,
     onColorChange: (String) -> Unit,
     onOpacityChange: (Float) -> Unit,
-    onCustomClick: () -> Unit
+    onCustomClick: () -> Unit,
+    onColorReset: () -> Unit,
+    onOpacityReset: () -> Unit
 ) {
     Column(modifier = Modifier.padding(20.dp)) {
         Row(
@@ -627,8 +720,11 @@ private fun ColorPaletteSlider(
                     fontWeight = FontWeight.SemiBold
                 )
             )
-            IconButton(onClick = onCustomClick) {
-                Icon(Icons.Default.Palette, null, tint = MaterialTheme.colorScheme.primary)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                WidgetResetButton(onClick = onColorReset)
+                IconButton(onClick = onCustomClick) {
+                    Icon(Icons.Default.Palette, null, tint = MaterialTheme.colorScheme.primary)
+                }
             }
         }
         Spacer(modifier = Modifier.height(12.dp))
@@ -641,13 +737,20 @@ private fun ColorPaletteSlider(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Text(
-            text = stringResource(R.string.widget_transparency, (opacity * 100).toInt()),
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontFamily = PlusJakartaSans,
-                fontWeight = FontWeight.SemiBold
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.widget_transparency, (opacity * 100).toInt()),
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.SemiBold
+                )
             )
-        )
+            WidgetResetButton(onClick = onOpacityReset)
+        }
         Slider(
             value = opacity,
             onValueChange = onOpacityChange,
@@ -708,12 +811,22 @@ private fun ColorCircle(
             .clip(CircleShape)
             .background(color)
             .border(
-                width = if (isSelected) 3.dp else 1.dp,
-                color = if (isSelected) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.2f),
+                width = 1.dp,
+                color = Color.White.copy(alpha = 0.2f),
                 shape = CircleShape
             )
-            .clickable(onClick = onClick)
-    )
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        if (isSelected) {
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = null,
+                tint = if (color.luminance() > 0.179f) Color.Black else Color.White,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+    }
 }
 
 @Composable
@@ -738,16 +851,7 @@ private fun WidgetCornerRadiusSlider(
                     fontWeight = FontWeight.SemiBold
                 )
             )
-            IconButton(
-                onClick = { onRadiusChange(defaultRadius) },
-                modifier = Modifier.size(32.dp)
-            ) {
-                Icon(
-                    Icons.Default.Refresh,
-                    contentDescription = stringResource(R.string.common_reset),
-                    modifier = Modifier.size(18.dp)
-                )
-            }
+            WidgetResetButton(onClick = { onRadiusChange(defaultRadius) })
         }
         Slider(value = radius, onValueChange = onRadiusChange, valueRange = 0f..maxRadius, steps = steps)
     }

@@ -46,7 +46,8 @@ fun TasbeehCustomizeScreen(
             LargeTopAppBar(
                 title = { SettingsTopBarTitle(stringResource(R.string.settings_tasbih_screen), scrollBehavior) },
                 navigationIcon = { SettingsBackButton(onBack) },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                colors = SettingsTopAppBarColors()
             )
         },
         containerColor = MaterialTheme.colorScheme.background

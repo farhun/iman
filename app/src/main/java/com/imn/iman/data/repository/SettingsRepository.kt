@@ -33,6 +33,13 @@ object WidgetVisibilityItems {
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
+const val DEFAULT_WIDGET_BACKGROUND_COLOR = "#293041"
+const val DEFAULT_WIDGET_BACKGROUND_OPACITY = 0.8f
+const val DEFAULT_WIDGET_PANEL_COLOR = "#000000"
+const val DEFAULT_WIDGET_PANEL_OPACITY = 0.3f
+const val DEFAULT_WIDGET_FONT_COLOR = "#FFFFFF"
+const val DEFAULT_WIDGET_INDICATOR_COLOR = "#B0C6FE"
+
 const val DEFAULT_TASBIH_BACKGROUND_COLOR = "#000000"
 const val DEFAULT_TASBIH_BEAD_COLOR = "#3192F5"
 const val DEFAULT_TASBIH_TEXT_COLOR = "#FFFFFF"
@@ -405,13 +412,16 @@ class SettingsRepository(private val context: Context) {
                 locationLabelLat = preferences[PreferencesKeys.LOCATION_LABEL_LAT],
                 locationLabelLng = preferences[PreferencesKeys.LOCATION_LABEL_LNG],
                 locationLabelLang = preferences[PreferencesKeys.LOCATION_LABEL_LANG],
-                widgetBackgroundColor = preferences[PreferencesKeys.WIDGET_BACKGROUND_COLOR] ?: "#293041",
-                widgetBackgroundOpacity = preferences[PreferencesKeys.WIDGET_BACKGROUND_OPACITY] ?: 0.8f,
-                widgetPanelColor = preferences[PreferencesKeys.WIDGET_PANEL_COLOR] ?: "#000000",
-                widgetPanelOpacity = preferences[PreferencesKeys.WIDGET_PANEL_OPACITY] ?: 0.3f,
-                widgetFontColor = preferences[PreferencesKeys.WIDGET_FONT_COLOR] ?: "#FFFFFF",
+                widgetBackgroundColor = preferences[PreferencesKeys.WIDGET_BACKGROUND_COLOR]
+                    ?: DEFAULT_WIDGET_BACKGROUND_COLOR,
+                widgetBackgroundOpacity = preferences[PreferencesKeys.WIDGET_BACKGROUND_OPACITY]
+                    ?: DEFAULT_WIDGET_BACKGROUND_OPACITY,
+                widgetPanelColor = preferences[PreferencesKeys.WIDGET_PANEL_COLOR] ?: DEFAULT_WIDGET_PANEL_COLOR,
+                widgetPanelOpacity = preferences[PreferencesKeys.WIDGET_PANEL_OPACITY] ?: DEFAULT_WIDGET_PANEL_OPACITY,
+                widgetFontColor = preferences[PreferencesKeys.WIDGET_FONT_COLOR] ?: DEFAULT_WIDGET_FONT_COLOR,
                 hiddenWidgetItems = preferences[PreferencesKeys.WIDGET_HIDDEN_ITEMS] ?: emptySet(),
-                widgetIndicatorColor = preferences[PreferencesKeys.WIDGET_INDICATOR_COLOR] ?: "#B0C6FE",
+                widgetIndicatorColor = preferences[PreferencesKeys.WIDGET_INDICATOR_COLOR]
+                    ?: DEFAULT_WIDGET_INDICATOR_COLOR,
                 widgetBackgroundCornerRadius = preferences[PreferencesKeys.WIDGET_BACKGROUND_CORNER_RADIUS] ?: 24f,
                 widgetPanelCornerRadius = preferences[PreferencesKeys.WIDGET_PANEL_CORNER_RADIUS] ?: 24f,
                 widgetIndicatorCornerRadius = preferences[PreferencesKeys.WIDGET_INDICATOR_CORNER_RADIUS] ?: 6f
@@ -954,13 +964,13 @@ data class UserSettings(
     val locationLabelLat: Float? = null,
     val locationLabelLng: Float? = null,
     val locationLabelLang: String? = null,
-    val widgetBackgroundColor: String = "#293041",
-    val widgetBackgroundOpacity: Float = 0.8f,
-    val widgetPanelColor: String = "#000000",
-    val widgetPanelOpacity: Float = 0.3f,
-    val widgetFontColor: String = "#FFFFFF",
+    val widgetBackgroundColor: String = DEFAULT_WIDGET_BACKGROUND_COLOR,
+    val widgetBackgroundOpacity: Float = DEFAULT_WIDGET_BACKGROUND_OPACITY,
+    val widgetPanelColor: String = DEFAULT_WIDGET_PANEL_COLOR,
+    val widgetPanelOpacity: Float = DEFAULT_WIDGET_PANEL_OPACITY,
+    val widgetFontColor: String = DEFAULT_WIDGET_FONT_COLOR,
     val hiddenWidgetItems: Set<String> = emptySet(),
-    val widgetIndicatorColor: String = "#B0C6FE",
+    val widgetIndicatorColor: String = DEFAULT_WIDGET_INDICATOR_COLOR,
     val widgetBackgroundCornerRadius: Float = 24f,
     val widgetPanelCornerRadius: Float = 24f,
     val widgetIndicatorCornerRadius: Float = 6f,
