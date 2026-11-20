@@ -294,8 +294,8 @@ class SettingsViewModel(
         viewModelScope.launch { repository.updateSelectedScript(script) }
     }
 
-    fun setSelectedTranslationLang(lang: String) {
-        viewModelScope.launch { repository.updateSelectedTranslationLang(lang) }
+    fun setTranslationChoice(choice: String?) {
+        viewModelScope.launch { repository.updateTranslationChoice(choice) }
     }
 
 

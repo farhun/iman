@@ -67,6 +67,7 @@ fun CreditsSettingsScreen(onBack: () -> Unit) {
     val uthmaniTitle = stringResource(R.string.about_credits_uthmani_title)
     val fontsTitle = stringResource(R.string.about_credits_fonts_title)
     val audioTitle = stringResource(R.string.about_credits_audio_title)
+    val quranEncTitle = stringResource(R.string.about_credits_quranenc_title)
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -150,6 +151,20 @@ fun CreditsSettingsScreen(onBack: () -> Unit) {
                         CreditParagraph(R.string.about_credits_everyayah)
                         CreditLinkButton(stringResource(R.string.about_credits_everyayah_link)) {
                             openUrl(EVERYAYAH_URL)
+                        }
+                    }
+                }
+            }
+            item {
+                SettingsSectionCard(title = quranEncTitle) {
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        CreditParagraph(R.string.about_credits_quranenc_en_credit)
+                        CreditLinkButton(stringResource(R.string.about_credits_view_details)) {
+                            selectedDocument = CreditDocument(R.raw.notice_quranenc_en, quranEncTitle)
+                        }
+                        CreditParagraph(R.string.about_credits_quranenc_id_credit)
+                        CreditLinkButton(stringResource(R.string.about_credits_view_details)) {
+                            selectedDocument = CreditDocument(R.raw.notice_quranenc_id, quranEncTitle)
                         }
                     }
                 }

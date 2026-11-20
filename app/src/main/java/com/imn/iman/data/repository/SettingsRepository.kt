@@ -70,6 +70,31 @@ class SettingsRepository(private val context: Context) {
     internal val applicationContext: Context
         get() = context.applicationContext
 
+    private fun legacyTranslationChoice(legacy: String?): String? {
+        if (legacy == null) return ""
+        if (legacy.isBlank()) return null
+        val normalized = legacy.lowercase(Locale.ROOT)
+        val parts = normalized.split('_', limit = 2)
+        val isOldDefault = normalized == "20" || normalized == "54" ||
+                (parts.size == 2 && ((parts[0] == "en" && parts[1] == "20") ||
+                        (parts[0] == "ur" && parts[1] == "54")))
+        return if (isOldDefault) "" else legacy
+    }
+
+    private fun defaultTranslationForAppLanguage(): String {
+        val savedTag = LocaleHelper.savedTag(context)
+        val language = (if (savedTag == "system") {
+            LocaleHelper.wrap(context).resources.configuration.locales[0].language
+        } else {
+            savedTag.substringBefore('-')
+        }).lowercase(Locale.ROOT)
+        return when (language) {
+            "en" -> TranslationRepository.QURANENC_ENGLISH_ID
+            "in", "id" -> TranslationRepository.QURANENC_INDONESIAN_ID
+            else -> ""
+        }
+    }
+
     private object PreferencesKeys {
         val HAPTICS_ENABLED = booleanPreferencesKey("haptics_enabled")
         val DYNAMIC_COLOR = booleanPreferencesKey("dynamic_color")
@@ -104,6 +129,8 @@ class SettingsRepository(private val context: Context) {
         val QURAN_EXIT_REMINDER_DISABLED = booleanPreferencesKey("quran_exit_reminder_disabled")
 
         val SELECTED_TRANSLATION_LANG = stringPreferencesKey("selected_translation_lang")
+        val TRANSLATION_CHOICE = stringPreferencesKey("translation_choice")
+        val TRANSLATION_DEFAULT_MIGRATED = booleanPreferencesKey("translation_default_migrated")
 
         val SELECTED_RECITER_ID = stringPreferencesKey("selected_reciter_id")
         val SELECTED_SCRIPT = stringPreferencesKey("selected_script")
@@ -289,6 +316,18 @@ class SettingsRepository(private val context: Context) {
             val locationLng = preferences[PreferencesKeys.LOCATION_LNG] ?: 39.8262f
             val locationLabel = preferences[PreferencesKeys.LOCATION_LABEL]
                 ?: if (isDefaultLocation(locationLat.toDouble(), locationLng.toDouble())) defaultLocationLabel() else ""
+            val translationChoice = when {
+                preferences.contains(PreferencesKeys.TRANSLATION_CHOICE) ->
+                    preferences[PreferencesKeys.TRANSLATION_CHOICE]
+
+                preferences[PreferencesKeys.TRANSLATION_DEFAULT_MIGRATED] == true -> null
+                else -> legacyTranslationChoice(preferences[PreferencesKeys.SELECTED_TRANSLATION_LANG])
+            }
+            val selectedTranslationLang = when (translationChoice) {
+                null -> ""
+                "" -> defaultTranslationForAppLanguage()
+                else -> translationChoice
+            }
 
             UserSettings(
                 hapticsEnabled = preferences[PreferencesKeys.HAPTICS_ENABLED] ?: true,
@@ -333,13 +372,8 @@ class SettingsRepository(private val context: Context) {
 
                 quranExitReminderDisabled = preferences[PreferencesKeys.QURAN_EXIT_REMINDER_DISABLED] ?: false,
 
-                selectedTranslationLang = (preferences[PreferencesKeys.SELECTED_TRANSLATION_LANG] ?: "").let { id ->
-                    val parts = id.lowercase().split('_', limit = 2)
-                    if (id == "20" || id == "54" ||
-                        (parts.size == 2 && ((parts[0] == "en" && parts[1] == "20") ||
-                                (parts[0] == "ur" && parts[1] == "54")))
-                    ) "" else id
-                },
+                translationChoice = translationChoice,
+                selectedTranslationLang = selectedTranslationLang,
                 selectedReciterId = preferences[PreferencesKeys.SELECTED_RECITER_ID] ?: "everyayah_mishari",
                 selectedScript = (preferences[PreferencesKeys.SELECTED_SCRIPT] ?: "indopak")
                     .let {
@@ -856,8 +890,23 @@ class SettingsRepository(private val context: Context) {
     }
 
 
-    suspend fun updateSelectedTranslationLang(lang: String) {
-        context.dataStore.edit { it[PreferencesKeys.SELECTED_TRANSLATION_LANG] = lang }
+    suspend fun migrateTranslationDefault() {
+        context.dataStore.edit { preferences ->
+            if (preferences[PreferencesKeys.TRANSLATION_DEFAULT_MIGRATED] == true) return@edit
+            if (!preferences.contains(PreferencesKeys.TRANSLATION_CHOICE)) {
+                legacyTranslationChoice(preferences[PreferencesKeys.SELECTED_TRANSLATION_LANG])?.let {
+                    preferences[PreferencesKeys.TRANSLATION_CHOICE] = it
+                }
+            }
+            preferences[PreferencesKeys.TRANSLATION_DEFAULT_MIGRATED] = true
+        }
+    }
+
+    suspend fun updateTranslationChoice(choice: String?) {
+        context.dataStore.edit { preferences ->
+            if (choice == null) preferences.remove(PreferencesKeys.TRANSLATION_CHOICE)
+            else preferences[PreferencesKeys.TRANSLATION_CHOICE] = choice
+        }
     }
 
 
@@ -902,6 +951,7 @@ data class UserSettings(
 
     val quranExitReminderDisabled: Boolean = false,
 
+    val translationChoice: String? = "",
     val selectedTranslationLang: String = "",
     val selectedReciterId: String = "everyayah_mishari",
     val selectedScript: String = "indopak",

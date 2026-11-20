@@ -47,6 +47,7 @@
     <string name="about_credits_fonts_title">Font</string>
     <string name="about_credits_audio_title">Audio</string>
     <string name="about_credits_data_libraries_title">Data dan pustaka</string>
+    <string name="about_credits_quranenc_title">Terjemahan (QuranEnc)</string>
     <string name="about_credits_quranwbw_link" translatable="false">QuranWBW.com</string>
     <string name="about_credits_qul_text_link" translatable="false">QUL text</string>
     <string name="about_credits_qul_font_link" translatable="false">QUL font</string>
@@ -565,6 +566,11 @@
     <string name="quran_keep_screen_on">Jaga Layar Tetap Menyala</string>
     <string name="quran_active_translation">Terjemahan Aktif</string>
     <string name="quran_translation_none">Tanpa terjemahan</string>
+    <string name="quran_translation_follow_app_language">Ikuti bahasa aplikasi</string>
+    <string name="quran_translation_bundled_section">Bawaan</string>
+    <string name="quran_translation_english">Bahasa Inggris</string>
+    <string name="quran_translation_indonesian">Bahasa Indonesia</string>
+    <string name="quran_translation_source_version">%1$s</string>
     <string name="quran_translation_select">Pilih Terjemahan</string>
     <string name="quran_script_style">Gaya Tulisan</string>
     <string name="quran_script_uthmani">Utsmani</string>

@@ -269,10 +269,26 @@ fun ReadingSettingsSheet(
                                         CatalogRepository.translations(context)
                                             .find { it.id == settings.selectedTranslationLang }
                                     }
-                                    val langLabel =
-                                        currentMeta?.let { "${it.langCode.uppercase()} • ${it.translatorName}" }
-                                            ?: if (settings.selectedTranslationLang.isBlank()) stringResource(R.string.quran_translation_none)
-                                            else stringResource(R.string.quran_translation_select)
+                                    val currentMetaName = when (currentMeta?.id) {
+                                        TranslationRepository.QURANENC_ENGLISH_ID ->
+                                            stringResource(R.string.quran_translation_english)
+
+                                        TranslationRepository.QURANENC_INDONESIAN_ID ->
+                                            stringResource(R.string.quran_translation_indonesian)
+
+                                        else -> null
+                                    }
+                                    val langLabel = currentMeta?.let {
+                                        currentMetaName ?: "${it.langCode.uppercase()} • ${it.translatorName}"
+                                    } ?: when {
+                                        settings.translationChoice == "" ->
+                                            stringResource(R.string.quran_translation_follow_app_language)
+
+                                        settings.selectedTranslationLang.isBlank() ->
+                                            stringResource(R.string.quran_translation_none)
+
+                                        else -> stringResource(R.string.quran_translation_select)
+                                    }
 
                                     SettingLabel(stringResource(R.string.quran_active_translation))
                                     Spacer(Modifier.height(12.dp))
@@ -576,28 +592,37 @@ fun ThemeChip(label: String, selected: Boolean, onClick: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TranslationPickerSheet(
-    selectedId: String,
+    selectedChoice: String?,
     isDownloading: Boolean,
     progress: Float,
     onSelectNone: () -> Unit,
+    onSelectFollowLanguage: () -> Unit,
     onSelect: (TranslationMeta) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val context = LocalContext.current
     val otherLanguageLabel = stringResource(R.string.quran_translation_other)
+    val bundledLabel = stringResource(R.string.quran_translation_bundled_section)
     val downloadedLabel = stringResource(R.string.quran_translation_downloaded_section)
-    val catalog = remember(context, otherLanguageLabel) {
-        CatalogRepository.translations(context)
+    val allTranslations = remember(context) { CatalogRepository.translations(context) }
+    val bundledTranslations = remember(allTranslations) { allTranslations.filter { it.isBundled } }
+    val catalog = remember(allTranslations, otherLanguageLabel) {
+        allTranslations.filterNot { it.isBundled }
             .groupBy { it.langName.ifBlank { otherLanguageLabel } }
             .toSortedMap()
     }
     var searchText by remember { mutableStateOf("") }
-    val visibleCatalog = remember(catalog, searchText, context, downloadedLabel) {
-        val filtered = catalog.filterKeys { it.contains(searchText.trim(), ignoreCase = true) }
+    val visibleCatalog = remember(catalog, bundledTranslations, searchText, context, bundledLabel, downloadedLabel) {
+        val search = searchText.trim()
+        val filtered = catalog.filterKeys { it.contains(search, ignoreCase = true) }
+        val visibleBundled = bundledTranslations.filter {
+            search.isBlank() || it.langName.contains(search, ignoreCase = true)
+        }
         val downloaded = filtered.values.flatten()
             .filter { TranslationRepository.isDownloaded(context, it.id) }
         buildList<Pair<String, List<TranslationMeta>>> {
+            if (visibleBundled.isNotEmpty()) add(bundledLabel to visibleBundled)
             if (downloaded.isNotEmpty()) add(downloadedLabel to downloaded)
             filtered.forEach { (language, translations) ->
                 val notDownloaded = translations.filterNot {
@@ -645,7 +670,38 @@ fun TranslationPickerSheet(
 
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     item {
-                        val isNoneSelected = selectedId.isBlank()
+                        val isFollowSelected = selectedChoice == ""
+                        Surface(
+                            onClick = { if (!isDownloading) onSelectFollowLanguage() },
+                            shape = RoundedCornerShape(12.dp),
+                            color = if (isFollowSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
+                            else Color.Transparent,
+                            border = if (isFollowSelected) BorderStroke(
+                                1.dp,
+                                MaterialTheme.colorScheme.primary
+                            ) else null
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                Text(
+                                    stringResource(R.string.quran_translation_follow_app_language),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontFamily = PlusJakartaSans,
+                                    fontWeight = if (isFollowSelected) FontWeight.Bold else FontWeight.Normal
+                                )
+                                if (isFollowSelected) Icon(
+                                    Icons.Default.Check,
+                                    null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    }
+                    item {
+                        val isNoneSelected = selectedChoice == null
                         Surface(
                             onClick = { if (!isDownloading) onSelectNone() },
                             shape = RoundedCornerShape(12.dp),
@@ -681,8 +737,8 @@ fun TranslationPickerSheet(
                             )
                         }
                         items(translations) { meta ->
-                            val isDownloaded = TranslationRepository.isDownloaded(context, meta.id)
-                            val isSelected = selectedId == meta.id
+                            val isDownloaded = meta.isBundled || TranslationRepository.isDownloaded(context, meta.id)
+                            val isSelected = selectedChoice == meta.id
 
                             Surface(
                                 onClick = { if (!isDownloading) onSelect(meta) },
@@ -697,18 +753,34 @@ fun TranslationPickerSheet(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                 ) {
                                     Column(modifier = Modifier.weight(1f)) {
+                                        val translationName = when (meta.id) {
+                                            TranslationRepository.QURANENC_ENGLISH_ID ->
+                                                stringResource(R.string.quran_translation_english)
+
+                                            TranslationRepository.QURANENC_INDONESIAN_ID ->
+                                                stringResource(R.string.quran_translation_indonesian)
+
+                                            else -> meta.translatorName
+                                        }
                                         Text(
-                                            meta.translatorName,
+                                            translationName,
                                             style = MaterialTheme.typography.bodyLarge,
                                             fontFamily = PlusJakartaSans,
                                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                                         )
                                         Text(
-                                            stringResource(
-                                                if (isDownloaded) R.string.quran_translation_downloaded_status
-                                                else R.string.quran_translation_tap_to_download,
-                                                meta.langCode.uppercase()
-                                            ),
+                                            if (meta.isBundled) {
+                                                stringResource(
+                                                    R.string.quran_translation_source_version,
+                                                    meta.sourcePublisher.orEmpty()
+                                                )
+                                            } else {
+                                                stringResource(
+                                                    if (isDownloaded) R.string.quran_translation_downloaded_status
+                                                    else R.string.quran_translation_tap_to_download,
+                                                    meta.langCode.uppercase()
+                                                )
+                                            },
                                             style = MaterialTheme.typography.bodySmall,
                                             fontFamily = PlusJakartaSans,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant

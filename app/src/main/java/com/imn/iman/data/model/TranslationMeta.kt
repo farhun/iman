@@ -11,6 +11,9 @@ data class TranslationMeta(
     val isRtl: Boolean,
     val downloadUrl: String,
     val sizeKb: Int,
+    val isBundled: Boolean = false,
+    val sourcePublisher: String? = null,
+    val sourceVersion: String? = null,
 ) {
     companion object {
         fun fromFawazJson(obj: JsonObject): TranslationMeta {

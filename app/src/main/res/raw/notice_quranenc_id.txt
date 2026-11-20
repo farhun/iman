@@ -1,0 +1,11 @@
+Terjemahan Bahasa Indonesia: Kementerian Agama Republik Indonesia, versi 1.0.1 (23/06/2025), diterbitkan melalui QuranEnc.com.
+Translations published by QuranEnc.com, re-published under the QuranEnc terms: no modification, addition, or deletion of the content; publisher and source named; version mentioned; transcript information kept; no inappropriate advertisements.
+
+Translation Info :
+Translation of the meanings of the Noble Qur'an
+- Language: Indonesian
+- Translation ID: indonesian_affairs
+- Source: https://quranenc.com
+- URL: https://quranenc.com/en/browse/indonesian_affairs
+- Last update: 2025-06-23 10:58:32 (v1.0.1-csv.1)
+- Check for updates: https://quranenc.com/check/indonesian_affairs/v1.0.1-csv.1

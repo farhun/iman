@@ -230,6 +230,7 @@ class MainActivity : ComponentActivity() {
 
 
         lifecycleScope.launch {
+            settingsRepository.migrateTranslationDefault()
             settingsRepository.migrateReminderSettingsV2()
             settingsRepository.settingsFlow
                 .map { settings -> settings.toPrayerNotificationScheduleConfig() to settings }

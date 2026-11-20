@@ -885,7 +885,7 @@ fun QuranReaderScreen(
                     onShowTranslationChange = { settingsViewModel.toggleShowTranslation(it) },
                     onKeepScreenOnChange = { settingsViewModel.toggleReadingKeepScreenOn(it) },
 
-                    onTranslationLangChange = { settingsViewModel.setSelectedTranslationLang(it) },
+                    onTranslationLangChange = { settingsViewModel.setTranslationChoice(it) },
 
                     onReciterChange = { settingsViewModel.setSelectedReciterId(it) },
                     onScriptChange = { settingsViewModel.setSelectedScript(it) },
@@ -900,16 +900,23 @@ fun QuranReaderScreen(
 
             if (showTranslationPicker) {
                 TranslationPickerSheet(
-                    selectedId = settings.selectedTranslationLang,
+                    selectedChoice = settings.translationChoice,
                     isDownloading = isTranslationDownloading,
                     progress = translationDownloadProgress,
                     onSelectNone = {
-                        settingsViewModel.setSelectedTranslationLang("")
+                        settingsViewModel.setTranslationChoice(null)
+                        showTranslationPicker = false
+                    },
+                    onSelectFollowLanguage = {
+                        settingsViewModel.setTranslationChoice("")
                         showTranslationPicker = false
                     },
                     onSelect = { meta ->
-                        if (TranslationRepository.isDownloaded(context, meta.id)) {
-                            settingsViewModel.setSelectedTranslationLang(meta.id)
+                        if (meta.isBundled) {
+                            settingsViewModel.setTranslationChoice(meta.id)
+                            showTranslationPicker = false
+                        } else if (TranslationRepository.isDownloaded(context, meta.id)) {
+                            settingsViewModel.setTranslationChoice(meta.id)
                             showTranslationPicker = false
                         } else if (!isTranslationDownloading) {
                             translationDownloadScope.launch {
@@ -921,7 +928,7 @@ fun QuranReaderScreen(
                                         }
                                     if (downloaded) {
                                         withContext(Dispatchers.IO) { TranslationRepository.load(context, meta.id) }
-                                        settingsViewModel.setSelectedTranslationLang(meta.id)
+                                        settingsViewModel.setTranslationChoice(meta.id)
                                         showTranslationPicker = false
                                     } else {
                                         Toast.makeText(

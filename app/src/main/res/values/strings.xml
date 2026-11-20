@@ -47,6 +47,9 @@
     <string name="about_credits_fonts_title">Fonts</string>
     <string name="about_credits_audio_title">Audio</string>
     <string name="about_credits_data_libraries_title">Data and libraries</string>
+    <string name="about_credits_quranenc_title">Translations (QuranEnc)</string>
+    <string name="about_credits_quranenc_en_credit" translatable="false">English translation: Markaz Noor International, version 1.1.2 (24/06/2025), published via QuranEnc.com.</string>
+    <string name="about_credits_quranenc_id_credit" translatable="false">Terjemahan Bahasa Indonesia: Kementerian Agama Republik Indonesia, versi 1.0.1 (23/06/2025), diterbitkan melalui QuranEnc.com.</string>
     <string name="about_credits_quranwbw_link" translatable="false">QuranWBW.com</string>
     <string name="about_credits_qul_text_link" translatable="false">QUL text</string>
     <string name="about_credits_qul_font_link" translatable="false">QUL font</string>
@@ -566,6 +569,11 @@
     <string name="quran_keep_screen_on">Keep Screen On</string>
     <string name="quran_active_translation">Active Translation</string>
     <string name="quran_translation_none">No translation</string>
+    <string name="quran_translation_follow_app_language">Follow app language</string>
+    <string name="quran_translation_bundled_section">Bundled</string>
+    <string name="quran_translation_english">English</string>
+    <string name="quran_translation_indonesian">Indonesian</string>
+    <string name="quran_translation_source_version">%1$s</string>
     <string name="quran_translation_select">Select Translation</string>
     <string name="quran_script_style">Script Style</string>
     <string name="quran_script_uthmani">Uthmani</string>

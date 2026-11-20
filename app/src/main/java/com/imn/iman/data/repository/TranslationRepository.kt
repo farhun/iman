@@ -1,6 +1,7 @@
 package com.imn.iman.data.repository
 
 import android.content.Context
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
@@ -13,6 +14,9 @@ import java.net.URL
 import java.util.concurrent.ConcurrentHashMap
 
 object TranslationRepository {
+    const val QURANENC_ENGLISH_ID = "quranenc_en"
+    const val QURANENC_INDONESIAN_ID = "quranenc_id"
+
     private val cache = ConcurrentHashMap<String, Map<String, String>>()
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -65,14 +69,35 @@ object TranslationRepository {
     fun load(context: Context, id: String): Map<String, String> {
         if (id.isBlank()) return emptyMap()
         cache[id]?.let { return it }
-        val file = File(context.filesDir, "translations/$id.json")
-        if (!file.exists()) return emptyMap()
         return try {
-            parseJson(file.readText()).also { if (it.isNotEmpty()) cache[id] = it }
-        } catch (_: Exception) {
+            val content = when (id) {
+                QURANENC_ENGLISH_ID -> context.assets.open("translations/en.json")
+                    .bufferedReader().use { it.readText() }
+
+                QURANENC_INDONESIAN_ID -> context.assets.open("translations/id.json")
+                    .bufferedReader().use { it.readText() }
+
+                else -> {
+                    val file = File(context.filesDir, "translations/$id.json")
+                    if (!file.exists()) return emptyMap()
+                    file.readText()
+                }
+            }
+            val translation = parseJson(content)
+            if (translation.isEmpty()) {
+                if (isBundled(id)) Log.e("TranslationRepository", "Bundled translation is empty: $id")
+                return emptyMap()
+            }
+            cache[id] = translation
+            translation
+        } catch (exception: Exception) {
+            if (isBundled(id)) Log.e("TranslationRepository", "Unable to load bundled translation: $id", exception)
             emptyMap()
         }
     }
+
+    private fun isBundled(id: String): Boolean =
+        id == QURANENC_ENGLISH_ID || id == QURANENC_INDONESIAN_ID
 
     private fun parseJson(content: String): Map<String, String> {
         val root = json.parseToJsonElement(content).jsonObject
