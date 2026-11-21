@@ -4,74 +4,43 @@ Iman is an Android app for prayer times, Quran reading, and Tasbih. It focuses o
 
 ## Features
 
-- **Prayer times:** the five daily prayers with the current and next prayer and the Hijri date. About 25 calculation conventions, the Asr school (Standard or Hanafi), per-prayer adjustments of up to 15 minutes, GPS or manual location, and optional extra timings (Imsak, Sunrise, Sunset, Midnight, night thirds). Pull down on Home to refresh.
-- **Reminders:** prayer-time and pre-prayer reminders that keep working after a reboot, an app update, or a time or timezone change. Choose a sound for each prayer: default, adhan, takbir, or silent.
-- **Widget:** the five prayers with show/hide switches for every item, 24-hour times, an `HH:mm` countdown, and customizable colors, including the active-prayer indicator.
-- **Qibla compass:** corrected for magnetic declination and smoothed, with a calibration hint.
-- **Quran:** Uthmani and IndoPak scripts, search, sortable bookmarks, an optional reminder when you leave the reader without a bookmark, ayah-by-ayah audio with retry, and downloadable translations.
-- **Tasbih:** dhikr collections and an immersive counter with two bead styles (slide or press), customizable background and bead colors, and volume-key counting.
-- **Languages:** system language or a choice in Settings. English for now, and more can be added.
+🕌 **Prayer times, right on your home screen**
+See today's five prayers, what's happening now, and what's coming next. Your times work even without internet. Fine-tune any prayer by a few minutes, use your location or set your own, and see extra times like sunrise and midnight.
+
+🔔 **Reminders you can count on**
+Get a heads-up before each prayer and when it's time. Pick the sound you like for each one: a gentle default, the adhan, the takbir, or silence.
+
+📱 **A widget for your home screen**
+Keep the five prayers and a countdown in front of you. Choose what you want to see, and pick the colors that feel right.
+
+🧭 **Qibla finder**
+Point your phone toward Makkah. The compass steadies itself, and it'll let you know when it needs a quick calibration.
+
+📖 **Read the Quran**
+Choose the Uthmani or IndoPak script. English and Indonesian translations come built in, with more to download. Search, bookmark your place, and listen to each ayah.
+
+📿 **Tasbih counter**
+Count your dhikr in a simple, focused way. Tap anywhere or use the volume buttons, and make it yours with your own colors.
+
+🌍 **Your language**
+Iman follows your phone's language, or you can choose one in Settings. It's available in English and Indonesian.
 
 ## Privacy
 
 Iman has no accounts, no ads, and no analytics or tracking libraries. Your location stays on your phone, except when a calculation convention uses the AlAdhan online service: then your coordinates are sent to it to get the times. The app also contacts outside servers to stream ayah audio (EveryAyah), download translations, and check for updates (GitHub).
 
-## Notes
-
-- Set Iman's battery use to Unrestricted and allow Alarms & reminders, or reminders may be late.
-- Some conventions (for example Indonesia, Turkey, and Malaysia) have no offline version and need internet.
-- Iman is free, with no ads and nothing behind a payment. This is a condition of the QuranWBW permission below.
-
 ## Credits
 
-The same credits are in the app under Settings > About > Credits. Full terms for every asset are in [`third_party/NOTICES.md`](third_party/NOTICES.md).
+Full credits and license terms are in [`third_party/NOTICES.md`](third_party/NOTICES.md) and in the app under Settings > About > Credits.
 
-### Origin
-
-Iman is a modified version of [Khushu](https://github.com/greykaizen/khushu), whose source code is licensed under GPLv3. This version was modified in 2026. Iman is an independent project. It is not affiliated with or endorsed by the Khushu project, and the Khushu name and logo are not used.
-
-### IndoPak Quran text and font: QuranWBW
-
-The IndoPak (Hanafi) Quran text and the AlQuranNeo font come from **QuranWBW.com** (https://www.QuranWBW.com), prepared by Ayman Siddiqui and R. Siddiqua exclusively for the service of the Noble Qur'an as a Sadaqah Jariyah initiative.
-
-**Prior written permission was obtained from QuranWBW.com to use the original, unmodified Quran text and font in this app. The permission is restricted to displaying the Quran text only.** It is conditional on the app staying free, with no ads and no paywall. The text and font are not modified, and the font is used only for IndoPak ayah text.
-
-- **Copyright holders and sources:** © Ayman Siddiqui, © Al-Qalam and Ghandhara Software, © King Fahd Glorious Quran Printing Complex (KFGQPC).
-- **Quran text sources:** KFGQPC, TypeMyBook.com (Ata Rafi), InPage Quran Publishing Resources.
-- **Font development:** Ayman Siddiqui and R. Siddiqua, the Al-Qalam Font Project, Ghandhara Software, KFGQPC.
-- **Verification and quality assurance:** Hafiz Muhammad Zain Viqar, Content Lead at Deen App, and his team of Huffuz: Hafiz Muavia bin Muhammad Haneef, Hafiz Ali Ahmed bin Aftab Ahmed, and Hafiz Abdul Rehman bin Ramzan.
-- **Special thanks:** Abdul Majeed Khan, Arif Karim, Shakir-ul-Qadree, and Jawad (Al Qalam Quran Majeed font), and all contributors who directly or indirectly assisted in the digitization, preservation, verification, testing, and enhancement of Quranic text and typography.
-
-These are not covered by this project's GPLv3 license. Terms: [`third_party/fonts/QuranWBW-NOTICE.txt`](third_party/fonts/QuranWBW-NOTICE.txt).
-
-### Uthmani Quran text and font: KFGQPC
-
-The Uthmani script uses the **QPC Hafs** text (Ayah by Ayah) and the **KFGQPC Uthmanic Hafs** font (`uthmanic_hafs_v2_2.ttf`), published by the King Fahd Glorious Quran Printing Complex (KFGQPC) and obtained from the [Quranic Universal Library (QUL)](https://qul.tarteel.ai/): [text](https://qul.tarteel.ai/resources/quran-script/86), [font](https://qul.tarteel.ai/resources/font/245). They are used unmodified and only for Quran text.
-
-They remain the property of KFGQPC and are not covered by this project's GPLv3 license. Terms: [`third_party/fonts/QPC-HAFS-NOTICE.txt`](third_party/fonts/QPC-HAFS-NOTICE.txt).
-
-### Other fonts
-
-- **Noto Sans Arabic** (Arabic text outside the Quran script): © The Noto Project Authors, SIL Open Font License 1.1.
-- **Plus Jakarta Sans** (interface): © The Plus Jakarta Sans Project Authors (Tokotype), SIL Open Font License 1.1.
-
-License texts are in [`third_party/fonts/`](third_party/fonts/).
-
-### Audio
-
-The adhan and takbir sounds come from **"Adhan Recordings from Doha, Qatar"** on the Internet Archive, marked [Public Domain Mark 1.0](https://creativecommons.org/publicdomain/mark/1.0/). The takbir is a shortened excerpt of the same recording. Source: https://archive.org/details/adhan.recordings.from.doha.qatar (accessed 2026-11-07). Details: [`third_party/audio/ADHAN-NOTICE.txt`](third_party/audio/ADHAN-NOTICE.txt).
-
-Ayah-by-ayah recitation is streamed from EveryAyah (everyayah.com).
-
-### Data and libraries
-
-- **Prayer times:** the `adhan2` library, with an optional AlAdhan API mode (aladhan.com).
-- **Translations:** the [Free Quran API](https://github.com/fawazahmed0/quran-api) by Fawaz Ahmed (Unlicense), through the jsDelivr CDN. Each translation keeps its own translator's or publisher's copyright.
-- **Libraries:** listed in `app/build.gradle.kts`, each under its own license.
-
-### Logo
-
-The Iman logo and icons are original artwork created for this project.
+- **Original project:** [Khushu](https://github.com/greykaizen/khushu), GPLv3. Iman is a modified version (2026), independent, and not affiliated with Khushu.
+- **IndoPak Quran text and font:** [QuranWBW.com](https://www.QuranWBW.com), used with prior written permission, for Quran text only. Terms: [`QuranWBW-NOTICE.txt`](third_party/fonts/QuranWBW-NOTICE.txt).
+- **Uthmani Quran text and font:** King Fahd Glorious Quran Printing Complex (KFGQPC), via the [Quranic Universal Library](https://qul.tarteel.ai/). Terms: [`QPC-HAFS-NOTICE.txt`](third_party/fonts/QPC-HAFS-NOTICE.txt).
+- **Translations:** [QuranEnc.com](https://quranenc.com) (bundled English and Indonesian editions, re-published under its terms). Downloadable translations from the [Free Quran API](https://github.com/fawazahmed0/quran-api) by Fawaz Ahmed. Each translation keeps its own copyright.
+- **Fonts:** Noto Sans Arabic and Plus Jakarta Sans, under the SIL Open Font License 1.1.
+- **Audio:** adhan and takbir from the [Internet Archive](https://archive.org/details/adhan.recordings.from.doha.qatar), marked [Public Domain Mark 1.0](https://creativecommons.org/publicdomain/mark/1.0/). Ayah audio streamed from [EveryAyah](https://everyayah.com).
+- **Prayer times:** [adhan2](https://github.com/batoulapps/adhan-kotlin) library, and optional [AlAdhan](https://aladhan.com) API.
+- **Logo:** original artwork created for this project.
 
 ## Building
 

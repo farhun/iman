@@ -12,10 +12,8 @@ Source and terms of everything in Iman that was not written for this project. Th
 | Plus Jakarta Sans (font) | Tokotype / Google Fonts | SIL Open Font License 1.1 | `fonts/PlusJakartaSans-OFL.txt` |
 | `adhan.mp3`, `takbir.mp3` | Internet Archive, "Adhan Recordings from Doha, Qatar" | Public Domain Mark 1.0 | `audio/ADHAN-NOTICE.txt` |
 | Ayah audio | EveryAyah (everyayah.com) | Streamed, not bundled. See the site's terms | |
-| Translations | Free Quran API by Fawaz Ahmed, via jsDelivr | Repository under the Unlicense. Each translation keeps its translator's or publisher's copyright | |
+| Translations (downloadable) | Free Quran API by Fawaz Ahmed, via jsDelivr | Repository under the Unlicense. Each translation keeps its translator's or publisher's copyright | |
+| Bundled translation: English | QuranEnc.com, Markaz Noor International, version 1.1.2 (24/06/2025) | Re-published under the QuranEnc.com terms. Content unchanged | `res/raw/notice_quranenc_en.txt` |
+| Bundled translation: Indonesian | QuranEnc.com, Kementerian Agama Republik Indonesia, version 1.0.1 (23/06/2025) | Re-published under the QuranEnc.com terms. Content unchanged | `res/raw/notice_quranenc_id.txt` |
 | Prayer-time API (some conventions) | AlAdhan (aladhan.com) | See the service's terms. Your coordinates are sent to it in this mode | |
 | Libraries (`adhan2`, Jetpack Compose, Room, Media3, and others) | `app/build.gradle.kts` | Each library's own license | |
-
-The OFL licenses require each font's copyright and license text to travel with it. The app shows them under Settings > About > Credits.
-
-When you add a font, sound, image, or data file from someone else, add a row here and a notice file next to it.
